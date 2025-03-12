@@ -43,10 +43,10 @@ const HomePage = () => {
 
     return (
         <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
-            <div className='max-w-7xl mx-auto space-y-1 mt-10'>
-                <div className='flex gap-2'>
+            <div className='px-16 mx-auto space-y-1 mt-10'>
+                <div className='flex justify-between gap-2'>
                     <Sidebar />
-                    <div className="flex-grow">
+                    <div className="w-[70%]">
                         <SortingOptions onSortChange={handleSortChange} />
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
                             {currentItems.map(product => (

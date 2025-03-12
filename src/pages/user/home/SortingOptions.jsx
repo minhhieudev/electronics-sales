@@ -24,13 +24,13 @@ const SortingOptions = ({ onSortChange }) => {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center justify-between mt-7 w-full">
-            <div className='font-bold text-[24px]'>
+        <div className="flex flex-col md:flex-row items-center justify-between mt-7 w-full">
+            <div className='font-bold text-[24px] mb-2 md:mb-0'>
                 Tất cả sản phẩm
             </div>
-            <div className='flex justify-between gap-3 items-center text-[16px] col-span-1 md:col-span-1'>
+            <div className='flex items-center gap-3 text-[16px]'>
                 <span className='font-semibold'>Sắp xếp theo</span>
-                <div className='flex gap-4 justify-between'>
+                <div className='flex gap-4'>
                     {SORT_OPTIONS.map((sortType) => (
                         <button
                             key={sortType.value}

@@ -44,11 +44,11 @@ const HomePage = () => {
     return (
         <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
             <div className='px-16 mx-auto space-y-1 mt-10'>
-                <div className='flex justify-between gap-2'>
+                <div className='flex gap-16'>
                     <Sidebar />
-                    <div className="w-[70%]">
+                    <div className="">
                         <SortingOptions onSortChange={handleSortChange} />
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-4 w-full">
                             {currentItems.map(product => (
                                 <div key={product.id}>
                                     <ProductItem

@@ -24,18 +24,18 @@ const SortingOptions = ({ onSortChange }) => {
     };
 
     return (
-        <div className="flex gap-4 items-center justify-between mt-7">
+        <div className="flex gap-4 items-center justify-between mt-7 w-full">
             <div className='font-bold text-[24px]'>
                 Tất cả sản phẩm
             </div>
-            <div className='flex justify-between gap-4 items-center text-[16px]'>
-                <span className='font-bold'>Sắp xếp theo</span>
-                <div className='flex gap-2 text-gray-600 font-bold'>
+            <div className='flex justify-between gap-3 items-center text-[16px]'>
+                <span className='font-semibold'>Sắp xếp theo</span>
+                <div className='flex gap-4 justify-between bg-white'>
                     {SORT_OPTIONS.map((sortType) => (
                         <button
                             key={sortType.value}
                             onClick={() => handleSortChange(sortType.value)}
-                            className={`border rounded px-3 py-1 flex items-center ${selectedSort === sortType.value ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
+                            className={`border rounded px-2 py-1 flex items-center ${selectedSort === sortType.value ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
                         >
                             {sortType.label}
                         </button>
@@ -43,10 +43,10 @@ const SortingOptions = ({ onSortChange }) => {
                     <div className="relative">
                         <button
                             onClick={() => setShowDropdown(!showDropdown)}
-                            className={`border rounded px-3 py-1 flex items-center ${selectedSort.startsWith('price') || showDropdown ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
+                            className={`w-[95px] border rounded px-3 py-1 flex justify-between items-center ${selectedSort.startsWith('price') || showDropdown ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
                         >
                             Giá
-                            <AiOutlineDown className="h-4 w-3 cursor-pointer ml-3" />
+                            <AiOutlineDown className="h-4 w-3 cursor-pointer" />
                         </button>
                         {showDropdown && (
                             <div className="absolute bg-white border border-gray-300 rounded mt-1 z-10 w-18">

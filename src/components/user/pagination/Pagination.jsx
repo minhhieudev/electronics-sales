@@ -8,7 +8,7 @@ function Pagination({
   onChange = (e) => {},
 }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between my-3">
       <div className="flex items-center">
         <ReactPaginate
           previousLabel={

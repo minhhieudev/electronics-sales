@@ -42,7 +42,7 @@ const Header = () => {
     };
 
     return (
-        <header className="flex items-center justify-between px-10 py-1 bg-white shadow-md h-[90px]">
+        <header className="flex items-center justify-between px-16 py-1 bg-white shadow-md h-[90px]">
             <div className="flex items-center gap-2 flex-grow">
                 <img src={logo} alt="logo" className="h-14 w-16" />
                 <div className="flex-grow mt-1">
@@ -56,8 +56,8 @@ const Header = () => {
                             <AiOutlineSearch className="h-8 w-6" />
                         </button>
                     </div>
-                    <div className="mt-2 font-semibold">
-                        <ul className="text-[14px] flex gap-2 text-gray-400">
+                    <div className="mt-2">
+                        <ul className="text-[14px] flex gap-2 text-gray-500">
                             <li>Điện thoại</li>
                             <li>Máy tính</li>
                             <li>Đồng hồ</li>
@@ -115,7 +115,7 @@ const Header = () => {
                             <AiOutlineEnvironment className="h-4 w-4" />
                             <span className="text-gray-400">Địa chỉ của bạn:</span>
                         </div>
-                        <span className="font-semibold">{userInfo.address || 'Chưa cập nhật địa chỉ !'}</span>
+                        <span className="text-black">{userInfo.address || 'Chưa cập nhật địa chỉ !'}</span>
                     </div>
                 ) : (
                     <div></div>

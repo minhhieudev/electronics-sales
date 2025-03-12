@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { CONST } from '../../../common/const';
 import Pagination from "../../../components/user/pagination/Pagination";
+import Sidebar from './Categories';
 import data from './data';
 import ProductItem from './ProductItem';
-import Sidebar from './Categories';
 import SortingOptions from './SortingOptions';
-import { CONST } from '../../../common/const';
 
 const ITEMS_PER_PAGE = CONST.ITEMS_PER_PAGE;
 
@@ -43,12 +43,14 @@ const HomePage = () => {
 
     return (
         <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
-            <div className='px-16 mx-auto space-y-1 mt-10'>
-                <div className='flex gap-16'>
-                    <Sidebar />
-                    <div className="">
+            <div className='px-4 md:px-16 mx-auto space-y-1 mt-10'>
+                <div className='grid grid-cols-1 md:grid-cols-4 gap-20'>
+                    <div className="col-span-1">
+                        <Sidebar />
+                    </div>
+                    <div className="col-span-3">
                         <SortingOptions onSortChange={handleSortChange} />
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-4 w-full">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4 w-full">
                             {currentItems.map(product => (
                                 <div key={product.id}>
                                     <ProductItem
@@ -71,7 +73,6 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

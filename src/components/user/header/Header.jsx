@@ -37,20 +37,20 @@ const Header = () => {
         if (!isLogin) {
             navigate('/auth');
         } else {
-            alert('Chưa xử lý :)')
+            alert('Chưa xử lý :)');
         }
     };
 
     return (
-        <header className="flex items-center justify-between px-16 py-1 bg-white shadow-md h-[90px]">
-            <div className="flex items-center gap-2 flex-grow">
+        <header className="grid grid-cols-3 items-center px-16 py-1 bg-white shadow-md h-[90px]">
+            <div className="flex items-center gap-2 col-span-1">
                 <img src={logo} alt="logo" className="h-14 w-16" />
                 <div className="flex-grow mt-1">
                     <div className="flex p-[1px] text-sm w-[742px] h-[48px] gap-1 rounded-md border-2 border-[#FF8900]">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"
-                            className=" p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                            className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
                         />
                         <button className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center">
                             <AiOutlineSearch className="h-8 w-6" />
@@ -65,7 +65,7 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className='flex flex-col justify-between h-full pt-3 pb-2'>
+            <div className='flex flex-col justify-between h-full col-span-2 pt-3 pb-2'>
                 <div className="flex justify-end items-center gap-4">
                     {userInfo ? (
                         <div className="flex gap-1 items-center relative">

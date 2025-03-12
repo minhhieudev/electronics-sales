@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import Pagination from "../../../components/user/pagination/Pagination";
 import data from './data';
 import ProductItem from './ProductItem';
-import Sidebar from './SideBar';
+import Sidebar from './Categories';
 import SortingOptions from './SortingOptions';
+import { CONST } from '../../../common/const';
 
-// Number of items to display per page
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = CONST.ITEMS_PER_PAGE;
 
 const HomePage = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +42,7 @@ const HomePage = () => {
     const currentItems = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
-        <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3]">
+        <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
             <div className='max-w-7xl mx-auto space-y-1 mt-10'>
                 <div className='flex gap-2'>
                     <Sidebar />

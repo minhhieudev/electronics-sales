@@ -12,3 +12,9 @@ const MESSAGES = {
 };
 
 export default MESSAGES;
+
+const CONST = {
+    ITEMS_PER_PAGE: 12,
+};
+
+export { CONST };

@@ -42,17 +42,17 @@ const Header = () => {
     };
 
     return (
-        <header className="grid grid-cols-6 items-center px-16 py-1 bg-white shadow-md h-[90px]">
+        <header className="grid grid-cols-6 items-center px-4 py-1 h-20">
             <div className="flex items-center gap-2 col-span-4">
-                <img src={logo} alt="logo" className="h-14 w-16" />
+                <img src={logo} alt="logo" className="h-14 w-16 shrink-0" />
                 <div className="flex-grow mt-1">
-                    <div className="flex p-[1px] text-sm h-[48px] gap-1 rounded-md border-2 border-[#FF8900] w-full">
+                    <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] w-[600px]">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"
                             className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
                         />
-                        <button className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center">
+                        <button className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0">
                             <AiOutlineSearch className="h-8 w-6" />
                         </button>
                     </div>

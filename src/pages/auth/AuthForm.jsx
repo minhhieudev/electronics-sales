@@ -21,51 +21,48 @@ const AuthForm = () => {
         }
     }, [dispatch]);
 
-    const toggleForm = (e) => {
+    const toggleForm = () => {
         setIsLogin(!isLogin);
     };
 
     return (
-        <div className="flex flex-col items-center justify-start p-4 min-h-[100vh]">
-            <h1 className="absolute text-2xl text-center font-bold mb-2 text-[#FF8900]">shoplogo</h1>
-            <div className="absolute inset-0 bg-cover bg-center m-auto"
-                style={{
-                    backgroundImage: `url(${bgimage})`,
-                    height: '416px',
-                    width: '665px',
-                }}
-            >
-            </div>
-            <div className={`relative bg-white p-6 rounded shadow-lg text-[12px] font-semibold z-10 w-[376px] ${isLogin ? 'h-[510px]' : 'h-[613px] top-4'} m-auto`}>
-                {isLogin ? (
-                    <LoginForm />
-                ) : (
-                    <RegisterForm />
-                )}
-                <div className="flex items-center my-2">
-                    <div className="flex-grow border-t border-gray-300"></div>
-                    <span className="mx-2 px-3 text-gray-400">Hoặc</span>
-                    <div className="flex-grow border-t border-gray-300"></div>
-                </div>
-                <div className="flex items-center text-[16px] justify-center">
-                    <button className="flex h-12 font-bold justify-center items-center bg-[#F2F4F5] w-full border border-gray-300 rounded">
-                        <img src={googleIcon} alt="Google" className="mr-1 h-6 w-6" />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="w-[1000px] h-[700px] relative flex items-center justify-center">
+                <h1 className="absolute top-8 text-2xl font-bold text-[#FF8900] z-20">shoplogo</h1>
+                
+                <div className="absolute w-[665px] h-[416px] bg-cover bg-center"
+                    style={{
+                        backgroundImage: `url(${bgimage})`
+                    }}
+                />
+
+                <div className={`relative bg-white p-5 rounded-lg shadow-lg w-[350px] 
+                    ${isLogin ? 'h-[460px]' : 'h-[560px]'} z-10`}>
+                    {isLogin ? <LoginForm /> : <RegisterForm />}
+
+                    <div className="flex items-center my-2">
+                        <div className="flex-grow border-t border-gray-300"></div>
+                        <span className="mx-2 text-gray-400 text-xs">Hoặc</span>
+                        <div className="flex-grow border-t border-gray-300"></div>
+                    </div>
+
+                    <button className="flex h-9 text-sm font-bold justify-center items-center bg-[#F2F4F5] w-full border border-gray-300 rounded">
+                        <img src={googleIcon} alt="Google" className="mr-2 h-4 w-4" />
                         Tiếp tục với Google
                     </button>
-                </div>
-                <p className="text-center font-semibold mt-3">
-                    {isLogin ? 'Bạn chưa có tài khoản?' : 'Bạn đã có tài khoản?'}
-                    <button onClick={toggleForm} className="text-[#FF8900] ml-1">
-                        {isLogin ? 'Đăng ký' : 'Đăng nhập'}
-                    </button>
-                </p>
-                <div className="text-[12px] text-gray-400 mt-4 text-center">
-                    <span className=" mt-6 text-justify">
-                        Bằng việc tiếp tục, bạn đã đồng ý với <span className='font-bold'>Điều khoản dịch vụ</span> của HPQ và xác nhận đã đọc và hiểu <span className='font-bold'>Chính sách về quyền riêng tư</span> của chúng tôi,
-                    </span>
-                    <span>
+
+                    <p className="text-center text-xs font-semibold mt-3">
+                        {isLogin ? 'Bạn chưa có tài khoản?' : 'Bạn đã có tài khoản?'}
+                        <button onClick={toggleForm} className="text-[#FF8900] ml-1">
+                            {isLogin ? 'Đăng ký' : 'Đăng nhập'}
+                        </button>
+                    </p>
+
+                    <div className="text-[10px] text-gray-400 mt-3 text-center leading-tight">
+                        Bằng việc tiếp tục, bạn đã đồng ý với <span className="font-bold">Điều khoản dịch vụ</span> của HPQ 
+                        và xác nhận đã đọc và hiểu <span className="font-bold">Chính sách về quyền riêng tư</span> của chúng tôi, 
                         cũng như bạn đã đủ 13 tuổi.
-                    </span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -24,18 +24,18 @@ const SortingOptions = ({ onSortChange }) => {
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-between mt-7 w-full">
-            <div className='font-bold text-[24px] mb-2 md:mb-0'>
+        <div className="flex items-center justify-between mb-6">
+            <div className='font-bold text-[24px]'>
                 Tất cả sản phẩm
             </div>
             <div className='flex items-center gap-3 text-[16px]'>
-                <span className='font-semibold'>Sắp xếp theo</span>
+                <span className='font-semibold whitespace-nowrap'>Sắp xếp theo</span>
                 <div className='flex gap-4'>
                     {SORT_OPTIONS.map((sortType) => (
                         <button
                             key={sortType.value}
                             onClick={() => handleSortChange(sortType.value)}
-                            className={`border bg-white rounded px-2 py-1 flex items-center ${selectedSort === sortType.value ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
+                            className={`border bg-white rounded px-2 py-1 flex items-center whitespace-nowrap ${selectedSort === sortType.value ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'}`}
                         >
                             {sortType.label}
                         </button>

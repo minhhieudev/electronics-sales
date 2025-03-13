@@ -16,7 +16,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="mt-3 bg-opacity-20 py-4 px-0 text-base">
+    <div className="bg-opacity-20 py-4 px-0 text-base">
       <h2 className="text-sm mb-4 text-gray-500">DANH MỤC</h2>
       <ul className="space-y-2 ">
         {categories.map((category, index) => (

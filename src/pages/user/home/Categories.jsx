@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AiOutlineRight } from 'react-icons/ai';
 
-const Sidebar = () => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
+const Sidebar = ({ selectedIndex, setSelectedIndex }) => {
   const categories = [
     "Tất cả sản phẩm",
     "Điện thoại / Tablet",
@@ -17,19 +15,27 @@ const Sidebar = () => {
 
   return (
     <div className="bg-opacity-20 py-4 px-0 text-base">
-      <h2 className="text-sm mb-4 text-gray-500">DANH MỤC</h2>
-      <ul className="space-y-2 ">
+      <h2 className="text-sm mb-4 text-gray-500 uppercase font-semibold">Danh mục</h2>
+      <ul className="space-y-1">
         {categories.map((category, index) => (
-          <div
-            className='flex justify-between items-center font-bold py-2 cursor-pointer'
+          <li
             key={index}
+            className={`flex justify-between items-center py-2 px-1 cursor-pointer rounded hover:bg-gray-50 ${
+              selectedIndex === index ? "text-[#FF8900]" : "text-gray-700"
+            }`}
             onClick={() => setSelectedIndex(index)}
           >
-            <li className={selectedIndex === index ? "text-[#FF8900]" : ""}>{category}</li>
+            <span className={`text-sm md:text-base font-medium truncate pr-2 ${
+              selectedIndex === index ? "font-semibold" : ""
+            }`}>
+              {category}
+            </span>
             <AiOutlineRight
-              className={`h-3 w-3 cursor-pointer ${selectedIndex === index ? "text-[#FF8900]" : "text-gray-400"}`}
+              className={`h-3 w-3 flex-shrink-0 ${
+                selectedIndex === index ? "text-[#FF8900]" : "text-gray-400"
+              }`}
             />
-          </div>
+          </li>
         ))}
       </ul>
     </div>

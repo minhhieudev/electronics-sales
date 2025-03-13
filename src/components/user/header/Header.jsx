@@ -1,19 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineDown, AiOutlineEnvironment, AiOutlineLogout, AiOutlineSearch, AiOutlineShoppingCart, AiOutlineUser } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import avatar from '../../../Images/avatar.png';
 import logo from '../../../Images/logo.png';
 import { logout } from '../../../app/redux/slices/auth.slice';
 
 const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showSearchBar, setShowSearchBar] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const userInfo = useSelector((state) => state.auth.userInfo);
     const isLogin = useSelector((state) => state.auth.isLogin);
+
+    // Đề xuất tìm kiếm
+    const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -41,58 +46,174 @@ const Header = () => {
         }
     };
 
+    const toggleSearchBar = () => {
+        setShowSearchBar(!showSearchBar);
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        // Xử lý tìm kiếm
+        console.log("Searching for:", searchTerm);
+        // navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        setSearchTerm(suggestion);
+        // Có thể tự động submit form tìm kiếm
+        // handleSearch({ preventDefault: () => {} });
+    };
+
     return (
-        <header className="grid grid-cols-6 items-center px-4 md:px-16 py-1 h-20">
-            <div className="flex items-center gap-2 col-span-4">
-                <img src={logo} alt="logo" className="h-14 w-16 shrink-0" />
-                <div className="flex-grow mt-1">
-                    <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] max-w-[600px]">
+        <header className="relative">
+            {/* Desktop Header */}
+            <div className="hidden md:grid grid-cols-12 items-center px-4 lg:px-16 py-1 h-20">
+                {/* Logo */}
+                <div className="col-span-2 lg:col-span-1">
+                    <Link to="/" className="block">
+                        <img src={logo} alt="logo" className="h-14 w-16 shrink-0" />
+                    </Link>
+                </div>
+                
+                {/* Search */}
+                <div className="col-span-6 lg:col-span-7">
+                    <form onSubmit={handleSearch} className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] max-w-[600px]">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"
                             className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0">
+                        <button
+                            type="submit"
+                            className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0"
+                        >
                             <AiOutlineSearch className="h-8 w-6" />
                         </button>
-                    </div>
+                    </form>
                     <div className="mt-2">
                         <ul className="text-[14px] flex gap-2 text-gray-500">
-                            <li>Điện thoại</li>
-                            <li>Máy tính</li>
-                            <li>Đồng hồ</li>
+                            {searchSuggestions.map((suggestion, index) => (
+                                <li
+                                    key={index}
+                                    className="cursor-pointer hover:text-[#FF8900]"
+                                    onClick={() => handleSuggestionClick(suggestion)}
+                                >
+                                    {suggestion}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
-            </div>
-            <div className='flex flex-col justify-between h-full col-span-2 pt-3 pb-2'>
-                <div className="flex justify-end items-center gap-4">
-                    {userInfo ? (
-                        <div className="flex gap-1 items-center relative">
-                            <div className='flex items-center gap-1'>
-                                <img src={avatar} alt="avatar" className="h-7" />
-                                <span className="text-base font-bold mr-4">{userInfo.fullName}</span>
+                
+                {/* User Info & Cart */}
+                <div className="col-span-4 flex flex-col items-end">
+                    <div className="flex items-center gap-4">
+                        {userInfo ? (
+                            <div className="flex gap-1 items-center relative">
+                                <div className='flex items-center gap-1'>
+                                    <img src={avatar} alt="avatar" className="h-7 w-7 rounded-full" />
+                                    <span className="text-base font-bold hidden lg:inline">{userInfo.fullName}</span>
+                                </div>
+                                <AiOutlineDown
+                                    className="h-4 cursor-pointer"
+                                    onClick={() => setShowDropdown(!showDropdown)}
+                                />
+                                {showDropdown && (
+                                    <div ref={dropdownRef} className="absolute top-full right-[-10px] mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
+                                        <div className="absolute -top-2 right-6 w-4 h-4 rotate-45 bg-white border shadow-lg z-0"></div>
+                                        <div className="relative bg-white rounded-lg z-10">
+                                            <div className="py-2 font-semibold">
+                                                <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                                    <div className="flex gap-1 items-center">
+                                                        <AiOutlineUser className="h-4 text-black" />
+                                                        <span className="text-sm">Tài khoản của tôi</span>
+                                                    </div>
+                                                </Link>
+                                                <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
+                                                    <div className="flex gap-1 items-center">
+                                                        <AiOutlineLogout className="h-4 text-black" />
+                                                        <span className="text-sm">Đăng xuất</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <AiOutlineDown
-                                className="h-4 cursor-pointer"
+                        ) : (
+                            <Link to="/auth" className="bg-[#FF8900] text-[12px] text-white p-2 rounded whitespace-nowrap">
+                                Đăng nhập
+                            </Link>
+                        )}
+                        <div className="relative" onClick={handleCartClick}>
+                            <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
+                            <AiOutlineShoppingCart className="h-6 w-6 cursor-pointer" />
+                        </div>
+                    </div>
+                    {userInfo && (
+                        <div className="mt-2 flex items-center text-xs lg:text-sm">
+                            <div className='flex items-center gap-1'>
+                                <AiOutlineEnvironment className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
+                                <span className="text-gray-400 whitespace-nowrap">Địa chỉ:</span>
+                            </div>
+                            <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">{userInfo.address || 'Chưa cập nhật'}</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Mobile Header */}
+            <div className="md:hidden flex items-center justify-between px-4 py-2 h-16">
+                <Link to="/" className="flex items-center">
+                    <img src={logo} alt="logo" className="h-10 w-12" />
+                </Link>
+                
+                <div className="flex items-center gap-3">
+                    <button onClick={toggleSearchBar} className="p-1">
+                        <AiOutlineSearch className="h-6 w-6 text-gray-700" />
+                    </button>
+                    
+                    <div className="relative" onClick={handleCartClick}>
+                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
+                        <AiOutlineShoppingCart className="h-6 w-6 text-gray-700" />
+                    </div>
+                    
+                    {userInfo ? (
+                        <div className="relative">
+                            <img 
+                                src={avatar} 
+                                alt="avatar" 
+                                className="h-8 w-8 rounded-full cursor-pointer"
                                 onClick={() => setShowDropdown(!showDropdown)}
                             />
                             {showDropdown && (
-                                <div ref={dropdownRef} className="absolute top-full right-[-10px] mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
-                                    <div className="absolute -top-2 right-6 w-4 h-4 rotate-45 bg-white border shadow-lg z-0"></div>
-                                    <div className="relative bg-white rounded-lg z-10">
-                                        <div className="py-2 font-semibold">
-                                            <a href="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                                <div className="flex gap-1 items-center">
-                                                    <AiOutlineUser className="h-4 text-black" />
-                                                    <span className="text-sm">Tài khoản của tôi</span>
-                                                </div>
-                                            </a>
-                                            <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
-                                                <div className="flex gap-1 items-center">
-                                                    <AiOutlineLogout className="h-4 text-black" />
-                                                    <span className="text-sm">Đăng xuất</span>
-                                                </div>
+                                <div ref={dropdownRef} className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10">
+                                    <div className="p-3 border-b">
+                                        <div className="flex items-center gap-2">
+                                            <img src={avatar} alt="avatar" className="h-8 w-8 rounded-full" />
+                                            <div>
+                                                <p className="font-bold text-sm">{userInfo.fullName}</p>
+                                                <p className="text-xs text-gray-500 truncate max-w-[150px]">{userInfo.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-2 flex items-center gap-1 text-xs">
+                                            <AiOutlineEnvironment className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                                            <span className="text-gray-500 flex-shrink-0">Địa chỉ:</span>
+                                            <span className="text-gray-700 truncate max-w-[150px]">{userInfo.address || 'Chưa cập nhật'}</span>
+                                        </div>
+                                    </div>
+                                    <div className="py-2 font-semibold">
+                                        <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                            <div className="flex gap-2 items-center">
+                                                <AiOutlineUser className="h-5 w-5 text-gray-600" />
+                                                <span className="text-sm">Tài khoản của tôi</span>
+                                            </div>
+                                        </Link>
+                                        <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
+                                            <div className="flex gap-2 items-center">
+                                                <AiOutlineLogout className="h-5 w-5 text-gray-600" />
+                                                <span className="text-sm">Đăng xuất</span>
                                             </div>
                                         </div>
                                     </div>
@@ -100,27 +221,51 @@ const Header = () => {
                             )}
                         </div>
                     ) : (
-                        <a href="/auth" className="bg-[#FF8900] text-[12px] text-white p-2 rounded">
+                        <Link to="/auth" className="bg-[#FF8900] text-[12px] text-white px-2 py-1 rounded">
                             Đăng nhập
-                        </a>
+                        </Link>
                     )}
-                    <div className="relative" onClick={handleCartClick}>
-                        <span className="absolute bottom-4 right-0 text-[#FF8900] rounded-full text-[12px] px-1 font-bold">99+</span>
-                        <AiOutlineShoppingCart className="h-6 w-10 cursor-pointer" />
+                </div>
+            </div>
+
+            {/* Mobile Search Bar (Expandable) */}
+            {showSearchBar && (
+                <div className="md:hidden px-4 py-2 bg-white border-t border-gray-200">
+                    <form onSubmit={handleSearch}>
+                        <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900]">
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm sản phẩm"
+                                className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                            />
+                            <button
+                                type="submit"
+                                className="bg-[#FF8900] text-white p-2 rounded w-12 flex items-center justify-center shrink-0"
+                            >
+                                <AiOutlineSearch className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </form>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {searchSuggestions.map((suggestion, index) => (
+                            <span
+                                key={index}
+                                className="text-sm text-gray-500 cursor-pointer hover:text-[#FF8900]"
+                                onClick={() => {
+                                    handleSuggestionClick(suggestion);
+                                    // Tự động submit form sau khi chọn đề xuất trên mobile
+                                    setTimeout(() => handleSearch({ preventDefault: () => { } }), 100);
+                                }}
+                            >
+                                {suggestion}
+                            </span>
+                        ))}
                     </div>
                 </div>
-                {userInfo ? (
-                    <div className="flex text-sm gap-1">
-                        <div className='flex gap-1 items-center'>
-                            <AiOutlineEnvironment className="h-4 w-4" />
-                            <span className="text-gray-400">Địa chỉ của bạn:</span>
-                        </div>
-                        <span className="text-black">{userInfo.address || 'Chưa cập nhật địa chỉ !'}</span>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-            </div>
+            )}
         </header>
     );
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { AiOutlineDown } from 'react-icons/ai';
+import React, { useState, useEffect } from 'react';
+import { AiOutlineDown, AiOutlineCheck } from 'react-icons/ai';
 
 const SORT_OPTIONS = [
     { value: 'popular', label: 'Phổ biến' },
@@ -7,107 +7,115 @@ const SORT_OPTIONS = [
     { value: 'best-selling', label: 'Bán chạy' }
 ];
 
-const SortingOptions = ({ onSortChange }) => {
-    const [sortOption, setSortOption] = useState({
-        popular: false,
-        newest: false,
-        bestSelling: false,
-        price: ''
-    });
+const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
+    const [selectedOption, setSelectedOption] = useState(currentSort || '');
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
 
-    const handleButtonClick = (option) => {
-        // Reset 
-        const newSortOption = {
-            popular: false,
-            newest: false,
-            bestSelling: false,
-            price: ''
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
         };
 
-        switch (option) {
-            case 'popular':
-                newSortOption.popular = true;
-                break;
-            case 'newest':
-                newSortOption.newest = true;
-                break;
-            case 'best-selling':
-                newSortOption.bestSelling = true;
-                break;
-            default:
-                break;
-        }
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-        setSortOption(newSortOption);
-        onSortChange(option);
+    useEffect(() => {
+        setSelectedOption(currentSort || '');
+    }, [currentSort]);
+
+    const handleButtonClick = (option) => {
+        if (selectedOption === option) {
+            setSelectedOption('');
+            onSortChange('');
+        } else {
+            setSelectedOption(option);
+            onSortChange(option);
+        }
     };
 
     const handlePriceSelectChange = (e) => {
         const value = e.target.value;
-
-        const newSortOption = {
-            popular: false,
-            newest: false,
-            bestSelling: false,
-            price: value
-        };
-
-        setSortOption(newSortOption);
-
         if (value) {
+            setSelectedOption(`price-${value}`);
             onSortChange(`price-${value}`);
+        } else {
+            setSelectedOption('');
+            onSortChange('');
         }
     };
 
-    return (
-        <div className="flex items-center justify-between mb-6">
-            <div className='font-bold text-[24px]'>
-                Tất cả sản phẩm
+    if (isMobile) {
+        return (
+            <div className="flex flex-col">
+                <div className="relative">
+                    <select
+                        value={selectedOption}
+                        onChange={(e) => handleButtonClick(e.target.value)}
+                        className={`w-full py-2 px-3 text-sm appearance-none cursor-pointer focus:outline-none rounded-md border ${
+                            selectedOption ? 'text-[#FF8900] border-[#FF8900] bg-orange-50 font-medium' : 'text-gray-700 border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                        <option value="">Chọn phương thức sắp xếp</option>
+                        {SORT_OPTIONS.map((sortType) => (
+                            <option key={sortType.value} value={sortType.value}>
+                                {sortType.label}
+                            </option>
+                        ))}
+                        <option value="price-asc">Giá tăng dần</option>
+                        <option value="price-desc">Giá giảm dần</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                        <AiOutlineDown className="h-4 w-4 text-gray-400" />
+                    </div>
+                </div>
             </div>
-            <div className='flex items-center gap-3 text-[16px]'>
-                <span className='font-semibold whitespace-nowrap'>Sắp xếp theo</span>
-                <div className='flex gap-4'>
+        );
+    }
+
+    // Desktop version
+    return (
+        <div className="p-2">
+            <div className="flex items-center flex-wrap justify-end">
+                <span className="font-medium text-base text-gray-700 whitespace-nowrap mr-3">
+                    Sắp xếp theo
+                </span>
+                
+                <div className="flex flex-wrap gap-2">
                     {SORT_OPTIONS.map((sortType) => {
-                        const isSelected = sortOption[sortType.value === 'best-selling' ? 'bestSelling' : sortType.value];
+                        const isSelected = selectedOption === sortType.value;
                         return (
                             <button
                                 key={sortType.value}
                                 onClick={() => handleButtonClick(sortType.value)}
-                                className={`border bg-white rounded px-2 py-1 flex items-center whitespace-nowrap ${isSelected ? 'border-[#FF8900] text-[#FF8900]' : 'border-gray-300'
-                                    }`}
+                                className={`border rounded-md px-3 py-1.5 flex items-center justify-center whitespace-nowrap text-sm transition-all ${
+                                    isSelected 
+                                        ? 'border-[#FF8900] text-[#FF8900] bg-orange-50 font-medium' 
+                                        : 'border-gray-300 bg-white hover:bg-gray-50'
+                                }`}
                             >
                                 {sortType.label}
                             </button>
                         );
                     })}
-                    <div className="relative">
+                    
+                    <div className="relative" style={{ minWidth: '90px' }}>
                         <select
-                            value={sortOption.price}
+                            value={selectedOption.startsWith('price-') ? selectedOption.replace('price-', '') : ''}
                             onChange={handlePriceSelectChange}
-                            className={`bg-white border rounded px-3 py-1 pr-8 min-w-[120px] appearance-none cursor-pointer focus:outline-none ${
-                                sortOption.price ? 'border-[#FF8900]' : 'border-gray-300'
+                            className={`w-full bg-white border rounded-md px-3 py-1.5 pr-8 appearance-none cursor-pointer focus:outline-none text-sm transition-all ${
+                                selectedOption.startsWith('price-')
+                                    ? 'border-[#FF8900] text-[#FF8900] bg-orange-50 font-medium' 
+                                    : 'border-gray-300 hover:bg-gray-50'
                             }`}
-                            style={{
-                                color: sortOption.price ? '#FF8900' : 'inherit'
-                            }}
                         >
-                            <option value="" style={{ color: 'inherit' }}>Giá</option>
-                            <option 
-                                value="asc" 
-                                style={{ color: sortOption.price === 'asc' ? '#FF8900' : 'inherit' }}
-                            >
-                                Tăng dần
-                            </option>
-                            <option 
-                                value="desc" 
-                                style={{ color: sortOption.price === 'desc' ? '#FF8900' : 'inherit' }}
-                            >
-                                Giảm dần
-                            </option>
+                            <option value="">Giá</option>
+                            <option value="asc">Tăng dần</option>
+                            <option value="desc">Giảm dần</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-                            <AiOutlineDown className={`h-4 w-3 ${
-                                sortOption.price ? 'text-[#FF8900]' : 'text-gray-500'
+                            <AiOutlineDown className={`h-4 w-4 ${
+                                selectedOption.startsWith('price-') ? 'text-[#FF8900]' : 'text-gray-500'
                             }`} />
                         </div>
                     </div>

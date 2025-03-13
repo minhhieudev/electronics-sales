@@ -10,29 +10,29 @@ const ProductItem = ({ product }) => {
     };
 
     return (
-        <div className="flex flex-col cursor-pointer rounded-lg overflow-hidden" onClick={handleClick}>
-            <div className="aspect-w-1 aspect-h-1 w-full">
+        <div className="flex flex-col h-full cursor-pointer rounded-lg hover:shadow-md transition-shadow" onClick={handleClick}>
+            <div className="relative pt-[100%]"> {/* 1:1 aspect ratio */}
                 <img
                     src={image || defaultProduct}
                     alt={name}
-                    className="object-cover w-full h-full"
+                    className="absolute top-0 left-0 w-full h-full object-cover"
                 />
             </div>
-            <div className="p-3">
+            <div className="p-2 sm:p-3 flex flex-col flex-grow">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1">
-                        <span className="font-bold text-[#FF8900] text-base">{price.toLocaleString()}</span>
-                        <span className="text-base text-gray-400">đ</span>
+                        <span className="font-bold text-[#FF8900] text-sm sm:text-base">{price.toLocaleString()}</span>
+                        <span className="text-sm sm:text-base text-gray-400">đ</span>
                     </div>
-                    <span className="text-[#FF4943] text-[12px]">{discount}</span>
+                    <span className="text-[#FF4943] text-[10px] sm:text-[12px]">{discount}</span>
                 </div>
-                <h2 className="mt-2 text-base text-black line-clamp-2">{name}</h2>
-                <div className="flex items-center justify-between mt-2">
+                <h2 className="mt-1 sm:mt-2 text-sm sm:text-base text-black line-clamp-2 flex-grow">{name}</h2>
+                <div className="flex items-center justify-between mt-1 sm:mt-2">
                     <div className="flex items-center gap-1">
-                        <AiFillStar className="text-[#FF8900] h-5" />
-                        <span className="font-bold text-[12px]">4.9/5</span>
+                        <AiFillStar className="text-[#FF8900] h-4 sm:h-5" />
+                        <span className="font-bold text-[10px] sm:text-[12px]">4.9/5</span>
                     </div>
-                    <div className='flex gap-1 items-center text-gray-400 text-[12px] font-semibold'>
+                    <div className='flex gap-1 items-center text-gray-400 text-[10px] sm:text-[12px] font-semibold'>
                         <p>Đã bán</p>
                         <p>{sold}</p>
                     </div>

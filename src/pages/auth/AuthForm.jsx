@@ -29,7 +29,7 @@ const AuthForm = () => {
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
             <div className="w-full max-w-[1000px] min-h-[500px] relative flex items-center justify-center">
                 <h1 className="absolute -top-3 md:-top-6 text-2xl font-bold text-[#FF8900] z-30">shoplogo</h1>
-                
+
                 <div className="absolute w-[500px] h-[350px] md:w-[665px] md:h-[416px] bg-cover bg-center"
                     style={{
                         backgroundImage: `url(${bgimage})`
@@ -59,8 +59,8 @@ const AuthForm = () => {
                     </p>
 
                     <div className="text-[10px] text-gray-400 mt-3 text-center leading-tight">
-                        Bằng việc tiếp tục, bạn đã đồng ý với <span className="font-bold">Điều khoản dịch vụ</span> của HPQ 
-                        và xác nhận đã đọc và hiểu <span className="font-bold">Chính sách về quyền riêng tư</span> của chúng tôi, 
+                        Bằng việc tiếp tục, bạn đã đồng ý với <span className="font-bold">Điều khoản dịch vụ</span> của HPQ
+                        và xác nhận đã đọc và hiểu <span className="font-bold">Chính sách về quyền riêng tư</span> của chúng tôi,
                         cũng như bạn đã đủ 13 tuổi.
                     </div>
                 </div>

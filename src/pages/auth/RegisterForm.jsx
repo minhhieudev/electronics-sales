@@ -41,7 +41,7 @@ const RegisterForm = () => {
     return (
         <form onSubmit={handleRegister} className="w-full">
             <h1 className="text-base text-center font-bold mb-3">Đăng ký</h1>
-            
+
             <div className="mb-2">
                 <label className="block text-[11px] font-semibold mb-1" htmlFor="userName">
                     Tài khoản
@@ -107,9 +107,8 @@ const RegisterForm = () => {
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                         placeholder="Nhập lại mật khẩu ..."
-                        className={`h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px] ${
-                            passwordError ? 'border-red-500' : ''
-                        }`}
+                        className={`h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px] ${passwordError ? 'border-red-500' : ''
+                            }`}
                     />
                     <button
                         type="button"

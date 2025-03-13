@@ -1,9 +1,10 @@
 import React from 'react';
 import { AiFillStar } from 'react-icons/ai';
-import product from './product.png';
+import defaultProduct from './product.png';
 
-const ProductItem = ({ name, price, discount, sold, image }) => {
-    
+const ProductItem = ({ product }) => {
+    const { name, price, discount, sold, image } = product;
+
     const handleClick = () => {
         alert(`Bạn đã chọn sản phẩm: ${name}\nGiá: ${price.toLocaleString()} đ\nGiảm giá: ${discount}`);
     };
@@ -12,7 +13,7 @@ const ProductItem = ({ name, price, discount, sold, image }) => {
         <div className="flex flex-col cursor-pointer rounded-lg overflow-hidden" onClick={handleClick}>
             <div className="aspect-w-1 aspect-h-1 w-full">
                 <img
-                    src={image || product}
+                    src={image || defaultProduct}
                     alt={name}
                     className="object-cover w-full h-full"
                 />

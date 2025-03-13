@@ -40,10 +40,10 @@ const RegisterForm = () => {
 
     return (
         <form onSubmit={handleRegister} className="w-full">
-            <h1 className="text-xl text-center font-bold mb-4">Đăng ký</h1>
+            <h1 className="text-base text-center font-bold mb-3">Đăng ký</h1>
             
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="userName">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="userName">
                     Tài khoản
                 </label>
                 <input
@@ -52,12 +52,12 @@ const RegisterForm = () => {
                     value={formData.userName}
                     onChange={handleInputChange}
                     placeholder="Nhập tên đăng nhập ..."
-                    className="h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs"
+                    className="h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px]"
                 />
             </div>
 
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="fullName">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="fullName">
                     Họ và tên
                 </label>
                 <input
@@ -66,12 +66,12 @@ const RegisterForm = () => {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     placeholder="Nhập họ và tên ..."
-                    className="h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs"
+                    className="h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px]"
                 />
             </div>
 
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="passWord">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="passWord">
                     Mật khẩu
                 </label>
                 <div className="relative">
@@ -81,7 +81,7 @@ const RegisterForm = () => {
                         value={formData.passWord}
                         onChange={handleInputChange}
                         placeholder="Nhập mật khẩu ..."
-                        className="h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs"
+                        className="h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px]"
                     />
                     <button
                         type="button"
@@ -89,15 +89,15 @@ const RegisterForm = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ?
-                            <AiOutlineEyeInvisible className="w-4 h-4 text-gray-400" /> :
-                            <AiOutlineEye className="w-4 h-4 text-gray-400" />
+                            <AiOutlineEyeInvisible className="w-3.5 h-3.5 text-gray-400" /> :
+                            <AiOutlineEye className="w-3.5 h-3.5 text-gray-400" />
                         }
                     </button>
                 </div>
             </div>
 
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="confirmPassword">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="confirmPassword">
                     Xác nhận mật khẩu
                 </label>
                 <div className="relative">
@@ -107,7 +107,7 @@ const RegisterForm = () => {
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                         placeholder="Nhập lại mật khẩu ..."
-                        className={`h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs ${
+                        className={`h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px] ${
                             passwordError ? 'border-red-500' : ''
                         }`}
                     />
@@ -117,17 +117,17 @@ const RegisterForm = () => {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                         {showConfirmPassword ?
-                            <AiOutlineEyeInvisible className="w-4 h-4 text-gray-400" /> :
-                            <AiOutlineEye className="w-4 h-4 text-gray-400" />
+                            <AiOutlineEyeInvisible className="w-3.5 h-3.5 text-gray-400" /> :
+                            <AiOutlineEye className="w-3.5 h-3.5 text-gray-400" />
                         }
                     </button>
                 </div>
                 {passwordError && (
-                    <p className="text-red-500 text-[10px] mt-1">{passwordError}</p>
+                    <p className="text-red-500 text-[10px] mt-0.5">{passwordError}</p>
                 )}
             </div>
 
-            <button type="submit" className="w-full h-9 bg-[#FF8900] text-white font-bold rounded-md text-sm hover:bg-[#ff9920] transition-colors">
+            <button type="submit" className="w-full h-8 bg-[#FF8900] text-white font-bold rounded-md text-xs hover:bg-[#ff9920] transition-colors">
                 Đăng ký
             </button>
         </form>

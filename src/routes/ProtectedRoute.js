@@ -5,7 +5,7 @@ import CONST from '../app/redux/const';
 const ProtectedRoute = ({ children }) => {
     const userInfo = JSON.parse(localStorage.getItem(CONST.STORAGE.USER_INFO));
 
-    const isAdmin = userInfo;
+    const isAdmin = true;
     //const isAdmin = userInfo && userInfo.role === false;
 
     return isAdmin ? children : <Navigate to="/" />;

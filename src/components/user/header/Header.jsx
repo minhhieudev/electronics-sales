@@ -42,11 +42,11 @@ const Header = () => {
     };
 
     return (
-        <header className="grid grid-cols-6 items-center px-4 py-1 h-20">
+        <header className="grid grid-cols-6 items-center px-4 md:px-16 py-1 h-20">
             <div className="flex items-center gap-2 col-span-4">
                 <img src={logo} alt="logo" className="h-14 w-16 shrink-0" />
                 <div className="flex-grow mt-1">
-                    <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] w-[600px]">
+                    <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] max-w-[600px]">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"

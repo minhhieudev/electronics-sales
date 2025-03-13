@@ -43,10 +43,10 @@ const LoginForm = () => {
 
     return (
         <form onSubmit={handleLogin} className="w-full">
-            <h1 className="text-xl text-center font-bold mb-4">Đăng nhập</h1>
+            <h1 className="text-base text-center font-bold mb-3">Đăng nhập</h1>
             
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="userName">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="userName">
                     Tài khoản
                 </label>
                 <input
@@ -55,12 +55,12 @@ const LoginForm = () => {
                     value={formData.userName}
                     onChange={handleInputChange}
                     placeholder="Nhập tên đăng nhập ..."
-                    className="h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs"
+                    className="h-8 w-full px-3 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px]"
                 />
             </div>
 
-            <div className="mb-3">
-                <label className="block text-xs font-semibold mb-1" htmlFor="passWord">
+            <div className="mb-2">
+                <label className="block text-[11px] font-semibold mb-1" htmlFor="passWord">
                     Mật khẩu
                 </label>
                 <div className="relative">
@@ -70,7 +70,7 @@ const LoginForm = () => {
                         value={formData.passWord}
                         onChange={handleInputChange}
                         placeholder="Nhập mật khẩu ..."
-                        className="h-9 w-full px-3 py-2 border rounded-md focus:border-[#FF8900] focus:outline-none text-xs"
+                        className="h-8 w-full px-2 py-1 border rounded-md focus:border-[#FF8900] focus:outline-none text-[11px]"
                     />
                     <button
                         type="button"
@@ -78,18 +78,18 @@ const LoginForm = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? 
-                            <AiOutlineEyeInvisible className="w-4 h-4 text-gray-400" /> : 
-                            <AiOutlineEye className="w-4 h-4 text-gray-400" />
+                            <AiOutlineEyeInvisible className="w-3.5 h-3.5 text-gray-400" /> : 
+                            <AiOutlineEye className="w-3.5 h-3.5 text-gray-400" />
                         }
                     </button>
                 </div>
             </div>
 
-            <a href="/forgot-password" className="block text-center text-[#FF8900] text-xs font-semibold mb-3">
+            <a href="/forgot-password" className="block text-center text-[#FF8900] text-[11px] font-semibold mb-3">
                 Bạn quên mật khẩu?
             </a>
 
-            <button type="submit" className="w-full h-9 bg-[#FF8900] text-white font-bold rounded-md text-sm hover:bg-[#ff9920] transition-colors">
+            <button type="submit" className="w-full h-8 bg-[#FF8900] text-white font-bold rounded-md text-xs hover:bg-[#ff9920] transition-colors">
                 Đăng nhập
             </button>
         </form>

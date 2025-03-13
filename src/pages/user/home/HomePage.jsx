@@ -42,17 +42,17 @@ const HomePage = () => {
     const currentItems = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
-        <div className="min-h-screen px-4">
+        <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
             <div className='mx-auto space-y-1 mt-10'>
-                <div className='grid grid-cols-12 gap-8'>
-                    <div className="col-span-3 min-w-[250px]">
+                <div className='grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 px-4 md:px-16'>
+                    <div className="col-span-1 md:col-span-3">
                         <Sidebar />
                     </div>
-                    <div className="col-span-9 mt-3">
+                    <div className="col-span-1 md:col-span-9 mt-3">
                         <SortingOptions onSortChange={handleSortChange} />
-                        <div className="grid grid-cols-4 gap-6 mt-4">
+                        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-4">
                             {currentItems.map(product => (
-                                <div key={product.id}>
+                                <div key={product.id} className="w-full">
                                     <ProductItem
                                         name={product.name}
                                         price={product.price}

@@ -26,28 +26,28 @@ const AuthForm = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="w-[1000px] h-[700px] relative flex items-center justify-center">
-                <h1 className="absolute top-8 text-2xl font-bold text-[#FF8900] z-20">shoplogo</h1>
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+            <div className="w-full max-w-[1000px] min-h-[500px] relative flex items-center justify-center">
+                <h1 className="absolute -top-3 md:-top-6 text-2xl font-bold text-[#FF8900] z-30">shoplogo</h1>
                 
-                <div className="absolute w-[665px] h-[416px] bg-cover bg-center"
+                <div className="absolute w-[500px] h-[350px] md:w-[665px] md:h-[416px] bg-cover bg-center"
                     style={{
                         backgroundImage: `url(${bgimage})`
                     }}
                 />
 
-                <div className={`relative bg-white p-5 rounded-lg shadow-lg w-[350px] 
-                    ${isLogin ? 'h-[460px]' : 'h-[560px]'} z-10`}>
+                <div className={`relative bg-white p-5 rounded-lg shadow-lg w-[340px] mt-8
+                    ${isLogin ? 'min-h-[420px]' : 'min-h-[480px]'} z-10`}>
                     {isLogin ? <LoginForm /> : <RegisterForm />}
 
-                    <div className="flex items-center my-2">
+                    <div className="flex items-center my-3">
                         <div className="flex-grow border-t border-gray-300"></div>
                         <span className="mx-2 text-gray-400 text-xs">Hoặc</span>
                         <div className="flex-grow border-t border-gray-300"></div>
                     </div>
 
                     <button className="flex h-9 text-sm font-bold justify-center items-center bg-[#F2F4F5] w-full border border-gray-300 rounded">
-                        <img src={googleIcon} alt="Google" className="mr-2 h-4 w-4" />
+                        <img src={googleIcon} alt="Google" className="mr-2 h-5 w-5" />
                         Tiếp tục với Google
                     </button>
 

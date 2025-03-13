@@ -5,6 +5,8 @@ const data = [
         price: 159000,
         discount: "-28%",
         sold: 43,
+        rating: 4.8,
+        created_at: "2023-10-15T08:30:00Z",
     },
     {
         id: 2,
@@ -12,6 +14,8 @@ const data = [
         price: 199000,
         discount: "-15%",
         sold: 27,
+        rating: 4.7,
+        created_at: "2023-11-20T10:15:00Z",
     },
     {
         id: 3,
@@ -19,6 +23,8 @@ const data = [
         price: 239000,
         discount: "-18%",
         sold: 35,
+        rating: 4.9,
+        created_at: "2023-09-05T14:45:00Z",
     },
     {
         id: 4,
@@ -26,6 +32,8 @@ const data = [
         price: 129000,
         discount: "-25%",
         sold: 55,
+        rating: 4.6,
+        created_at: "2023-08-12T09:20:00Z",
     },
     {
         id: 5,
@@ -33,6 +41,8 @@ const data = [
         price: 189000,
         discount: "-22%",
         sold: 19,
+        rating: 4.5,
+        created_at: "2024-01-05T11:30:00Z",
     },
     {
         id: 6,
@@ -40,6 +50,8 @@ const data = [
         price: 179000,
         discount: "-20%",
         sold: 40,
+        rating: 4.7,
+        created_at: "2023-12-18T16:40:00Z",
     },
     {
         id: 7,
@@ -47,6 +59,8 @@ const data = [
         price: 269000,
         discount: "-12%",
         sold: 12,
+        rating: 4.4,
+        created_at: "2024-02-22T13:15:00Z",
     },
     {
         id: 8,
@@ -54,6 +68,8 @@ const data = [
         price: 259000,
         discount: "-10%",
         sold: 21,
+        rating: 4.6,
+        created_at: "2024-01-30T10:45:00Z",
     },
     {
         id: 9,
@@ -61,6 +77,8 @@ const data = [
         price: 159000,
         discount: "-17%",
         sold: 33,
+        rating: 4.5,
+        created_at: "2023-11-08T09:10:00Z",
     },
     {
         id: 10,
@@ -68,6 +86,8 @@ const data = [
         price: 349000,
         discount: "-8%",
         sold: 8,
+        rating: 4.8,
+        created_at: "2024-03-01T15:20:00Z",
     },
     {
         id: 11,
@@ -75,6 +95,8 @@ const data = [
         price: 139000,
         discount: "-20%",
         sold: 25,
+        rating: 4.3,
+        created_at: "2023-10-25T12:30:00Z",
     },
     {
         id: 12,
@@ -82,6 +104,8 @@ const data = [
         price: 209000,
         discount: "-18%",
         sold: 29,
+        rating: 4.5,
+        created_at: "2023-12-05T08:50:00Z",
     },
     {
         id: 13,
@@ -89,6 +113,8 @@ const data = [
         price: 429000,
         discount: "-5%",
         sold: 7,
+        rating: 4.9,
+        created_at: "2024-02-10T11:15:00Z",
     },
     {
         id: 14,
@@ -96,6 +122,8 @@ const data = [
         price: 399000,
         discount: "-10%",
         sold: 11,
+        rating: 4.7,
+        created_at: "2024-01-15T14:30:00Z",
     },
     {
         id: 15,
@@ -103,6 +131,8 @@ const data = [
         price: 169000,
         discount: "-16%",
         sold: 30,
+        rating: 4.6,
+        created_at: "2023-09-28T10:05:00Z",
     },
 ];
 

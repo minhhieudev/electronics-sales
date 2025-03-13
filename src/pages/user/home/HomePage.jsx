@@ -15,7 +15,6 @@ const HomePage = () => {
     const totalItems = data.length;
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-    // Helper function to sort data by price
     const sortByPrice = (data, order) => {
         return [...data].sort((a, b) =>
             order === 'asc' ? a.price - b.price : b.price - a.price
@@ -32,9 +31,16 @@ const HomePage = () => {
             setSortedData(sortByPrice(data, 'asc'));
         } else if (sortType === 'price-desc') {
             setSortedData(sortByPrice(data, 'desc'));
+        } else if (sortType === 'popular') {
+            setSortedData([...data].sort((a, b) => b.rating - a.rating));
+        } else if (sortType === 'newest') {
+            setSortedData([...data].sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            ));
+        } else if (sortType === 'best-selling') {
+            setSortedData([...data].sort((a, b) => b.sold - a.sold));
         } else {
             setSortedData(data);
-            console.log('Will handle sorting with API later:', sortType);
         }
     };
 

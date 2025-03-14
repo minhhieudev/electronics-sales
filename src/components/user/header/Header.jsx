@@ -11,19 +11,23 @@ const Header = () => {
     const [showSearchBar, setShowSearchBar] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const dropdownRef = useRef(null);
+    const searchBarRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const userInfo = useSelector((state) => state.auth.userInfo);
     const isLogin = useSelector((state) => state.auth.isLogin);
 
-    // Đề xuất tìm kiếm
     const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
 
+    // This effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowDropdown(false);
+            }
+            if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
+                setShowSearchBar(false);
             }
         };
 
@@ -52,138 +56,137 @@ const Header = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Xử lý tìm kiếm
-        console.log("Searching for:", searchTerm);
-        // navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
     };
 
     const handleSuggestionClick = (suggestion) => {
         setSearchTerm(suggestion);
-        // Có thể tự động submit form tìm kiếm
-        // handleSearch({ preventDefault: () => {} });
     };
 
     return (
         <header className="relative">
+            
             {/* Desktop Header */}
             <div className="hidden md:grid grid-cols-12 items-center px-4 lg:px-16 py-1 h-20">
                 {/* Logo */}
-                <div className="col-span-2 lg:col-span-1">
+                <div className="col-span-3 lg:col-span-2">
                     <Link to="/" className="block">
-                        <img src={logo} alt="logo" className="h-14 w-16 shrink-0" />
+                        <img src={logo} alt="logo" className="h-14 w-[40%] shrink-0" />
                     </Link>
                 </div>
-                
-                {/* Search */}
-                <div className="col-span-6 lg:col-span-7">
-                    <form onSubmit={handleSearch} className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] max-w-[600px]">
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm sản phẩm"
-                            className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button
-                            type="submit"
-                            className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0"
-                        >
-                            <AiOutlineSearch className="h-8 w-6" />
-                        </button>
-                    </form>
-                    <div className="mt-2">
-                        <ul className="text-[14px] flex gap-2 text-gray-500">
-                            {searchSuggestions.map((suggestion, index) => (
-                                <li
-                                    key={index}
-                                    className="cursor-pointer hover:text-[#FF8900]"
-                                    onClick={() => handleSuggestionClick(suggestion)}
-                                >
-                                    {suggestion}
-                                </li>
-                            ))}
-                        </ul>
+
+                {/* Search and User Info */}
+                <div className="flex justify-between items-center col-span-9 lg:col-span-10">
+                    <div className="flex flex-col w-[60%]">
+                        {/* Search */}
+                        <form onSubmit={handleSearch} className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] flex-grow">
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm sản phẩm"
+                                className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button
+                                type="submit"
+                                className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0"
+                            >
+                                <AiOutlineSearch className="h-8 w-6" />
+                            </button>
+                        </form>
+                        <div className="mt-2">
+                            <ul className="text-[14px] flex gap-2 text-gray-500">
+                                {searchSuggestions.map((suggestion, index) => (
+                                    <li
+                                        key={index}
+                                        className="cursor-pointer hover:text-[#FF8900]"
+                                        onClick={() => handleSuggestionClick(suggestion)}
+                                    >
+                                        {suggestion}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
-                {/* User Info & Cart */}
-                <div className="col-span-4 flex flex-col items-end">
-                    <div className="flex items-center gap-4">
-                        {userInfo ? (
-                            <div className="flex gap-1 items-center relative">
-                                <div className='flex items-center gap-1'>
-                                    <img src={avatar} alt="avatar" className="h-7 w-7 rounded-full" />
-                                    <span className="text-base font-bold hidden lg:inline">{userInfo.fullName}</span>
-                                </div>
-                                <AiOutlineDown
-                                    className="h-4 cursor-pointer"
-                                    onClick={() => setShowDropdown(!showDropdown)}
-                                />
-                                {showDropdown && (
-                                    <div ref={dropdownRef} className="absolute top-full right-[-10px] mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
-                                        <div className="absolute -top-2 right-6 w-4 h-4 rotate-45 bg-white border shadow-lg z-0"></div>
-                                        <div className="relative bg-white rounded-lg z-10">
-                                            <div className="py-2 font-semibold">
-                                                <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                                    <div className="flex gap-1 items-center">
-                                                        <AiOutlineUser className="h-4 text-black" />
-                                                        <span className="text-sm">Tài khoản của tôi</span>
-                                                    </div>
-                                                </Link>
-                                                <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
-                                                    <div className="flex gap-1 items-center">
-                                                        <AiOutlineLogout className="h-4 text-black" />
-                                                        <span className="text-sm">Đăng xuất</span>
+
+                    {/* User Info & Cart */}
+                    <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-4">
+                            {userInfo ? (
+                                <div className="flex gap-1 items-center relative">
+                                    <div className='flex items-center gap-1'>
+                                        <img src={avatar} alt="avatar" className="h-7 w-7 rounded-full" />
+                                        <span className="text-base font-bold hidden md:inline">{userInfo.fullName}</span>
+                                    </div>
+                                    <AiOutlineDown
+                                        className="h-4 cursor-pointer"
+                                        onClick={() => setShowDropdown(!showDropdown)}
+                                    />
+                                    {showDropdown && (
+                                        <div ref={dropdownRef} className="absolute top-full right-[-10px] mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
+                                            <div className="absolute -top-2 right-6 w-4 h-4 rotate-45 bg-white border shadow-lg z-0"></div>
+                                            <div className="relative bg-white rounded-lg z-10">
+                                                <div className="py-2 font-semibold">
+                                                    <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                                        <div className="flex gap-1 items-center">
+                                                            <AiOutlineUser className="h-4 text-black" />
+                                                            <span className="text-sm">Tài khoản của tôi</span>
+                                                        </div>
+                                                    </Link>
+                                                    <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
+                                                        <div className="flex gap-1 items-center">
+                                                            <AiOutlineLogout className="h-4 text-black" />
+                                                            <span className="text-sm">Đăng xuất</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
+                            ) : (
+                                <Link to="/auth" className="bg-[#FF8900] text-[12px] text-white p-2 rounded whitespace-nowrap">
+                                    Đăng nhập
+                                </Link>
+                            )}
+                            <div className="relative" onClick={handleCartClick}>
+                                <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
+                                <AiOutlineShoppingCart className="h-8 w-8 cursor-pointer" />
                             </div>
-                        ) : (
-                            <Link to="/auth" className="bg-[#FF8900] text-[12px] text-white p-2 rounded whitespace-nowrap">
-                                Đăng nhập
-                            </Link>
+                        </div>
+                        {userInfo && (
+                            <div className="mt-2 flex items-center text-xs lg:text-sm">
+                                <div className='flex items-center gap-1'>
+                                    <AiOutlineEnvironment className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
+                                    <span className="text-gray-400 whitespace-nowrap">Địa chỉ:</span>
+                                </div>
+                                <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">{userInfo.address || 'Chưa cập nhật'}</span>
+                            </div>
                         )}
-                        <div className="relative" onClick={handleCartClick}>
-                            <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
-                            <AiOutlineShoppingCart className="h-6 w-6 cursor-pointer" />
-                        </div>
                     </div>
-                    {userInfo && (
-                        <div className="mt-2 flex items-center text-xs lg:text-sm">
-                            <div className='flex items-center gap-1'>
-                                <AiOutlineEnvironment className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
-                                <span className="text-gray-400 whitespace-nowrap">Địa chỉ:</span>
-                            </div>
-                            <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">{userInfo.address || 'Chưa cập nhật'}</span>
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Mobile Header */}
             <div className="md:hidden flex items-center justify-between px-4 py-2 h-16">
                 <Link to="/" className="flex items-center">
-                    <img src={logo} alt="logo" className="h-10 w-12" />
+                    <img src={logo} alt="logo" className="h-10 w-[75%]" />
                 </Link>
-                
+
                 <div className="flex items-center gap-3">
                     <button onClick={toggleSearchBar} className="p-1">
                         <AiOutlineSearch className="h-6 w-6 text-gray-700" />
                     </button>
-                    
+
                     <div className="relative" onClick={handleCartClick}>
-                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
-                        <AiOutlineShoppingCart className="h-6 w-6 text-gray-700" />
+                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[9px] px-1.5 py-0.5 font-bold">99+</span>
+                        <AiOutlineShoppingCart className="h-7 w-7 text-gray-700" />
                     </div>
-                    
+
                     {userInfo ? (
                         <div className="relative">
-                            <img 
-                                src={avatar} 
-                                alt="avatar" 
+                            <img
+                                src={avatar}
+                                alt="avatar"
                                 className="h-8 w-8 rounded-full cursor-pointer"
                                 onClick={() => setShowDropdown(!showDropdown)}
                             />
@@ -230,7 +233,7 @@ const Header = () => {
 
             {/* Mobile Search Bar (Expandable) */}
             {showSearchBar && (
-                <div className="md:hidden px-4 py-2 bg-white border-t border-gray-200">
+                <div ref={searchBarRef} className="md:hidden px-4 py-2 bg-white border-t border-gray-200">
                     <form onSubmit={handleSearch}>
                         <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900]">
                             <input
@@ -256,7 +259,7 @@ const Header = () => {
                                 className="text-sm text-gray-500 cursor-pointer hover:text-[#FF8900]"
                                 onClick={() => {
                                     handleSuggestionClick(suggestion);
-                                    // Tự động submit form sau khi chọn đề xuất trên mobile
+                                    // Automatically submit form after selecting a suggestion on mobile
                                     setTimeout(() => handleSearch({ preventDefault: () => { } }), 100);
                                 }}
                             >

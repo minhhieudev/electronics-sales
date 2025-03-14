@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { FiMenu } from 'react-icons/fi';
+import { IoMdClose } from 'react-icons/io';
 import { CONST } from '../../../common/const';
 import Pagination from "../../../components/user/pagination/Pagination";
-import Sidebar from './Categories';
+import Categories from './Categories';
 import data from './data';
 import ProductItem from './ProductItem';
 import SortingOptions from './SortingOptions';
-import { FiMenu } from 'react-icons/fi';
-import { IoMdClose } from 'react-icons/io';
 
 const ITEMS_PER_PAGE = CONST.ITEMS_PER_PAGE;
 
-// Danh sách các danh mục
 const CATEGORIES = [
     "Tất cả sản phẩm",
     "Điện thoại / Tablet",
@@ -25,7 +24,7 @@ const CATEGORIES = [
 const HomePage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortedData, setSortedData] = useState(data);
-    const [showSidebar, setShowSidebar] = useState(false);
+    const [showCategories, setShowCategories] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(0);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
@@ -39,7 +38,7 @@ const HomePage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Kiểm tra xem màn hình có phải là desktop hẹp không
+    // Check if the screen is a narrow desktop
     const isNarrowDesktop = windowWidth >= 768 && windowWidth < 1024;
 
     const totalItems = data.length;
@@ -61,10 +60,8 @@ const HomePage = () => {
             setSortedData(sortByPrice(data, 'asc'));
         } else if (sortType === 'price-desc') {
             setSortedData(sortByPrice(data, 'desc'));
-        } else if (sortType === 'popular') {
-            setSortedData([...data].sort((a, b) => b.rating - a.rating));
         } else if (sortType === 'newest') {
-            setSortedData([...data].sort((a, b) => 
+            setSortedData([...data].sort((a, b) =>
                 new Date(b.created_at) - new Date(a.created_at)
             ));
         } else if (sortType === 'best-selling') {
@@ -76,43 +73,34 @@ const HomePage = () => {
 
     const handleCategoryChange = (index) => {
         setSelectedCategory(index);
-        setCurrentPage(1); // Reset về trang đầu tiên khi chuyển danh mục
-        
-        // Ở đây có thể thêm logic lọc sản phẩm theo danh mục
-        // Ví dụ: const filteredData = data.filter(item => item.category === index);
-        // setSortedData(filteredData);
+        setCurrentPage(1); // Reset to the first page when changing categories
     };
 
-    const toggleSidebar = () => {
-        setShowSidebar(!showSidebar);
-    };
-
-    const toggleFilters = () => {
-        setShowFilters(!showFilters);
+    const toggleCategories = () => {
+        setShowCategories(!showCategories);
     };
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
-        <div className="bg-gradient-to-r from-[#FFFAFA] to-[#f3faf3] min-h-screen">
+        <div className="bg-gradient-to-r min-h-screen">
             <div className='container mx-auto space-y-1 mt-10'>
                 {/* Mobile Header */}
                 <div className="md:hidden flex justify-between items-center px-4 mb-4">
-                    <button 
-                        onClick={toggleSidebar}
+                    <button
+                        onClick={toggleCategories}
                         className="p-2 rounded-md bg-white shadow-sm"
                     >
                         <FiMenu className="h-6 w-6 text-gray-700" />
                     </button>
                     <h1 className="font-bold text-xl">{CATEGORIES[selectedCategory]}</h1>
                     {/* Dropdown for Filters */}
-                    <select 
-                        onChange={(e) => handleSortChange(e.target.value)} 
-                        className="p-2 rounded-md bg-white shadow-sm"
+                    <select
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        className="p-2 rounded-md bg-white shadow-sm focus:outline-none"
                     >
                         <option value="">Lọc</option>
-                        <option value="popular">Phổ biến</option>
                         <option value="newest">Mới nhất</option>
                         <option value="best-selling">Bán chạy</option>
                         <option value="price-asc">Giá tăng dần</option>
@@ -121,36 +109,36 @@ const HomePage = () => {
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-6 lg:gap-8 px-4 md:px-8 lg:px-16'>
-                    {/* Mobile Sidebar */}
-                    {showSidebar && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleSidebar}>
-                            <div 
+                    {/* Mobile Categories */}
+                    {showCategories && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleCategories}>
+                            <div
                                 className="absolute top-0 left-0 h-full w-64 bg-white p-4 overflow-y-auto"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="font-bold text-lg">Danh mục</h2>
-                                    <button onClick={toggleSidebar} className="p-1 hover:bg-gray-100 rounded-full">
+                                    <button onClick={toggleCategories} className="p-1 hover:bg-gray-100 rounded-full">
                                         <IoMdClose className="h-6 w-6" />
                                     </button>
                                 </div>
-                                <Sidebar 
-                                    selectedIndex={selectedCategory} 
+                                <Categories
+                                    selectedIndex={selectedCategory}
                                     setSelectedIndex={(index) => {
                                         handleCategoryChange(index);
-                                        toggleSidebar(); // Đóng sidebar sau khi chọn danh mục trên mobile
-                                    }} 
+                                        toggleCategories();
+                                    }}
                                 />
                             </div>
                         </div>
                     )}
 
-                    {/* Desktop Sidebar */}
+                    {/* Desktop Categories */}
                     <div className="hidden md:block md:col-span-3 lg:col-span-2">
-                        <div className="rounded-lg shadow-sm p-0">
-                            <Sidebar 
-                                selectedIndex={selectedCategory} 
-                                setSelectedIndex={handleCategoryChange} 
+                        <div className="p-0">
+                            <Categories
+                                selectedIndex={selectedCategory}
+                                setSelectedIndex={handleCategoryChange}
                             />
                         </div>
                     </div>
@@ -163,7 +151,7 @@ const HomePage = () => {
                                 <h1 className={`font-bold text-xl md:text-2xl ${isNarrowDesktop ? 'w-full text-center' : ''}`}>
                                     {CATEGORIES[selectedCategory]}
                                 </h1>
-                                
+
                                 {/* Desktop Sorting Options */}
                                 <div className={`${isNarrowDesktop ? 'w-full' : ''}`}>
                                     <SortingOptions onSortChange={handleSortChange} />

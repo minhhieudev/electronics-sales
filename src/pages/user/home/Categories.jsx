@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlineRight } from 'react-icons/ai';
 
-const Sidebar = ({ selectedIndex, setSelectedIndex }) => {
+const Categories = ({ selectedIndex, setSelectedIndex }) => {
   const categories = [
     "Tất cả sản phẩm",
     "Điện thoại / Tablet",
@@ -20,20 +20,17 @@ const Sidebar = ({ selectedIndex, setSelectedIndex }) => {
         {categories.map((category, index) => (
           <li
             key={index}
-            className={`flex justify-between items-center py-2 px-1 cursor-pointer rounded hover:bg-gray-50 ${
-              selectedIndex === index ? "text-[#FF8900]" : "text-gray-700"
-            }`}
+            className={`flex justify-between items-center py-2 px-1 cursor-pointer rounded hover:bg-gray-50 ${selectedIndex === index ? "text-[#FF8900]" : "text-gray-700"
+              }`}
             onClick={() => setSelectedIndex(index)}
           >
-            <span className={`text-sm md:text-base font-medium truncate pr-2 ${
-              selectedIndex === index ? "font-semibold" : ""
-            }`}>
+            <span className={`text-sm md:text-base font-medium truncate pr-2 ${selectedIndex === index ? "font-semibold" : ""
+              }`}>
               {category}
             </span>
             <AiOutlineRight
-              className={`h-3 w-3 flex-shrink-0 ${
-                selectedIndex === index ? "text-[#FF8900]" : "text-gray-400"
-              }`}
+              className={`h-3 w-3 flex-shrink-0 ${selectedIndex === index ? "text-[#FF8900]" : "text-gray-400"
+                }`}
             />
           </li>
         ))}
@@ -42,4 +39,4 @@ const Sidebar = ({ selectedIndex, setSelectedIndex }) => {
   );
 };
 
-export default Sidebar;
+export default Categories;

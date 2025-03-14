@@ -11,7 +11,7 @@ const ProductItem = ({ product }) => {
 
     return (
         <div className="flex flex-col h-full cursor-pointer rounded-lg hover:shadow-md transition-shadow" onClick={handleClick}>
-            <div className="relative pt-[100%]"> {/* 1:1 aspect ratio */}
+            <div className="relative pt-[100%]">
                 <img
                     src={image || defaultProduct}
                     alt={name}

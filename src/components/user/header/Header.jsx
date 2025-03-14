@@ -23,6 +23,10 @@ const Header = () => {
     // This effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Check if the click is on the logout button
+            const isLogoutButton = event.target.closest('[data-logout-button]');
+            if (isLogoutButton) return;
+
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowDropdown(false);
             }
@@ -41,7 +45,7 @@ const Header = () => {
         dispatch(logout());
         navigate('/auth');
     };
-
+    
     const handleCartClick = () => {
         if (!isLogin) {
             navigate('/auth');
@@ -132,7 +136,7 @@ const Header = () => {
                                                             <span className="text-sm">Tài khoản của tôi</span>
                                                         </div>
                                                     </Link>
-                                                    <div onClick={handleLogout} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
+                                                    <div onClick={handleLogout} data-logout-button className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
                                                         <div className="flex gap-1 items-center">
                                                             <AiOutlineLogout className="h-4 text-black" />
                                                             <span className="text-sm">Đăng xuất</span>

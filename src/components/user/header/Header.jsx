@@ -20,12 +20,13 @@ const Header = () => {
 
     const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
 
-    // This effect handles the closing of dropdown and search bar when clicking outside of them.
+    // Effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
         const handleClickOutside = (event) => {
-            // Check if the click is on the logout button
+            // Check if the click is on the logout button or account button
             const isLogoutButton = event.target.closest('[data-logout-button]');
-            if (isLogoutButton) return;
+            const isAccountButton = event.target.closest('[data-account-button]');
+            if (isLogoutButton || isAccountButton) return;
 
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowDropdown(false);
@@ -45,7 +46,7 @@ const Header = () => {
         dispatch(logout());
         navigate('/auth');
     };
-    
+
     const handleCartClick = () => {
         if (!isLogin) {
             navigate('/auth');
@@ -67,11 +68,10 @@ const Header = () => {
     };
 
     return (
-        <header className="relative">
-            
+        <header className="relative z-40">
+
             {/* Desktop Header */}
             <div className="hidden md:grid grid-cols-12 items-center px-4 lg:px-16 py-1 h-20">
-                {/* Logo */}
                 <div className="col-span-3 lg:col-span-2">
                     <Link to="/" className="block">
                         <img src={logo} alt="logo" className="h-14 w-[40%] shrink-0" />
@@ -130,7 +130,11 @@ const Header = () => {
                                             <div className="absolute -top-2 right-6 w-4 h-4 rotate-45 bg-white border shadow-lg z-0"></div>
                                             <div className="relative bg-white rounded-lg z-10">
                                                 <div className="py-2 font-semibold">
-                                                    <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                                    <Link
+                                                        to="/account"
+                                                        data-account-button
+                                                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                                    >
                                                         <div className="flex gap-1 items-center">
                                                             <AiOutlineUser className="h-4 text-black" />
                                                             <span className="text-sm">Tài khoản của tôi</span>
@@ -211,7 +215,11 @@ const Header = () => {
                                         </div>
                                     </div>
                                     <div className="py-2 font-semibold">
-                                        <Link to="/account" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        <Link
+                                            to="/account"
+                                            data-account-button
+                                            className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                        >
                                             <div className="flex gap-2 items-center">
                                                 <AiOutlineUser className="h-5 w-5 text-gray-600" />
                                                 <span className="text-sm">Tài khoản của tôi</span>

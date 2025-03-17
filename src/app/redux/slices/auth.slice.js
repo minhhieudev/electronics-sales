@@ -40,7 +40,7 @@ export const registerAction = createAsyncThunk(
       dispatch(setLoading(true));
       const registerResponse = await AuthService.register(body);
       const response = registerResponse.data
-      
+
       if (response && response.status === 'success') {
         toast.success(MESSAGES.REGISTER_SUCCESS);
       }
@@ -67,16 +67,18 @@ const authSlice = createSlice({
       state.isLogin = false;
       localStorage.clear();
     },
+    updateUserInfo: (state, { payload }) => {
+      state.userInfo = payload;
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginAction.fulfilled, (state, { payload }) => {
-        console.log('UUUUUU:',payload);
         state.userInfo = payload;
         state.isLogin = true;
       })
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, updateUserInfo } = authSlice.actions;
 export default authSlice.reducer;

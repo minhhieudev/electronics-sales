@@ -6,7 +6,7 @@ const Loading = () => {
   if (!loading) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-md">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-[99999] backdrop-blur-md">
       <div className="relative w-24 h-24 flex items-center justify-center">
         {/* Vòng ngoài quay theo chiều kim đồng hồ */}
         <div className="absolute w-20 h-20 border-8 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin" />

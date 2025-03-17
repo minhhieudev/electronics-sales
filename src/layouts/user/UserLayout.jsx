@@ -4,7 +4,7 @@ import Header from "../../components/user/header/Header";
 
 const UserLayout = () => {
     return (
-        <div className="user-layout min-h-screen bg-gradient-to-r from-[#f9eeee] to-[#ecf9ec]">
+        <div className="user-layout font-cabin min-h-screen bg-gradient-to-r from-[#f9eeee] to-[#ecf9ec]">
             <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
                 <div className="max-w-[1440px] mx-auto ">
                     <Header />

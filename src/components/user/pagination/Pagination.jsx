@@ -5,7 +5,7 @@ import ReactPaginate from "react-paginate";
 function Pagination({
   totalPage,
   page,
-  onChange = (e) => {},
+  onChange = (e) => { },
 }) {
   return (
     <div className="flex items-center justify-between my-3">

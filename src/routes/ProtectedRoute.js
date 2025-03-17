@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
     const userInfo = JSON.parse(localStorage.getItem(CONST.STORAGE.USER_INFO));
 
     const isAdmin = true;
-    //const isAdmin = userInfo && userInfo.role === false;
+    // const isAdmin = userInfo && userInfo.role === true;
 
     return isAdmin ? children : <Navigate to="/" />;
 };

@@ -7,7 +7,7 @@ import { loginAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
 const LoginForm = () => {
-    const [formData, setFormData] = useState({ userName: '', passWord: '' });
+    const [formData, setFormData] = useState({ userName: 'hieu20', passWord: '12' });
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);

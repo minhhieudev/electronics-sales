@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { updateProfileAction } from '../../../app/redux/slices/account.slice';
 import { deleteFileFromCloudinary, uploadFileToCloudinary, validateFile } from '../../../app/utils/uploadUtils';
 import MESSAGES from '../../../common/const';
-import avatarUrls from './avatars.png';
+import avatarUrls from '../../../Images/avatars.png';
 import ChangePasswordModal from './ChangePasswordModal';
 
 const ProfileContent = () => {
@@ -165,22 +165,41 @@ const ProfileContent = () => {
     //=====================================================================
 
     const renderEditableField = (field, label, value) => {
+        // Tạo text mặc định cho từng trường
+        const getDefaultText = () => {
+            switch (field) {
+                case 'fullName':
+                    return 'Chưa cập nhật họ tên';
+                case 'email':
+                    return 'Chưa cập nhật email';
+                case 'numberPhone':
+                    return 'Chưa cập nhật số điện thoại';
+                case 'address':
+                    return 'Chưa cập nhật địa chỉ';
+                default:
+                    return 'Chưa cập nhật';
+            }
+        };
+
         return (
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-32 text-gray-500 text-sm">{label}:</label>
+            <div className="flex sm:items-center gap-10 sm:gap-2">
+                <label className="w-[30%] sm:w-32 text-gray-500 text-sm">{label}:</label>
                 <div className="flex-1">
                     {editing[field] ? (
                         <input
                             type="text"
-                            value={value}
+                            value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
                             className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             onBlur={() => setEditing(prev => ({ ...prev, [field]: false }))}
                             autoFocus
                         />
                     ) : (
-                        <div className="flex flex-wrap items-center gap-10">
-                            <span className={`text-sm ${field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>{value}</span>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-12 justify-between sm:w-[75%] w-full">
+                            <span className={`text-sm ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'
+                                }`}>
+                                {value || getDefaultText()}
+                            </span>
                             <button
                                 className="text-orange-500 text-sm font-medium hover:text-orange-500"
                                 onClick={() => handleEdit(field)}
@@ -269,7 +288,7 @@ const ProfileContent = () => {
 
                                 {/* Date and Gender fields */}
                                 <div className="grid grid-cols-1">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <div className="flex items-center gap-2">
                                         <label className="w-32 text-gray-500 text-sm">Ngày sinh:</label>
                                         <input
                                             type="date"
@@ -279,7 +298,7 @@ const ProfileContent = () => {
                                         />
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                                    <div className="flex items-center gap-2 mt-2">
                                         <label className="w-32 text-gray-500 text-sm">Giới tính:</label>
                                         <select
                                             value={userInfo.gender}

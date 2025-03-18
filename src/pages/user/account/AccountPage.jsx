@@ -69,6 +69,7 @@ const AccountPage = () => {
                             lg:shadow-none shadow-lg
                             overflow-y-auto
                             lg:bg-transparent bg-white
+                            ${isSidebarOpen ? 'p-4 pt-20' : ''}
                         `}>
                             <Sidebar
                                 activePage={currentPage}

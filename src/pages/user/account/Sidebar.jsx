@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlineEdit, AiOutlineFileProtect, AiOutlineFileText, AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
-import avatars from './avatars.png';
+import avatars from '../../../Images/avatars.png';
 
 const Sidebar = ({ activePage, onPageChange }) => {
     const profile = useSelector((state) => state.auth.userInfo);

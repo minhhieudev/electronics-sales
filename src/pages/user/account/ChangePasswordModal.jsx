@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AiOutlineClose, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { changePasswordAction } from '../../../app/redux/slices/account.slice';
+import { changePasswordAction } from '../../../app/redux/slices/user/account.slice';
 import MESSAGES from '../../../common/const';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {

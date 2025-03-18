@@ -20,7 +20,7 @@ const Header = () => {
 
     const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
 
-    // Effect handles the closing of dropdown and search bar when clicking outside of them.
+    // This effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
         const handleClickOutside = (event) => {
             // Check if the click is on the logout button or account button
@@ -134,6 +134,7 @@ const Header = () => {
                                                         to="/account"
                                                         data-account-button
                                                         className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                                        onClick={() => setShowDropdown(false)}
                                                     >
                                                         <div className="flex gap-1 items-center">
                                                             <AiOutlineUser className="h-4 text-black" />
@@ -219,6 +220,7 @@ const Header = () => {
                                             to="/account"
                                             data-account-button
                                             className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                            onClick={() => setShowDropdown(false)}
                                         >
                                             <div className="flex gap-2 items-center">
                                                 <AiOutlineUser className="h-5 w-5 text-gray-600" />

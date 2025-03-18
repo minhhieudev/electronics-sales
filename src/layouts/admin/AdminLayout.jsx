@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/admin/Navbar";
 import Sidebar from "../../components/admin/Siderbar";
+import { ToastContainer } from "react-toastify";
 
 const AdminLayout = () => {
   return (
@@ -13,6 +14,19 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+
+      />
     </div>
   );
 };

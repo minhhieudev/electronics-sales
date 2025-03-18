@@ -14,6 +14,9 @@ const MESSAGES = {
     
     // Network messages
     NETWORK_ERROR: "Lỗi mạng hoặc máy chủ không phản hồi.",
+    INVALID_TOKEN: "Token truy cập không hợp lệ.",
+    SESSION_EXPIRED_MESSAGE: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
+    NO_DATA : "Không có dữ liệu",
     
     // Profile messages
     GET_PROFILE_ERROR: 'Lỗi khi lấy thông tin tài khoản',

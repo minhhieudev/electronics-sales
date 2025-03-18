@@ -4,7 +4,6 @@ import UserLayout from "../layouts/user/UserLayout";
 import HomePage from "../pages/user/home/HomePage";
 import PageNotFound from "../pages/page-not-found/PageNotFoundPage";
 import AuthForm from "../pages/auth/AuthForm";
-import ProductDetail from "../pages/user/product/ProductDetail";
 import AccountPage from "../pages/user/account/AccountPage";
 
 const UserRoutes = () => {
@@ -12,7 +11,8 @@ const UserRoutes = () => {
         <Routes>
             <Route element={<UserLayout />}>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
+
+
                 <Route path="/account" element={<AccountPage />} />
             </Route>
             <Route path="/auth" element={<AuthForm />} />

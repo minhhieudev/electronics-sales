@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
-import Account from "../components/admin/account";
+import AccountList from "../pages/admin/account/AccountList";
 import ProtectedRoute from "./ProtectedRoute";
 import PageNotFound from "../pages/page-not-found/PageNotFoundPage";
 
@@ -12,7 +12,7 @@ const AdminRoutes = () => {
       <Routes>
         <Route path="/" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="accounts" element={<Account />} />
+          <Route path="accounts" element={<AccountList />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

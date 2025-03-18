@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
-import { updateProfileAction } from '../../../app/redux/slices/account.slice';
+import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
 import { deleteFileFromCloudinary, uploadFileToCloudinary, validateFile } from '../../../app/utils/uploadUtils';
 import MESSAGES from '../../../common/const';
 import avatarUrls from '../../../Images/avatars.png';

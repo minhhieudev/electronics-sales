@@ -13,7 +13,7 @@ const UserLayout = () => {
                     <Header />
                 </div>
             </div>
-            <div className="user-content pt-[60px] bg-gradient-to-r from-[#f9eeee] to-[#ecf9ec]">
+            <div className="user-content min-h-screen pt-[60px] bg-gradient-to-r from-[#f9eeee] to-[#ecf9ec]">
                 <div className="max-w-[1440px] mx-auto">
                     <Outlet />
                 </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineUpload } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
@@ -34,6 +34,9 @@ const ProfileContent = () => {
         address: false
     });
 
+    // Thêm state để theo dõi thay đổi
+    const [isProfileChanged, setIsProfileChanged] = useState(false);
+
     // UseEffect to set data from profile into userInfo
     useEffect(() => {
         if (profile) {
@@ -46,6 +49,7 @@ const ProfileContent = () => {
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
             });
+            setIsProfileChanged(false); // Reset trạng thái khi profile thay đổi
         }
     }, [profile]);
 
@@ -74,7 +78,14 @@ const ProfileContent = () => {
             }
         }
 
-        setUserInfo(prev => ({ ...prev, [field]: value }));
+        const newUserInfo = { ...userInfo, [field]: value };
+        setUserInfo(newUserInfo);
+        
+        // Kiểm tra xem có sự thay đổi so với profile gốc không
+        const isChanged = Object.keys(newUserInfo).some(key => {
+            return newUserInfo[key] !== (profile[key] || '');
+        });
+        setIsProfileChanged(isChanged);
     };
     //=================================================================
 
@@ -108,6 +119,25 @@ const ProfileContent = () => {
         }));
     };
 
+    // Handle cancel action to reset user info
+    const handleCancel = () => {
+        setUserInfo({
+            fullName: profile.fullName || '',
+            email: profile.email || '',
+            numberPhone: profile.numberPhone || null,
+            birthDay: profile.birthDay || null,
+            gender: profile.gender,
+            address: profile.address || '',
+            avatarUrl: profile.avatarUrl || ''
+        });
+        setEditing({
+            fullName: false,
+            email: false,
+            numberPhone: false,
+            address: false
+        });
+        setIsProfileChanged(false);
+    };
 
     //========= Upload Image =====================================
     const fileInputRef = React.useRef(null);
@@ -182,8 +212,8 @@ const ProfileContent = () => {
         };
 
         return (
-            <div className="flex sm:items-center gap-10 sm:gap-2">
-                <label className="w-[30%] sm:w-32 text-gray-500 text-sm">{label}:</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
+                <label className="w-full sm:w-32 text-gray-500 text-sm">{label}:</label>
                 <div className="flex-1">
                     {editing[field] ? (
                         <input
@@ -195,13 +225,12 @@ const ProfileContent = () => {
                             autoFocus
                         />
                     ) : (
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-12 justify-between sm:w-[75%] w-full">
-                            <span className={`text-sm ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'
-                                }`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-between w-[80%]">
+                            <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
                                 {value || getDefaultText()}
                             </span>
                             <button
-                                className="text-orange-500 text-sm font-medium hover:text-orange-500"
+                                className="text-orange-500 text-sm font-medium hover:text-orange-600 whitespace-nowrap"
                                 onClick={() => handleEdit(field)}
                             >
                                 Thay đổi
@@ -287,23 +316,23 @@ const ProfileContent = () => {
                                 {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone)}
 
                                 {/* Date and Gender fields */}
-                                <div className="grid grid-cols-1">
-                                    <div className="flex items-center gap-2">
-                                        <label className="w-32 text-gray-500 text-sm">Ngày sinh:</label>
+                                <div className="grid grid-cols-1 gap-3">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
+                                        <label className="w-full sm:w-32 text-gray-500 text-sm">Ngày sinh:</label>
                                         <input
                                             type="date"
                                             value={userInfo.birthDay}
                                             onChange={(e) => handleChange('birthDay', e.target.value)}
-                                            className="w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                            className="w-full sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                         />
                                     </div>
 
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <label className="w-32 text-gray-500 text-sm">Giới tính:</label>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
+                                        <label className="w-full sm:w-32 text-gray-500 text-sm">Giới tính:</label>
                                         <select
                                             value={userInfo.gender}
                                             onChange={(e) => handleChange('gender', e.target.value === 'true')}
-                                            className="w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                            className="w-full sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                         >
                                             <option value="true">Nam</option>
                                             <option value="false">Nữ</option>
@@ -315,13 +344,22 @@ const ProfileContent = () => {
                             </div>
 
                             {/* Action buttons */}
-                            <div className="flex flex-col-reverse sm:flex-row items-center gap-4 pt-6">
-
+                            <div className="flex flex-col-reverse sm:flex-row items-center gap-4 pt-6 justify-end">
                                 <button
-                                    className="w-full sm:w-auto bg-[#FF8900] text-white px-8 py-2 rounded-lg hover:bg-orange-500 transition-colors ml-auto"
+                                    className="w-full sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={handleSave}
+                                    disabled={!isProfileChanged}
                                 >
-                                    Lưu
+                                    <AiOutlineSave className="h-5 w-5" />
+                                    <span>Lưu</span>
+                                </button>
+                                <button
+                                    className="w-full sm:w-auto border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={handleCancel}
+                                    disabled={!isProfileChanged}
+                                >
+                                    <AiOutlineClose className="h-5 w-5" />
+                                    <span>Hủy</span>
                                 </button>
                             </div>
                         </div>

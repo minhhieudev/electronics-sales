@@ -1,12 +1,14 @@
 import React from 'react';
 import { AiFillStar } from 'react-icons/ai';
 import defaultProduct from './product.png';
+import { useNavigate } from 'react-router-dom';
 
 const ProductItem = ({ product }) => {
-    const { name, price, discount, sold, image } = product;
+    const { id, name, price, discount, sold, image } = product;
+    const navigate = useNavigate();
 
     const handleClick = () => {
-        alert(`Bạn đã chọn sản phẩm: ${name}\nGiá: ${price.toLocaleString()} đ\nGiảm giá: ${discount}`);
+        navigate(`/product/${id}`);
     };
 
     return (
@@ -18,7 +20,7 @@ const ProductItem = ({ product }) => {
                     className="absolute top-0 left-0 w-full h-full object-cover"
                 />
             </div>
-            <div className="p-2 sm:p-3 flex flex-col flex-grow">
+            <div className="p-1 flex flex-col flex-grow">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1">
                         <span className="font-bold text-[#FF8900] text-sm sm:text-base">{price.toLocaleString()}</span>

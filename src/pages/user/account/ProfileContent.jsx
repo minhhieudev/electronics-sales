@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineClose, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineDown, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
@@ -14,6 +14,12 @@ const ProfileContent = () => {
     const profile = useSelector((state) => state.auth.userInfo);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
+    // State to track to change
+    const [isProfileChanged, setIsProfileChanged] = useState(false);
+
+    // Add state to store temporary avatar image file
+    const [tempAvatarUrl, setTempAvatarUrl] = useState(null);
 
     // State for user info
     const [userInfo, setUserInfo] = useState({
@@ -34,9 +40,6 @@ const ProfileContent = () => {
         address: false
     });
 
-    // Thêm state để theo dõi thay đổi
-    const [isProfileChanged, setIsProfileChanged] = useState(false);
-
     // UseEffect to set data from profile into userInfo
     useEffect(() => {
         if (profile) {
@@ -49,7 +52,7 @@ const ProfileContent = () => {
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
             });
-            setIsProfileChanged(false); // Reset trạng thái khi profile thay đổi
+            setIsProfileChanged(false); // Reset the state when profile changes
         }
     }, [profile]);
 
@@ -80,8 +83,8 @@ const ProfileContent = () => {
 
         const newUserInfo = { ...userInfo, [field]: value };
         setUserInfo(newUserInfo);
-        
-        // Kiểm tra xem có sự thay đổi so với profile gốc không
+
+        // Check if there are any changes compared to the original profile
         const isChanged = Object.keys(newUserInfo).some(key => {
             return newUserInfo[key] !== (profile[key] || '');
         });
@@ -115,12 +118,23 @@ const ProfileContent = () => {
                     numberPhone: false,
                     address: false
                 });
+                setTempAvatarUrl(null); // Reset tempAvatarUrl
             }
         }));
     };
 
     // Handle cancel action to reset user info
-    const handleCancel = () => {
+    const handleCancel = async () => {
+        // Delete current cloud image if temp exists and differs
+        if (tempAvatarUrl !== userInfo.avatarUrl && userInfo.avatarUrl) {
+            try {
+                await deleteFileFromCloudinary(userInfo.avatarUrl);
+            } catch (error) {
+                console.error("Error deleting temporary avatar:", error);
+            }
+        }
+
+        // Reset userInfo 
         setUserInfo({
             fullName: profile.fullName || '',
             email: profile.email || '',
@@ -128,15 +142,18 @@ const ProfileContent = () => {
             birthDay: profile.birthDay || null,
             gender: profile.gender,
             address: profile.address || '',
-            avatarUrl: profile.avatarUrl || ''
+            avatarUrl: tempAvatarUrl || ''
         });
+
         setEditing({
             fullName: false,
             email: false,
             numberPhone: false,
             address: false
         });
+
         setIsProfileChanged(false);
+        setTempAvatarUrl(null); // Reset tempAvatarUrl
     };
 
     //========= Upload Image =====================================
@@ -153,8 +170,13 @@ const ProfileContent = () => {
             // Upload new file
             const newFileName = await uploadFileToCloudinary(file);
 
-            // If have old avatar, delete it
-            if (userInfo.avatarUrl) {
+            // Save old file name to tempAvatarUrl if this is first upload in this edit session
+            if (!tempAvatarUrl) {
+                setTempAvatarUrl(userInfo.avatarUrl);
+            }
+
+            // If have old avatar (not the original one), delete it
+            if (userInfo.avatarUrl && userInfo.avatarUrl !== tempAvatarUrl) {
                 try {
                     await deleteFileFromCloudinary(userInfo.avatarUrl);
                 } catch (deleteError) {
@@ -167,6 +189,7 @@ const ProfileContent = () => {
                 ...prev,
                 avatarUrl: newFileName
             }));
+            setIsProfileChanged(true);
 
         } catch (error) {
             toast.error(MESSAGES.UPLOAD_ERROR + error.message);
@@ -195,39 +218,23 @@ const ProfileContent = () => {
     //=====================================================================
 
     const renderEditableField = (field, label, value) => {
-        // Tạo text mặc định cho từng trường
-        const getDefaultText = () => {
-            switch (field) {
-                case 'fullName':
-                    return 'Chưa cập nhật họ tên';
-                case 'email':
-                    return 'Chưa cập nhật email';
-                case 'numberPhone':
-                    return 'Chưa cập nhật số điện thoại';
-                case 'address':
-                    return 'Chưa cập nhật địa chỉ';
-                default:
-                    return 'Chưa cập nhật';
-            }
-        };
-
         return (
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
-                <label className="w-full sm:w-32 text-gray-500 text-sm">{label}:</label>
+            <div className="flex items-center gap-3 sm:gap-2">
+                <label className="w-[30%] sm:w-32 text-gray-500 text-sm">{label}:</label>
                 <div className="flex-1">
                     {editing[field] ? (
                         <input
                             type="text"
                             value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
-                            className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="w-[80%] border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             onBlur={() => setEditing(prev => ({ ...prev, [field]: false }))}
                             autoFocus
                         />
                     ) : (
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-between w-[80%]">
+                        <div className="flex items-center gap-2 justify-between w-full sm:w-[80%]">
                             <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
-                                {value || getDefaultText()}
+                                {value || 'Chưa cập nhật'}
                             </span>
                             <button
                                 className="text-orange-500 text-sm font-medium hover:text-orange-600 whitespace-nowrap"
@@ -252,18 +259,19 @@ const ProfileContent = () => {
                 </div>
 
                 {/* Main content grid */}
-                <div className="flex flex-col lg:flex-row gap-24">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-24">
                     {/* avatarUrl section */}
                     <div className="w-full lg:w-64">
-                        <div className="text-center">
-                            <div className="aspect-square w-48 mx-auto lg:w-full mb-4">
+                        <div className="flex flex-col items-center">
+                            <div className="w-64 aspect-square mb-4">
                                 <img
                                     src={userInfo.avatarUrl ? `${process.env.REACT_APP_CDN_URL}${userInfo.avatarUrl}` : avatarUrls}
                                     alt="Avatar"
                                     className="w-full h-full object-cover rounded-lg"
                                 />
                             </div>
-                            <div className="space-y-3">
+
+                            <div className="w-64 space-y-3">
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -272,6 +280,7 @@ const ProfileContent = () => {
                                     className="hidden"
                                 />
 
+                                {/* Upload button */}
                                 <button
                                     onClick={handleUploadClick}
                                     disabled={isUploading}
@@ -286,14 +295,14 @@ const ProfileContent = () => {
                                         {isUploading ? 'Đang tải lên...' : 'Tải ảnh lên'}
                                     </span>
                                 </button>
-                                <p className="text-xs text-gray-500 font-medium">
+
+                                <p className="text-xs text-gray-500 font-medium text-center">
                                     Dung lượng file tối đa 1 MB
                                     <br />
-                                    'Định dạng:.JPEG, .PNG
+                                    Định dạng:.JPEG, .PNG
                                 </p>
-                            </div>
 
-                            <div className='w-full'>
+                                {/* Change password button */}
                                 <button
                                     className="w-full mt-3 flex items-center justify-center gap-2 border-2 border-gray-300 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                                     onClick={() => setIsPasswordModalOpen(true)}
@@ -302,7 +311,6 @@ const ProfileContent = () => {
                                     <span className="font-semibold">Đổi mật khẩu</span>
                                 </button>
                             </div>
-
                         </div>
                     </div>
 
@@ -317,26 +325,29 @@ const ProfileContent = () => {
 
                                 {/* Date and Gender fields */}
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
-                                        <label className="w-full sm:w-32 text-gray-500 text-sm">Ngày sinh:</label>
+                                    <div className="flex items-center sm:gap-2">
+                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm">Ngày sinh:</label>
                                         <input
                                             type="date"
                                             value={userInfo.birthDay}
                                             onChange={(e) => handleChange('birthDay', e.target.value)}
-                                            className="w-full sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                            className="w-[60%] sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                         />
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
-                                        <label className="w-full sm:w-32 text-gray-500 text-sm">Giới tính:</label>
-                                        <select
-                                            value={userInfo.gender}
-                                            onChange={(e) => handleChange('gender', e.target.value === 'true')}
-                                            className="w-full sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                        >
-                                            <option value="true">Nam</option>
-                                            <option value="false">Nữ</option>
-                                        </select>
+                                    <div className="flex items-center sm:gap-2">
+                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm">Giới tính:</label>
+                                        <div className="relative w-[60%] sm:w-[40%]">
+                                            <select
+                                                value={userInfo.gender}
+                                                onChange={(e) => handleChange('gender', e.target.value === 'true')}
+                                                className="w-full text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none"
+                                            >
+                                                <option value="true">Nam</option>
+                                                <option value="false">Nữ</option>
+                                            </select>
+                                            <AiOutlineDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none w-4 h-4" />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -344,22 +355,22 @@ const ProfileContent = () => {
                             </div>
 
                             {/* Action buttons */}
-                            <div className="flex flex-col-reverse sm:flex-row items-center gap-4 pt-6 justify-end">
+                            <div className="flex items-center gap-4 pt-6 justify-end">
                                 <button
-                                    className="w-full sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handleSave}
-                                    disabled={!isProfileChanged}
-                                >
-                                    <AiOutlineSave className="h-5 w-5" />
-                                    <span>Lưu</span>
-                                </button>
-                                <button
-                                    className="w-full sm:w-auto border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-[30%] sm:w-auto border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={handleCancel}
                                     disabled={!isProfileChanged}
                                 >
                                     <AiOutlineClose className="h-5 w-5" />
                                     <span>Hủy</span>
+                                </button>
+                                <button
+                                    className="w-[30%] sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={handleSave}
+                                    disabled={!isProfileChanged}
+                                >
+                                    <AiOutlineSave className="h-5 w-5" />
+                                    <span>Lưu</span>
                                 </button>
                             </div>
                         </div>

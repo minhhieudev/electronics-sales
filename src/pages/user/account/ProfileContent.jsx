@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineClose, AiOutlineDown, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload, AiOutlineEdit, AiOutlineUser, AiOutlineMail, AiOutlinePhone, AiOutlineCalendar, AiOutlineEnvironment } from 'react-icons/ai';
+import { AiOutlineCalendar, AiOutlineClose, AiOutlineDown, AiOutlineEdit, AiOutlineEnvironment, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineMail, AiOutlinePhone, AiOutlineSave, AiOutlineUpload, AiOutlineUser } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
@@ -15,11 +15,9 @@ const ProfileContent = () => {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
-    // State to track to change
-    const [isProfileChanged, setIsProfileChanged] = useState(false);
-
-    // Add state to store temporary avatar image file
+    // State to store temporary avatar image file
     const [tempAvatarUrl, setTempAvatarUrl] = useState(null);
+    const [tempUploadedUrl, setTempUploadedUrl] = useState(null);
 
     // State for user info
     const [userInfo, setUserInfo] = useState({
@@ -32,15 +30,7 @@ const ProfileContent = () => {
         avatarUrl: ''
     });
 
-    // State for editing fields
-    const [editing, setEditing] = useState({
-        fullName: false,
-        email: false,
-        numberPhone: false,
-        address: false
-    });
-
-    // Thêm state để kiểm soát chế độ chỉnh sửa chung
+    // State to control edit mode
     const [isEditMode, setIsEditMode] = useState(false);
 
     // UseEffect to set data from profile into userInfo
@@ -55,7 +45,6 @@ const ProfileContent = () => {
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
             });
-            setIsProfileChanged(false); // Reset the state when profile changes
         }
     }, [profile]);
 
@@ -70,10 +59,6 @@ const ProfileContent = () => {
         return phoneRegex.test(phone);
     };
 
-    const handleEdit = (field) => {
-        setEditing(prev => ({ ...prev, [field]: true }));
-    };
-
     const handleChange = (field, value) => {
         if (field === 'numberPhone') {
             if (value && !/^\d*$/.test(value)) {
@@ -86,14 +71,7 @@ const ProfileContent = () => {
 
         const newUserInfo = { ...userInfo, [field]: value };
         setUserInfo(newUserInfo);
-
-        // Check if there are any changes compared to the original profile
-        const isChanged = Object.keys(newUserInfo).some(key => {
-            return newUserInfo[key] !== (profile[key] || '');
-        });
-        setIsProfileChanged(isChanged);
     };
-    //=================================================================
 
     // Handle save profile
     const handleSave = () => {
@@ -115,44 +93,38 @@ const ProfileContent = () => {
         dispatch(updateProfileAction({
             body: dataToSend,
             onSuccess: () => {
-                setIsEditMode(false); // Tắt chế độ chỉnh sửa
+                // If saved successfully and there is an old image, delete the old image
+                if (tempAvatarUrl && tempAvatarUrl !== userInfo.avatarUrl) {
+                    deleteFileFromCloudinary(tempAvatarUrl)
+                        .catch(error => console.error("Error deleting old avatar:", error));
+                }
+                setIsEditMode(false);
                 setTempAvatarUrl(null);
+                setTempUploadedUrl(null);
             }
         }));
     };
 
     // Handle cancel action to reset user info
     const handleCancel = async () => {
-        // Delete current cloud image if temp exists and differs
-        if (tempAvatarUrl !== userInfo.avatarUrl && userInfo.avatarUrl) {
+        // If there is a new uploaded image, delete it
+        if (tempUploadedUrl) {
             try {
-                await deleteFileFromCloudinary(userInfo.avatarUrl);
+                await deleteFileFromCloudinary(tempUploadedUrl);
             } catch (error) {
-                console.error("Error deleting temporary avatar:", error);
+                console.error("Error deleting temporary uploaded avatar:", error);
             }
         }
 
-        // Reset userInfo 
+        // Reset userInfo
         setUserInfo({
-            fullName: profile.fullName || '',
-            email: profile.email || '',
-            numberPhone: profile.numberPhone || null,
-            birthDay: profile.birthDay || null,
-            gender: profile.gender,
-            address: profile.address || '',
-            avatarUrl: tempAvatarUrl || ''
+            ...profile,
+            avatarUrl: tempAvatarUrl || profile.avatarUrl || ''
         });
 
-        setEditing({
-            fullName: false,
-            email: false,
-            numberPhone: false,
-            address: false
-        });
-
-        setIsProfileChanged(false);
-        setTempAvatarUrl(null); // Reset tempAvatarUrl
-        setIsEditMode(false); // Tắt chế độ chỉnh sửa
+        setTempUploadedUrl(null);
+        setTempAvatarUrl(null);
+        setIsEditMode(false);
     };
 
     //========= Upload Image =====================================
@@ -166,29 +138,20 @@ const ProfileContent = () => {
         try {
             setIsUploading(true);
 
-            // Upload new file
             const newFileName = await uploadFileToCloudinary(file);
 
-            // Save old file name to tempAvatarUrl if this is first upload in this edit session
             if (!tempAvatarUrl) {
                 setTempAvatarUrl(userInfo.avatarUrl);
             }
 
-            // If have old avatar (not the original one), delete it
-            if (userInfo.avatarUrl && userInfo.avatarUrl !== tempAvatarUrl) {
-                try {
-                    await deleteFileFromCloudinary(userInfo.avatarUrl);
-                } catch (deleteError) {
-                    console.error("Error deleting old avatar:", deleteError);
-                }
-            }
+            setTempUploadedUrl(newFileName);
 
-            // Update state with new file
             setUserInfo(prev => ({
                 ...prev,
                 avatarUrl: newFileName
             }));
-            setIsProfileChanged(true);
+
+            setIsEditMode(true);
 
         } catch (error) {
             toast.error(MESSAGES.UPLOAD_ERROR + error.message);
@@ -218,8 +181,8 @@ const ProfileContent = () => {
 
     const renderEditableField = (field, label, value, icon) => {
         return (
-            <div className="flex items-center gap-3 sm:gap-2">
-                <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+            <div className="flex items-center gap-3 sm:gap-12">
+                <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-3">
                     {icon}
                     {label}:
                 </label>
@@ -229,7 +192,7 @@ const ProfileContent = () => {
                             type="text"
                             value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
-                            className="w-[80%] border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="w-[80%] text-sm border border-[#FF8900] rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
                     ) : (
                         <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
@@ -244,16 +207,16 @@ const ProfileContent = () => {
     return (
         <div className="">
             <div className="p-6 bg-white rounded-lg">
-                {/* Header section với nút edit */}
+                {/* Header section */}
                 <div className="mb-6">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-4 w-[95%]">
                         <h1 className="text-xl sm:text-2xl font-bold">Tài khoản của tôi</h1>
                         {!isEditMode && (
                             <button
                                 onClick={() => setIsEditMode(true)}
                                 className="text-orange-500 hover:text-orange-600 p-2 rounded-full hover:bg-orange-50 transition-colors ml-4"
                             >
-                                <AiOutlineEdit className="w-5 h-5" />
+                                <AiOutlineEdit className="w-6 h-6" />
                             </button>
                         )}
                     </div>
@@ -263,7 +226,7 @@ const ProfileContent = () => {
                 {/* Main content grid */}
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-24">
                     {/* avatarUrl section */}
-                    <div className="w-full lg:w-64">
+                    <div className="w-full lg:w-64 flex justify-center">
                         <div className="flex flex-col items-center">
                             <div className="w-64 aspect-square mb-4">
                                 <img
@@ -317,20 +280,20 @@ const ProfileContent = () => {
                     </div>
 
                     {/* Form section */}
-                    <div className="flex-1">
-                        <div className="space-y-6">
+                    <div className="flex-1 flex justify-center lg:justify-start">
+                        <div className="space-y-6 w-full max-w-[600px]">
                             {/* Editable fields với icons */}
                             <div className="space-y-4">
-                                {renderEditableField('fullName', 'Họ và tên', userInfo.fullName, 
+                                {renderEditableField('fullName', 'Họ và tên', userInfo.fullName,
                                     <AiOutlineUser className="w-4 h-4 text-gray-500" />)}
-                                {renderEditableField('email', 'Email', userInfo.email, 
+                                {renderEditableField('email', 'Email', userInfo.email,
                                     <AiOutlineMail className="w-4 h-4 text-gray-500" />)}
-                                {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone, 
+                                {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone,
                                     <AiOutlinePhone className="w-4 h-4 text-gray-500" />)}
 
                                 {/* Date and Gender fields */}
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="flex items-center sm:gap-2">
+                                    <div className="flex items-center sm:gap-12">
                                         <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
                                             <AiOutlineCalendar className="w-4 h-4" />
                                             Ngày sinh:
@@ -344,7 +307,7 @@ const ProfileContent = () => {
                                         />
                                     </div>
 
-                                    <div className="flex items-center sm:gap-2">
+                                    <div className="flex items-center sm:gap-12">
                                         <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
                                             <AiOutlineUser className="w-4 h-4" />
                                             Giới tính:
@@ -364,11 +327,11 @@ const ProfileContent = () => {
                                     </div>
                                 </div>
 
-                                {renderEditableField('address', 'Địa chỉ', userInfo.address, 
+                                {renderEditableField('address', 'Địa chỉ', userInfo.address,
                                     <AiOutlineEnvironment className="w-4 h-4 text-gray-500" />)}
                             </div>
 
-                            {/* Action buttons - chỉ hiện khi đang trong chế độ edit */}
+                            {/* Action buttons */}
                             {isEditMode && (
                                 <div className="flex items-center gap-4 pt-6 justify-end">
                                     <button

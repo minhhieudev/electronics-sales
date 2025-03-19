@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineClose, AiOutlineDown, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineDown, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineSave, AiOutlineUpload, AiOutlineEdit, AiOutlineUser, AiOutlineMail, AiOutlinePhone, AiOutlineCalendar, AiOutlineEnvironment } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
@@ -39,6 +39,9 @@ const ProfileContent = () => {
         numberPhone: false,
         address: false
     });
+
+    // Thêm state để kiểm soát chế độ chỉnh sửa chung
+    const [isEditMode, setIsEditMode] = useState(false);
 
     // UseEffect to set data from profile into userInfo
     useEffect(() => {
@@ -112,13 +115,8 @@ const ProfileContent = () => {
         dispatch(updateProfileAction({
             body: dataToSend,
             onSuccess: () => {
-                setEditing({
-                    fullName: false,
-                    email: false,
-                    numberPhone: false,
-                    address: false
-                });
-                setTempAvatarUrl(null); // Reset tempAvatarUrl
+                setIsEditMode(false); // Tắt chế độ chỉnh sửa
+                setTempAvatarUrl(null);
             }
         }));
     };
@@ -154,6 +152,7 @@ const ProfileContent = () => {
 
         setIsProfileChanged(false);
         setTempAvatarUrl(null); // Reset tempAvatarUrl
+        setIsEditMode(false); // Tắt chế độ chỉnh sửa
     };
 
     //========= Upload Image =====================================
@@ -217,32 +216,25 @@ const ProfileContent = () => {
     };
     //=====================================================================
 
-    const renderEditableField = (field, label, value) => {
+    const renderEditableField = (field, label, value, icon) => {
         return (
             <div className="flex items-center gap-3 sm:gap-2">
-                <label className="w-[30%] sm:w-32 text-gray-500 text-sm">{label}:</label>
+                <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                    {icon}
+                    {label}:
+                </label>
                 <div className="flex-1">
-                    {editing[field] ? (
+                    {isEditMode ? (
                         <input
                             type="text"
                             value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
                             className="w-[80%] border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            onBlur={() => setEditing(prev => ({ ...prev, [field]: false }))}
-                            autoFocus
                         />
                     ) : (
-                        <div className="flex items-center gap-2 justify-between w-full sm:w-[80%]">
-                            <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
-                                {value || 'Chưa cập nhật'}
-                            </span>
-                            <button
-                                className="text-orange-500 text-sm font-medium hover:text-orange-600 whitespace-nowrap"
-                                onClick={() => handleEdit(field)}
-                            >
-                                Thay đổi
-                            </button>
-                        </div>
+                        <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
+                            {value || 'Chưa cập nhật'}
+                        </span>
                     )}
                 </div>
             </div>
@@ -252,9 +244,19 @@ const ProfileContent = () => {
     return (
         <div className="">
             <div className="p-6 bg-white rounded-lg">
-                {/* Header section */}
+                {/* Header section với nút edit */}
                 <div className="mb-6">
-                    <h1 className="text-xl sm:text-2xl font-bold mb-1">Tài khoản của tôi</h1>
+                    <div className="flex justify-between items-start mb-4">
+                        <h1 className="text-xl sm:text-2xl font-bold">Tài khoản của tôi</h1>
+                        {!isEditMode && (
+                            <button
+                                onClick={() => setIsEditMode(true)}
+                                className="text-orange-500 hover:text-orange-600 p-2 rounded-full hover:bg-orange-50 transition-colors ml-4"
+                            >
+                                <AiOutlineEdit className="w-5 h-5" />
+                            </button>
+                        )}
+                    </div>
                     <p className="text-sm sm:text-base text-gray-500">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
                 </div>
 
@@ -317,31 +319,42 @@ const ProfileContent = () => {
                     {/* Form section */}
                     <div className="flex-1">
                         <div className="space-y-6">
-                            {/* Editable fields */}
+                            {/* Editable fields với icons */}
                             <div className="space-y-4">
-                                {renderEditableField('fullName', 'Họ và tên', userInfo.fullName)}
-                                {renderEditableField('email', 'Email', userInfo.email)}
-                                {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone)}
+                                {renderEditableField('fullName', 'Họ và tên', userInfo.fullName, 
+                                    <AiOutlineUser className="w-4 h-4 text-gray-500" />)}
+                                {renderEditableField('email', 'Email', userInfo.email, 
+                                    <AiOutlineMail className="w-4 h-4 text-gray-500" />)}
+                                {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone, 
+                                    <AiOutlinePhone className="w-4 h-4 text-gray-500" />)}
 
                                 {/* Date and Gender fields */}
                                 <div className="grid grid-cols-1 gap-3">
                                     <div className="flex items-center sm:gap-2">
-                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm">Ngày sinh:</label>
+                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                                            <AiOutlineCalendar className="w-4 h-4" />
+                                            Ngày sinh:
+                                        </label>
                                         <input
                                             type="date"
                                             value={userInfo.birthDay}
                                             onChange={(e) => handleChange('birthDay', e.target.value)}
                                             className="w-[60%] sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                            disabled={!isEditMode}
                                         />
                                     </div>
 
                                     <div className="flex items-center sm:gap-2">
-                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm">Giới tính:</label>
+                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                                            <AiOutlineUser className="w-4 h-4" />
+                                            Giới tính:
+                                        </label>
                                         <div className="relative w-[60%] sm:w-[40%]">
                                             <select
                                                 value={userInfo.gender}
                                                 onChange={(e) => handleChange('gender', e.target.value === 'true')}
-                                                className="w-full text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none"
+                                                className="w-full text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none disabled:bg-gray-100"
+                                                disabled={!isEditMode}
                                             >
                                                 <option value="true">Nam</option>
                                                 <option value="false">Nữ</option>
@@ -351,28 +364,29 @@ const ProfileContent = () => {
                                     </div>
                                 </div>
 
-                                {renderEditableField('address', 'Địa chỉ', userInfo.address)}
+                                {renderEditableField('address', 'Địa chỉ', userInfo.address, 
+                                    <AiOutlineEnvironment className="w-4 h-4 text-gray-500" />)}
                             </div>
 
-                            {/* Action buttons */}
-                            <div className="flex items-center gap-4 pt-6 justify-end">
-                                <button
-                                    className="w-[30%] sm:w-auto border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handleCancel}
-                                    disabled={!isProfileChanged}
-                                >
-                                    <AiOutlineClose className="h-5 w-5" />
-                                    <span>Hủy</span>
-                                </button>
-                                <button
-                                    className="w-[30%] sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handleSave}
-                                    disabled={!isProfileChanged}
-                                >
-                                    <AiOutlineSave className="h-5 w-5" />
-                                    <span>Lưu</span>
-                                </button>
-                            </div>
+                            {/* Action buttons - chỉ hiện khi đang trong chế độ edit */}
+                            {isEditMode && (
+                                <div className="flex items-center gap-4 pt-6 justify-end">
+                                    <button
+                                        className="w-[30%] sm:w-auto border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                        onClick={handleCancel}
+                                    >
+                                        <AiOutlineClose className="h-5 w-5" />
+                                        <span>Hủy</span>
+                                    </button>
+                                    <button
+                                        className="w-[30%] sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2"
+                                        onClick={handleSave}
+                                    >
+                                        <AiOutlineSave className="h-5 w-5" />
+                                        <span>Lưu</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -73,7 +73,7 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
 
     // Desktop version
     return (
-        <div className="p-2">
+        <div className="py-2">
             <div className="flex items-center flex-wrap justify-center">
                 <span className="font-medium text-base text-gray-700 whitespace-nowrap mb-1 mr-3">
                     Sắp xếp theo

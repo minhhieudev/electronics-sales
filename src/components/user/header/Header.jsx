@@ -113,17 +113,16 @@ const Header = () => {
                     </div>
 
                     {/* User Info & Cart */}
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col">
                         <div className="flex items-center gap-4">
                             {userInfo ? (
-                                <div className="flex gap-1 items-center relative">
+                                <div className="flex gap-1 items-center relative cursor-pointer" onClick={() => setShowDropdown(!showDropdown)}>
                                     <div className='flex items-center gap-1'>
                                         <img src={avatar} alt="avatar" className="h-7 w-7 rounded-full" />
                                         <span className="text-base font-bold hidden md:inline">{userInfo.fullName}</span>
                                     </div>
                                     <AiOutlineDown
-                                        className="h-4 cursor-pointer"
-                                        onClick={() => setShowDropdown(!showDropdown)}
+                                        className="h-4"
                                     />
                                     {showDropdown && (
                                         <div ref={dropdownRef} className="absolute top-full right-[-10px] mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
@@ -163,12 +162,14 @@ const Header = () => {
                             </div>
                         </div>
                         {userInfo && (
-                            <div className="mt-2 flex items-center text-xs lg:text-sm">
+                            <div className="mt-2 flex items-center text-xs lg:text-sm ml-1.5">
                                 <div className='flex items-center gap-1'>
                                     <AiOutlineEnvironment className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
                                     <span className="text-gray-400 whitespace-nowrap">Địa chỉ:</span>
                                 </div>
-                                <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">{userInfo.address || 'Chưa cập nhật'}</span>
+                                <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">
+                                    {userInfo.address.length > 20 ? `${userInfo.address.substring(0, 20)}...` : userInfo.address || 'Chưa cập nhật'}
+                                </span>
                             </div>
                         )}
                     </div>

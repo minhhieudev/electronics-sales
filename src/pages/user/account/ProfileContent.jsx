@@ -19,6 +19,12 @@ const ProfileContent = () => {
     const [tempAvatarUrl, setTempAvatarUrl] = useState(null);
     const [tempUploadedUrl, setTempUploadedUrl] = useState(null);
 
+    // State to control edit mode
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    // State to track if data has changed
+    const [isChanged, setIsChanged] = useState(false);
+
     // State for user info
     const [userInfo, setUserInfo] = useState({
         fullName: '',
@@ -29,9 +35,6 @@ const ProfileContent = () => {
         address: '',
         avatarUrl: ''
     });
-
-    // State to control edit mode
-    const [isEditMode, setIsEditMode] = useState(false);
 
     // UseEffect to set data from profile into userInfo
     useEffect(() => {
@@ -45,10 +48,12 @@ const ProfileContent = () => {
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
             });
+            setIsChanged(false);
         }
     }, [profile]);
 
-    // Add validation functions
+    // ========== Add validation functions =======================
+
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -75,17 +80,23 @@ const ProfileContent = () => {
         }
 
         if (field === 'fullName') {
-            value = value.replace(/[^a-zA-ZÀ-ỹ\s]/g, '')  
-                         .replace(/\s+/g, ' ')          
-                         .trimStart();                   
+            value = value.replace(/[^a-zA-ZÀ-ỹ\s]/g, '')
+                .replace(/\s+/g, ' ')
+                .trimStart();
         }
 
         const newUserInfo = { ...userInfo, [field]: value };
         setUserInfo(newUserInfo);
+
+        // Check if the new userInfo is different from the original profile
+        const isProfileChanged = Object.keys(newUserInfo).some(key => newUserInfo[key] !== profile[key]);
+        setIsChanged(isProfileChanged || tempUploadedUrl !== null);
     };
+    // ===================================================================================
 
     // Handle save profile
     const handleSave = () => {
+
         if (!userInfo.fullName.trim()) {
             toast.error(MESSAGES.FULL_NAME_REQUIRED);
             return;
@@ -96,25 +107,21 @@ const ProfileContent = () => {
             return;
         }
 
-        // Validate email
         if (userInfo.email !== "" && !isValidEmail(userInfo.email)) {
             toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
             return;
         }
 
-        // Validate số điện thoại không được bỏ trống
         if (userInfo.numberPhone.trim() === '') {
             toast.error(MESSAGES.PHONE_REQUIRED);
             return;
         }
 
-        // Validate số điện thoại
         if (!isValidPhone(userInfo.numberPhone)) {
             toast.error(MESSAGES.INVALID_PHONE_FORMAT);
             return;
         }
 
-        // Validate địa chỉ không được bỏ trống
         if (!userInfo.address.trim()) {
             toast.error(MESSAGES.ADDRESS_REQUIRED);
             return;
@@ -154,9 +161,10 @@ const ProfileContent = () => {
         setTempUploadedUrl(null);
         setTempAvatarUrl(null);
         setIsEditMode(false);
+        setIsChanged(false);
     };
 
-    //========= Upload Image =====================================
+    // ========= Upload Image =====================================
     const fileInputRef = React.useRef(null);
 
     const handleUploadClick = () => {
@@ -181,6 +189,7 @@ const ProfileContent = () => {
             }));
 
             setIsEditMode(true);
+            setIsChanged(true); // Set isChanged to true when avatar is uploaded
 
         } catch (error) {
             toast.error(MESSAGES.UPLOAD_ERROR + error.message);
@@ -222,11 +231,10 @@ const ProfileContent = () => {
                             value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
                             placeholder={field === 'fullName' ? "Ví dụ: Nguyễn Văn A" : ""}
-                            className={`w-[80%] text-sm border ${
-                                field === 'fullName' 
-                                    ? (!value?.trim() || !isValidFullName(value || '')) ? 'border-red-500' : 'border-[#FF8900]'
-                                    : 'border-[#FF8900]'
-                            } rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                            className={`w-[80%] text-sm border ${field === 'fullName'
+                                ? (!value?.trim() || !isValidFullName(value || '')) ? 'border-red-500' : 'border-[#FF8900]'
+                                : 'border-[#FF8900]'
+                                } rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500`}
                         />
                     ) : (
                         <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
@@ -377,8 +385,8 @@ const ProfileContent = () => {
                                         <span>Hủy</span>
                                     </button>
                                     <button
-                                        className="w-[30%] sm:w-auto bg-[#FF8900] text-white px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2"
-                                        onClick={handleSave}
+                                        className={`w-[30%] sm:w-auto ${isChanged ? 'bg-[#FF8900] text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'} px-4 py-2 rounded-lg hover:bg-orange-500 transition-colors flex items-center gap-2`}
+                                        onClick={isChanged ? handleSave : undefined}
                                     >
                                         <AiOutlineSave className="h-5 w-5" />
                                         <span>Lưu</span>

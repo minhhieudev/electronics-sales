@@ -23,7 +23,7 @@ const ProfileContent = () => {
     const [userInfo, setUserInfo] = useState({
         fullName: '',
         email: '',
-        numberPhone: null,
+        numberPhone: '',
         birthDay: '',
         gender: null,
         address: '',
@@ -39,8 +39,8 @@ const ProfileContent = () => {
             setUserInfo({
                 fullName: profile.fullName || '',
                 email: profile.email || '',
-                numberPhone: profile.numberPhone || null,
-                birthDay: profile.birthDay || null,
+                numberPhone: profile.numberPhone || '',
+                birthDay: profile.birthDay || '',
                 gender: profile.gender,
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
@@ -59,14 +59,25 @@ const ProfileContent = () => {
         return phoneRegex.test(phone);
     };
 
+    const isValidFullName = (name) => {
+        const words = name.trim().split(/\s+/);
+        return words.length >= 2 && words.every(word => word.length >= 2);
+    };
+
     const handleChange = (field, value) => {
         if (field === 'numberPhone') {
-            if (value && !/^\d*$/.test(value)) {
+            if (!/^\d*$/.test(value)) {
                 return;
             }
-            if (value && value.length > 10) {
+            if (value.length > 10) {
                 return;
             }
+        }
+
+        if (field === 'fullName') {
+            value = value.replace(/[^a-zA-ZÀ-ỹ\s]/g, '')  
+                         .replace(/\s+/g, ' ')          
+                         .trimStart();                   
         }
 
         const newUserInfo = { ...userInfo, [field]: value };
@@ -75,25 +86,43 @@ const ProfileContent = () => {
 
     // Handle save profile
     const handleSave = () => {
+        if (!userInfo.fullName.trim()) {
+            toast.error(MESSAGES.FULL_NAME_REQUIRED);
+            return;
+        }
+
+        if (!isValidFullName(userInfo.fullName)) {
+            toast.error(MESSAGES.FULL_NAME_INVALID);
+            return;
+        }
+
+        // Validate email
         if (userInfo.email !== "" && !isValidEmail(userInfo.email)) {
             toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
             return;
         }
 
-        if (userInfo.numberPhone !== null && !isValidPhone(userInfo.numberPhone)) {
+        // Validate số điện thoại không được bỏ trống
+        if (userInfo.numberPhone.trim() === '') {
+            toast.error(MESSAGES.PHONE_REQUIRED);
+            return;
+        }
+
+        // Validate số điện thoại
+        if (!isValidPhone(userInfo.numberPhone)) {
             toast.error(MESSAGES.INVALID_PHONE_FORMAT);
             return;
         }
 
-        const dataToSend = {
-            ...userInfo,
-            numberPhone: userInfo.numberPhone || null
-        };
+        // Validate địa chỉ không được bỏ trống
+        if (!userInfo.address.trim()) {
+            toast.error(MESSAGES.ADDRESS_REQUIRED);
+            return;
+        }
 
         dispatch(updateProfileAction({
-            body: dataToSend,
+            body: userInfo,
             onSuccess: () => {
-                // If saved successfully and there is an old image, delete the old image
                 if (tempAvatarUrl && tempAvatarUrl !== userInfo.avatarUrl) {
                     deleteFileFromCloudinary(tempAvatarUrl)
                         .catch(error => console.error("Error deleting old avatar:", error));
@@ -192,7 +221,12 @@ const ProfileContent = () => {
                             type="text"
                             value={value || ''}
                             onChange={(e) => handleChange(field, e.target.value)}
-                            className="w-[80%] text-sm border border-[#FF8900] rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            placeholder={field === 'fullName' ? "Ví dụ: Nguyễn Văn A" : ""}
+                            className={`w-[80%] text-sm border ${
+                                field === 'fullName' 
+                                    ? (!value?.trim() || !isValidFullName(value || '')) ? 'border-red-500' : 'border-[#FF8900]'
+                                    : 'border-[#FF8900]'
+                            } rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500`}
                         />
                     ) : (
                         <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
@@ -302,6 +336,7 @@ const ProfileContent = () => {
                                             type="date"
                                             value={userInfo.birthDay}
                                             onChange={(e) => handleChange('birthDay', e.target.value)}
+                                            max={new Date().toISOString().split('T')[0]}
                                             className="w-[60%] sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                             disabled={!isEditMode}
                                         />

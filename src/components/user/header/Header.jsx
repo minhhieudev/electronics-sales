@@ -168,7 +168,7 @@ const Header = () => {
                                     <span className="text-gray-400 whitespace-nowrap">Địa chỉ:</span>
                                 </div>
                                 <span className="text-black ml-1 truncate max-w-[150px] lg:max-w-[250px]">
-                                    {userInfo.address.length > 20 ? `${userInfo.address.substring(0, 20)}...` : userInfo.address || 'Chưa cập nhật'}
+                                    {userInfo?.address?.length > 20 ? `${userInfo.address.substring(0, 20)}...` : userInfo?.address || 'Chưa cập nhật'}
                                 </span>
                             </div>
                         )}

@@ -10,6 +10,7 @@ import googleIcon from "../../Images/google-icon.png";
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const [prefilledUsername, setPrefilledUsername] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -19,10 +20,16 @@ const AuthForm = () => {
         if (accessToken && accessToken !== 'undefined') {
             navigate("/");
         }
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
-    const toggleForm = () => {
+    const handleToggleForm = () => {
         setIsLogin(!isLogin);
+        setPrefilledUsername('');
+    };
+
+    const handleRegisterSuccess = (userName) => {
+        setIsLogin(true);
+        setPrefilledUsername(userName);
     };
 
     return (
@@ -38,7 +45,10 @@ const AuthForm = () => {
 
                 <div className={`relative bg-white p-5 rounded-lg shadow-lg w-[340px] mt-8
                     ${isLogin ? 'min-h-[420px]' : 'min-h-[480px]'} z-10`}>
-                    {isLogin ? <LoginForm /> : <RegisterForm />}
+                    {isLogin ?
+                        <LoginForm prefilledUsername={prefilledUsername} /> :
+                        <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
+                    }
 
                     <div className="flex items-center my-3">
                         <div className="flex-grow border-t border-gray-300"></div>
@@ -53,7 +63,7 @@ const AuthForm = () => {
 
                     <p className="text-center text-xs font-semibold mt-3">
                         {isLogin ? 'Bạn chưa có tài khoản?' : 'Bạn đã có tài khoản?'}
-                        <button onClick={toggleForm} className="text-[#FF8900] ml-1">
+                        <button onClick={handleToggleForm} className="text-[#FF8900] ml-1">
                             {isLogin ? 'Đăng ký' : 'Đăng nhập'}
                         </button>
                     </p>

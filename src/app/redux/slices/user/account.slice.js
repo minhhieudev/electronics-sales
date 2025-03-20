@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import MESSAGES from "../../../../common/const";
+import MESSAGES, { CONST } from "../../../../common/const";
 import AccountService from "../../../services/user/account.service";
 import { updateUserInfo } from '../auth.slice';
 import { setLoading } from "../loading.slice";
@@ -14,7 +14,7 @@ export const updateProfileAction = createAsyncThunk(
             const response = await AccountService.updateProfile(body);
             const data = response.data;
 
-            if (data && response.status === 'success') {
+            if (data && response.status === CONST.STATUS.SUCCESS) {
                 toast.success(MESSAGES.UPDATE_PROFILE_SUCCESS);
                 dispatch(updateUserInfo(data));
                 onSuccess && onSuccess();
@@ -31,7 +31,7 @@ export const updateProfileAction = createAsyncThunk(
 // Thunk action to change password
 export const changePasswordAction = createAsyncThunk(
     "accounts/changePassword",
-    async ({ currentPassword, newPassword }, { dispatch }) => {
+    async ({ currentPassword, newPassword, onSuccess }, { dispatch }) => {
         try {
             dispatch(setLoading(true));
             const response = await AccountService.changePassword({
@@ -39,8 +39,9 @@ export const changePasswordAction = createAsyncThunk(
                 newPassword: newPassword
             });
 
-            if (response && response.status === 'success') {
+            if (response && response.status === CONST.STATUS.SUCCESS) {
                 toast.success(MESSAGES.CHANGE_PASSWORD_SUCCESS);
+                onSuccess && onSuccess();
             }
 
         } catch (error) {

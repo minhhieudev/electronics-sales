@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { registerAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
-const RegisterForm = () => {
+const RegisterForm = ({ onRegisterSuccess }) => {
     const [formData, setFormData] = useState({ userName: '', passWord: '', confirmPassword: '', fullName: '' });
     const [passwordError, setPasswordError] = useState('');
     const dispatch = useDispatch();
@@ -29,13 +29,16 @@ const RegisterForm = () => {
         }
         setPasswordError('');
 
-        await dispatch(registerAction({
+        dispatch(registerAction({
             body: {
                 userName: formData.userName,
                 password: formData.passWord,
                 fullName: formData.fullName
+            },
+            onSuccess: () => {
+                onRegisterSuccess(formData.userName);
             }
-        })).unwrap();
+        }));
     };
 
     return (

@@ -70,6 +70,7 @@ const ProfileContent = () => {
     };
 
     const handleChange = (field, value) => {
+        // Validate input như cũ
         if (field === 'numberPhone') {
             if (!/^\d*$/.test(value)) {
                 return;
@@ -85,18 +86,24 @@ const ProfileContent = () => {
                 .trimStart();
         }
 
+        // Cập nhật userInfo
         const newUserInfo = { ...userInfo, [field]: value };
         setUserInfo(newUserInfo);
 
-        // Check if the new userInfo is different from the original profile
-        const isProfileChanged = Object.keys(newUserInfo).some(key => newUserInfo[key] !== profile[key]);
-        setIsChanged(isProfileChanged || tempUploadedUrl !== null);
+        // Check for changes compared to the original data
+        const hasChanges = Object.keys(newUserInfo).some(key => {
+            if (key === 'gender') {
+                return newUserInfo[key] !== profile[key];
+            }
+            return String(newUserInfo[key] || '').trim() !== String(profile[key] || '').trim();
+        });
+
+        setIsChanged(hasChanges || tempUploadedUrl !== null);
     };
     // ===================================================================================
 
     // Handle save profile
     const handleSave = () => {
-
         if (!userInfo.fullName.trim()) {
             toast.error(MESSAGES.FULL_NAME_REQUIRED);
             return;
@@ -107,9 +114,11 @@ const ProfileContent = () => {
             return;
         }
 
-        if (userInfo.email !== "" && !isValidEmail(userInfo.email)) {
-            toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
-            return;
+        if (userInfo.email !== "") {
+            if ( !isValidEmail(userInfo.email)) {
+                toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
+                return;
+            }
         }
 
         if (userInfo.numberPhone.trim() === '') {
@@ -246,8 +255,74 @@ const ProfileContent = () => {
         );
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    };
+
+    const renderDateAndGender = () => {
+        return (
+            <div className="grid grid-cols-1 gap-3">
+                {/* Date Field */}
+                <div className="flex items-center sm:gap-12 gap-3">
+                    <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                        <AiOutlineCalendar className="w-4 h-4" />
+                        Ngày sinh:
+                    </label>
+                    <div className="flex-1">
+                        {isEditMode ? (
+                            <input
+                                type="date"
+                                value={userInfo.birthDay}
+                                onChange={(e) => handleChange('birthDay', e.target.value)}
+                                max={new Date().toISOString().split('T')[0]}
+                                className="w-[80%] sm:w-[50%] text-sm border border-[#FF8900] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                            />
+                        ) : (
+                            <span className={`text-sm break-words ${!userInfo.birthDay ? 'text-gray-400 italic' : 'font-semibold'}`}>
+                                {userInfo.birthDay ? formatDate(userInfo.birthDay) : 'Chưa cập nhật'}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Gender Field */}
+                <div className="flex items-center sm:gap-12 gap-3">
+                    <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                        <AiOutlineUser className="w-4 h-4" />
+                        Giới tính:
+                    </label>
+                    <div className="flex-1">
+                        {isEditMode ? (
+                            <div className="relative w-[60%] sm:w-[50%]">
+                                <select
+                                    value={userInfo.gender}
+                                    onChange={(e) => handleChange('gender', e.target.value === 'true')}
+                                    className="w-full text-sm border border-[#FF8900] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none cursor-pointer"
+                                >
+                                    <option value="true">Nam</option>
+                                    <option value="false">Nữ</option>
+                                </select>
+                                <AiOutlineDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none w-4 h-4" />
+                            </div>
+                        ) : (
+                            <span className="text-sm font-semibold">
+                                {userInfo.gender === true ? 'Nam' : 'Nữ'}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="">
+        <div>
             <div className="p-6 bg-white rounded-lg">
                 {/* Header section */}
                 <div className="mb-6">
@@ -333,42 +408,7 @@ const ProfileContent = () => {
                                 {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone,
                                     <AiOutlinePhone className="w-4 h-4 text-gray-500" />)}
 
-                                {/* Date and Gender fields */}
-                                <div className="grid grid-cols-1 gap-3">
-                                    <div className="flex items-center sm:gap-12">
-                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
-                                            <AiOutlineCalendar className="w-4 h-4" />
-                                            Ngày sinh:
-                                        </label>
-                                        <input
-                                            type="date"
-                                            value={userInfo.birthDay}
-                                            onChange={(e) => handleChange('birthDay', e.target.value)}
-                                            max={new Date().toISOString().split('T')[0]}
-                                            className="w-[60%] sm:w-[40%] text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                            disabled={!isEditMode}
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center sm:gap-12">
-                                        <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
-                                            <AiOutlineUser className="w-4 h-4" />
-                                            Giới tính:
-                                        </label>
-                                        <div className="relative w-[60%] sm:w-[40%]">
-                                            <select
-                                                value={userInfo.gender}
-                                                onChange={(e) => handleChange('gender', e.target.value === 'true')}
-                                                className="w-full text-sm border border-[#FF8900] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none disabled:bg-gray-100"
-                                                disabled={!isEditMode}
-                                            >
-                                                <option value="true">Nam</option>
-                                                <option value="false">Nữ</option>
-                                            </select>
-                                            <AiOutlineDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none w-4 h-4" />
-                                        </div>
-                                    </div>
-                                </div>
+                                {renderDateAndGender()}
 
                                 {renderEditableField('address', 'Địa chỉ', userInfo.address,
                                     <AiOutlineEnvironment className="w-4 h-4 text-gray-500" />)}

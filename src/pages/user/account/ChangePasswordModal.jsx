@@ -41,17 +41,17 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
         dispatch(changePasswordAction({
             currentPassword: passwords.currentPassword,
-            newPassword: passwords.newPassword
+            newPassword: passwords.newPassword,
+            onSuccess: () => {
+                // Reset form after successful password change
+                setPasswords({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                });
+                onClose(); // Close the modal
+            },
         }));
-
-        // Reset form
-        setPasswords({
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-        });
-
-        onClose();
     };
 
     if (!isOpen) return null;

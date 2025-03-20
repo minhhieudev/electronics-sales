@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,27 @@ import { toast } from "react-toastify";
 import { loginAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
-const LoginForm = () => {
-    const [formData, setFormData] = useState({ userName: 'hieu20', passWord: '12' });
+const LoginForm = ({ prefilledUsername = '' }) => {
+    const DEFAULT_USERNAME = "hieu20";  // tài khoản mặc định
+    const DEFAULT_PASSWORD = "123"; // mật khẩu mặc định
+
+    const [formData, setFormData] = useState({
+        userName: prefilledUsername || DEFAULT_USERNAME, // Nếu không có prefilledUsername thì dùng DEFAULT_USERNAME
+        passWord: DEFAULT_PASSWORD
+    });
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        if (prefilledUsername) {
+            setFormData(prev => ({
+                ...prev,
+                userName: prefilledUsername,
+                passWord: '' // Reset password khi có prefilledUsername
+            }));
+        }
+    }, [prefilledUsername]);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -24,10 +40,10 @@ const LoginForm = () => {
             return;
         }
 
-        await dispatch(loginAction({
-            body: { 
-                userName: formData.userName, 
-                password: formData.passWord 
+        dispatch(loginAction({
+            body: {
+                userName: formData.userName,
+                password: formData.passWord
             },
             onSuccess: (data) => {
                 toast.dismiss();
@@ -38,13 +54,13 @@ const LoginForm = () => {
                     navigate("/");
                 }
             }
-        })).unwrap();
+        }));
     };
 
     return (
         <form onSubmit={handleLogin} className="w-full">
             <h1 className="text-base text-center font-bold mb-3">Đăng nhập</h1>
-            
+
             <div className="mb-2">
                 <label className="block text-[11px] font-semibold mb-1" htmlFor="userName">
                     Tài khoản
@@ -77,8 +93,8 @@ const LoginForm = () => {
                         className="absolute right-2 top-1/2 transform -translate-y-1/2"
                         onClick={() => setShowPassword(!showPassword)}
                     >
-                        {showPassword ? 
-                            <AiOutlineEyeInvisible className="w-3.5 h-3.5 text-gray-400" /> : 
+                        {showPassword ?
+                            <AiOutlineEyeInvisible className="w-3.5 h-3.5 text-gray-400" /> :
                             <AiOutlineEye className="w-3.5 h-3.5 text-gray-400" />
                         }
                     </button>

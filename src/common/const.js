@@ -8,14 +8,11 @@ const MESSAGES = {
     FIELDS_REQUIRED: "Vui lòng điền đủ thông tin!",
     
     // Session messages
-    SESSION_EXPIRED: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     SESSION_EXPIRED_MESSAGE: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     INVALID_TOKEN: "Invalid access token",
     
     // Network messages
     NETWORK_ERROR: "Lỗi mạng hoặc máy chủ không phản hồi.",
-    INVALID_TOKEN: "Token truy cập không hợp lệ.",
-    SESSION_EXPIRED_MESSAGE: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     NO_DATA : "Không có dữ liệu",
     
     // Profile messages
@@ -48,14 +45,16 @@ const MESSAGES = {
     DELETE_FILE_CLOUDINARY_ERROR: 'Lỗi khi xóa file từ Cloudinary',
 };
 
-export default MESSAGES;
-
 const CONST = {
     ITEMS_PER_PAGE: 12,
     UPLOAD: {
         MAX_SIZE: 1024 * 1024, // 1MB
         ALLOWED_TYPES: ['image/jpeg', 'image/png']
+    },
+    STATUS: {
+        SUCCESS: 'success',
     }
 };
 
 export { CONST };
+export default MESSAGES;

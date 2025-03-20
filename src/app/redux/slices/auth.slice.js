@@ -4,6 +4,7 @@ import MESSAGES from "../../../common/const";
 import AuthService from "../../services/auth/auth.service";
 import CONST from "../const";
 import { setLoading } from "./loading.slice";
+import { CONST as CommonCONST } from "../../../common/const";
 
 export const loginAction = createAsyncThunk(
   "auth/login",
@@ -13,7 +14,7 @@ export const loginAction = createAsyncThunk(
       const loginResponse = await AuthService.login({ body });
       const response = loginResponse.data
 
-      if (response && response.status === 'success') {
+      if (response && response.status === CommonCONST.STATUS.SUCCESS) {
         const { token, data } = response;
 
         localStorage.setItem(CONST.STORAGE.ACCESS_TOKEN, token);
@@ -35,14 +36,15 @@ export const loginAction = createAsyncThunk(
 
 export const registerAction = createAsyncThunk(
   "auth/register",
-  async ({ body }, { dispatch }) => {
+  async ({ body, onSuccess }, { dispatch }) => {
     try {
       dispatch(setLoading(true));
       const registerResponse = await AuthService.register(body);
       const response = registerResponse.data
 
-      if (response && response.status === 'success') {
+      if (response && response.status === CommonCONST.STATUS.SUCCESS) {
         toast.success(MESSAGES.REGISTER_SUCCESS);
+        onSuccess && onSuccess();
       }
     } catch (error) {
       const errorMessage = error?.response?.data?.message || MESSAGES.REGISTER_ERROR;

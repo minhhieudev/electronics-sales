@@ -12,14 +12,14 @@ const Sidebar = ({ activePage, onPageChange }) => {
             <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                     <img
-                        src={profile.avatarUrl ? `${process.env.REACT_APP_CDN_URL}${profile.avatarUrl}` : avatars}
+                        src={profile?.avatarUrl ? `${process.env.REACT_APP_CDN_URL}${profile?.avatarUrl}` : avatars}
                         alt="Avatar"
                         className="w-full h-full object-cover rounded-lg"
                     />
                 </div>
                 <div className="min-w-0">
-                    <div className="font-bold text-base truncate">{profile.fullName || ""}</div>
-                    <div className="text-sm text-gray-500 truncate">{profile.email || "Chưa cập nhật email"}</div>
+                    <div className="font-bold text-base truncate">{profile?.fullName || ""}</div>
+                    <div className="text-sm text-gray-500 truncate">{profile?.email || "Chưa cập nhật email"}</div>
                 </div>
             </div>
 

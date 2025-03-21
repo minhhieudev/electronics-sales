@@ -10,23 +10,11 @@ import SortingOptions from './SortingOptions';
 
 const ITEMS_PER_PAGE = CONST.ITEMS_PER_PAGE;
 
-const CATEGORIES = [
-    "Tất cả sản phẩm",
-    "Điện thoại / Tablet",
-    "Laptop",
-    "Âm thanh",
-    "Đồng hồ, Camera",
-    "Tivi",
-    "Phụ kiện",
-    "Khuyến mãi"
-];
-
 const HomePage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortedData, setSortedData] = useState(data);
     const [showCategories, setShowCategories] = useState(false);
-    const [showFilters, setShowFilters] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(0);
+    const [selectedCategory, setSelectedCategory] = useState("Tất cả sản phẩm");
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
 
     useEffect(() => {
@@ -71,9 +59,9 @@ const HomePage = () => {
         }
     };
 
-    const handleCategoryChange = (index) => {
-        setSelectedCategory(index);
-        setCurrentPage(1); // Reset to the first page when changing categories
+    const handleCategoryChange = (category) => {
+        setSelectedCategory(category.name);
+        setCurrentPage(1);
     };
 
     const toggleCategories = () => {
@@ -87,14 +75,14 @@ const HomePage = () => {
         <div className="bg-gradient-to-r min-h-screen">
             <div className='container mx-auto space-y-1 mt-10'>
                 {/* Mobile Header */}
-                <div className="md:hidden flex justify-between items-center mb-4">
+                <div className="md:hidden flex justify-between items-center px-4 mb-4">
                     <button
                         onClick={toggleCategories}
                         className="p-2 rounded-md bg-white shadow-sm"
                     >
                         <FiMenu className="h-6 w-6 text-gray-700" />
                     </button>
-                    <h1 className="font-bold text-xl">{CATEGORIES[selectedCategory]}</h1>
+                    <h1 className="font-bold text-xl">{selectedCategory}</h1>
                     {/* Dropdown for Filters */}
                     <select
                         onChange={(e) => handleSortChange(e.target.value)}
@@ -124,8 +112,8 @@ const HomePage = () => {
                                 </div>
                                 <Categories
                                     selectedIndex={selectedCategory}
-                                    setSelectedIndex={(index) => {
-                                        handleCategoryChange(index);
+                                    setSelectedIndex={(category) => {
+                                        handleCategoryChange(category);
                                         toggleCategories();
                                     }}
                                 />
@@ -146,10 +134,10 @@ const HomePage = () => {
                     {/* Main Content */}
                     <div className="col-span-1 md:col-span-9 lg:col-span-10">
                         {/* Desktop Category Title and Sorting Options */}
-                        <div className="hidden md:block py-2">
+                        <div className="hidden md:block px-4 py-2">
                             <div className="flex items-center justify-between flex-wrap">
                                 <h1 className={`font-bold text-xl md:text-2xl ${isNarrowDesktop ? 'w-full text-center' : ''}`}>
-                                    {CATEGORIES[selectedCategory]}
+                                    {selectedCategory}
                                 </h1>
 
                                 {/* Desktop Sorting Options */}

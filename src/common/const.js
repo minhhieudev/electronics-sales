@@ -22,9 +22,6 @@ const MESSAGES = {
     INVALID_EMAIL_FORMAT: 'Email không đúng định dạng',
     INVALID_PHONE_FORMAT: 'Số điện thoại phải có 10 chữ số',
     FULL_NAME_REQUIRED: "Họ và tên không được bỏ trống",
-    FULL_NAME_INVALID: "Vui lòng nhập đầy đủ họ và tên (ít nhất 2 từ)",
-    PHONE_REQUIRED: "Số điện thoại không được bỏ trống",
-    ADDRESS_REQUIRED: "Địa chỉ không được bỏ trống",
 
     // Change password messages
     CHANGE_PASSWORD_FIELDS_REQUIRED: 'Vui lòng điền đầy đủ thông tin',

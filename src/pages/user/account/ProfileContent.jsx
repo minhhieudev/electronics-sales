@@ -28,9 +28,9 @@ const ProfileContent = () => {
     // State for user info
     const [userInfo, setUserInfo] = useState({
         fullName: '',
-        email: '',
-        numberPhone: '',
-        birthDay: '',
+        email: null,
+        phoneNumber: '',
+        dateOfBirth: '',
         gender: null,
         address: '',
         avatarUrl: ''
@@ -41,9 +41,9 @@ const ProfileContent = () => {
         if (profile) {
             setUserInfo({
                 fullName: profile.fullName || '',
-                email: profile.email || '',
-                numberPhone: profile.numberPhone || '',
-                birthDay: profile.birthDay || '',
+                email: profile.email || null,
+                phoneNumber: profile.phoneNumber || '',
+                dateOfBirth: profile.dateOfBirth || '',
                 gender: profile.gender,
                 address: profile.address || '',
                 avatarUrl: profile.avatarUrl || ''
@@ -65,13 +65,11 @@ const ProfileContent = () => {
     };
 
     const isValidFullName = (name) => {
-        const words = name.trim().split(/\s+/);
-        return words.length >= 2 && words.every(word => word.length >= 2);
+        return name.trim().length > 0;
     };
 
     const handleChange = (field, value) => {
-        // Validate input như cũ
-        if (field === 'numberPhone') {
+        if (field === 'phoneNumber') {
             if (!/^\d*$/.test(value)) {
                 return;
             }
@@ -86,7 +84,7 @@ const ProfileContent = () => {
                 .trimStart();
         }
 
-        // Cập nhật userInfo
+        // Update userInfo
         const newUserInfo = { ...userInfo, [field]: value };
         setUserInfo(newUserInfo);
 
@@ -104,40 +102,30 @@ const ProfileContent = () => {
 
     // Handle save profile
     const handleSave = () => {
-        if (!userInfo.fullName.trim()) {
+        if (!isValidFullName(userInfo.fullName)) {
             toast.error(MESSAGES.FULL_NAME_REQUIRED);
             return;
         }
 
-        if (!isValidFullName(userInfo.fullName)) {
-            toast.error(MESSAGES.FULL_NAME_INVALID);
-            return;
-        }
-
-        if (userInfo.email !== "") {
-            if ( !isValidEmail(userInfo.email)) {
+        if (userInfo.email !== null) {
+            if (!isValidEmail(userInfo.email)) {
                 toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
                 return;
             }
         }
 
-        if (userInfo.numberPhone.trim() === '') {
-            toast.error(MESSAGES.PHONE_REQUIRED);
-            return;
-        }
-
-        if (!isValidPhone(userInfo.numberPhone)) {
+        if (!isValidPhone(userInfo.phoneNumber) && userInfo.phoneNumber !== "") {
             toast.error(MESSAGES.INVALID_PHONE_FORMAT);
             return;
         }
 
-        if (!userInfo.address.trim()) {
-            toast.error(MESSAGES.ADDRESS_REQUIRED);
-            return;
-        }
+        const emailToSend = userInfo.email?.trim() === '' ? null : userInfo.email;
 
         dispatch(updateProfileAction({
-            body: userInfo,
+            body: {
+                ...userInfo,
+                email: emailToSend
+            },
             onSuccess: () => {
                 if (tempAvatarUrl && tempAvatarUrl !== userInfo.avatarUrl) {
                     deleteFileFromCloudinary(tempAvatarUrl)
@@ -226,6 +214,16 @@ const ProfileContent = () => {
     };
     //=====================================================================
 
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    };
+
     const renderEditableField = (field, label, value, icon) => {
         return (
             <div className="flex items-center gap-3 sm:gap-12">
@@ -246,23 +244,13 @@ const ProfileContent = () => {
                                 } rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500`}
                         />
                     ) : (
-                        <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'numberPhone' ? 'font-bold' : 'font-semibold'}`}>
+                        <span className={`text-sm break-words ${!value ? 'text-gray-400 italic' : field === 'phoneNumber' ? 'font-bold' : 'font-semibold'}`}>
                             {value || 'Chưa cập nhật'}
                         </span>
                     )}
                 </div>
             </div>
         );
-    };
-
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        });
     };
 
     const renderDateAndGender = () => {
@@ -278,14 +266,14 @@ const ProfileContent = () => {
                         {isEditMode ? (
                             <input
                                 type="date"
-                                value={userInfo.birthDay}
-                                onChange={(e) => handleChange('birthDay', e.target.value)}
+                                value={userInfo.dateOfBirth}
+                                onChange={(e) => handleChange('dateOfBirth', e.target.value)}
                                 max={new Date().toISOString().split('T')[0]}
                                 className="w-[80%] sm:w-[50%] text-sm border border-[#FF8900] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
                             />
                         ) : (
-                            <span className={`text-sm break-words ${!userInfo.birthDay ? 'text-gray-400 italic' : 'font-semibold'}`}>
-                                {userInfo.birthDay ? formatDate(userInfo.birthDay) : 'Chưa cập nhật'}
+                            <span className={`text-sm break-words ${!userInfo.dateOfBirth ? 'text-gray-400 italic' : 'font-semibold'}`}>
+                                {userInfo.dateOfBirth ? formatDate(userInfo.dateOfBirth) : 'Chưa cập nhật'}
                             </span>
                         )}
                     </div>
@@ -302,9 +290,10 @@ const ProfileContent = () => {
                             <div className="relative w-[60%] sm:w-[50%]">
                                 <select
                                     value={userInfo.gender}
-                                    onChange={(e) => handleChange('gender', e.target.value === 'true')}
+                                    onChange={(e) => handleChange('gender', e.target.value === 'true' ? true : e.target.value === 'false' ? false : null)}
                                     className="w-full text-sm border border-[#FF8900] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none cursor-pointer"
                                 >
+                                    <option value="">Chọn giới tính</option>
                                     <option value="true">Nam</option>
                                     <option value="false">Nữ</option>
                                 </select>
@@ -312,7 +301,7 @@ const ProfileContent = () => {
                             </div>
                         ) : (
                             <span className="text-sm font-semibold">
-                                {userInfo.gender === true ? 'Nam' : 'Nữ'}
+                                {userInfo.gender === true ? 'Nam' : userInfo.gender === false ? 'Nữ' : 'Chưa cập nhật'}
                             </span>
                         )}
                     </div>
@@ -345,7 +334,7 @@ const ProfileContent = () => {
                     {/* avatarUrl section */}
                     <div className="w-full lg:w-64 flex justify-center">
                         <div className="flex flex-col items-center">
-                            <div className="w-64 aspect-square mb-4">
+                            <div className="w-64 h-64 aspect-square mb-4">
                                 <img
                                     src={userInfo.avatarUrl ? `${process.env.REACT_APP_CDN_URL}${userInfo.avatarUrl}` : avatarUrls}
                                     alt="Avatar"
@@ -405,7 +394,7 @@ const ProfileContent = () => {
                                     <AiOutlineUser className="w-4 h-4 text-gray-500" />)}
                                 {renderEditableField('email', 'Email', userInfo.email,
                                     <AiOutlineMail className="w-4 h-4 text-gray-500" />)}
-                                {renderEditableField('numberPhone', 'Số điện thoại', userInfo.numberPhone,
+                                {renderEditableField('phoneNumber', 'Số điện thoại', userInfo.phoneNumber,
                                     <AiOutlinePhone className="w-4 h-4 text-gray-500" />)}
 
                                 {renderDateAndGender()}

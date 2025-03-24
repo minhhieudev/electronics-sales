@@ -120,11 +120,13 @@ const ProfileContent = () => {
         }
 
         const emailToSend = userInfo.email?.trim() === '' ? null : userInfo.email;
+        const phoneNumberToSend = userInfo.phoneNumber?.trim() === '' ? null : userInfo.phoneNumber;
 
         dispatch(updateProfileAction({
             body: {
                 ...userInfo,
-                email: emailToSend
+                email: emailToSend,
+                phoneNumber: phoneNumberToSend
             },
             onSuccess: () => {
                 if (tempAvatarUrl && tempAvatarUrl !== userInfo.avatarUrl) {

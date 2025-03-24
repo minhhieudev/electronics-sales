@@ -113,11 +113,14 @@ const ProfileContent = () => {
                 return;
             }
         }
-
-        if (!isValidPhone(userInfo.phoneNumber) && userInfo.phoneNumber !== "") {
-            toast.error(MESSAGES.INVALID_PHONE_FORMAT);
-            return;
+        
+        if (userInfo.phoneNumber !== ""){
+            if (!isValidPhone(userInfo.phoneNumber)) {
+                toast.error(MESSAGES.INVALID_PHONE_FORMAT);
+                return;
+            }
         }
+        
 
         const emailToSend = userInfo.email?.trim() === '' ? null : userInfo.email;
         const phoneNumberToSend = userInfo.phoneNumber?.trim() === '' ? null : userInfo.phoneNumber;

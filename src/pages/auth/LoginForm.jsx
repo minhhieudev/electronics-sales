@@ -20,11 +20,11 @@ const LoginForm = ({ prefilledUsername = '' }) => {
 
     useEffect(() => {
         if (prefilledUsername) {
-            setFormData(prev => ({
-                ...prev,
+        setFormData(prev => ({
+            ...prev,
                 userName: prefilledUsername,
                 passWord: '' // Reset password khi có prefilledUsername
-            }));
+        }));
         }
     }, [prefilledUsername]);
 

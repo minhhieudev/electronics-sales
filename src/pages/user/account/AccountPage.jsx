@@ -11,14 +11,6 @@ const AccountPage = () => {
         switch (currentPage) {
             case 'profile':
                 return <ProfileContent />;
-            // case 'orders':
-            //     return <OrdersContent />;
-            // case 'detailOrder':
-            //     return <DetailOrder />;
-            // case 'help':
-            //     return <HelpPage />;
-            // case 'terms':
-            //     return <TermsPage />;
             default:
                 return <ProfileContent />;
         }

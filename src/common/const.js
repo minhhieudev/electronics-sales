@@ -9,7 +9,7 @@ const MESSAGES = {
     
     // Session messages
     SESSION_EXPIRED_MESSAGE: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
-    INVALID_TOKEN: "Invalid access token",
+    INVALID_TOKEN: "Token không hợp lệ",
     
     // Network messages
     NETWORK_ERROR: "Lỗi mạng hoặc máy chủ không phản hồi.",

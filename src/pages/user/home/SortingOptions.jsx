@@ -8,16 +8,6 @@ const SORT_OPTIONS = [
 
 const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
     const [selectedOption, setSelectedOption] = useState(currentSort || '');
-    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         setSelectedOption(currentSort || '');
@@ -74,7 +64,7 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
     // Desktop version
     return (
         <div className="py-2">
-            <div className="flex items-center flex-wrap justify-center">
+            <div className="flex items-center flex-wrap justify-between">
                 <span className="font-medium text-base text-gray-700 whitespace-nowrap mb-1 mr-3">
                     Sắp xếp theo
                 </span>

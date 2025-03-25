@@ -20,15 +20,15 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", icon: <MdDashboard />, link: "/admin/dashboard" },
     { name: "Tài khoản", icon: <FaRegUser />, link: "/admin/accounts" },
+    { name: "Loại", icon: <PiTrashSimpleBold />, link: "/admin/category" },
     { name: "Thương hiệu", icon: <MdBrandingWatermark />, link: "/brands" },
-    { name: "Loại", icon: <PiTrashSimpleBold />, link: "/categories" },
     { name: "Sản phẩm", icon: <BsBox2 />, link: "/products" },
     { name: "Đơn hàng", icon: <RiListOrdered2 />, link: "/orders" },
     { name: "Thống kê", icon: <FiBarChart2 />, link: "/statistics" },
   ];
 
   return (
-    <div className="h-screen bg-white shadow-lg flex flex-col">
+    <div className="h-screen bg-white flex flex-col">
       {/* Logo */}
       <div className="flex flex-col px-2 mt-3 mb-5">
         <a href="/admin">

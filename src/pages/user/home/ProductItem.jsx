@@ -1,12 +1,14 @@
 import React from 'react';
 import { AiFillStar } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
 import defaultProduct from './product.png';
 
 const ProductItem = ({ product }) => {
-    const { name, price, discount, sold, image } = product;
+    const navigate = useNavigate();
+    const { id, name, price, discount, sold, image } = product;
 
     const handleClick = () => {
-        alert(`Bạn đã chọn sản phẩm: ${name}\nGiá: ${price.toLocaleString()} đ\nGiảm giá: ${discount}`);
+        navigate(`/product/${id}`);
     };
 
     return (

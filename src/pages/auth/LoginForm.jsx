@@ -7,7 +7,7 @@ import { loginAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
 const LoginForm = ({ prefilledUsername = '' }) => {
-    const DEFAULT_USERNAME = "hie";  // tài khoản mặc định
+    const DEFAULT_USERNAME = "hieu5";  // tài khoản mặc định
     const DEFAULT_PASSWORD = "123"; // mật khẩu mặc định
 
     const [formData, setFormData] = useState({

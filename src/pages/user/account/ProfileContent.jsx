@@ -106,22 +106,18 @@ const ProfileContent = () => {
             toast.error(MESSAGES.FULL_NAME_REQUIRED);
             return;
         }
-        if (userInfo.email !== '' && userInfo.email !== null) {
-            if (!isValidEmail(userInfo.email)) {
-                toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
-                return;
-            }
+
+        const emailToSend = userInfo.email?.trim() || null;
+        if (emailToSend && !isValidEmail(emailToSend)) {
+            toast.error(MESSAGES.INVALID_EMAIL_FORMAT);
+            return;
         }
 
-        if (userInfo.phoneNumber !== "" && userInfo.phoneNumber !== null) {
-            if (!isValidPhone(userInfo.phoneNumber)) {
-                toast.error(MESSAGES.INVALID_PHONE_FORMAT);
-                return;
-            }
+        const phoneNumberToSend = userInfo.phoneNumber?.trim() || null;
+        if (phoneNumberToSend && !isValidPhone(phoneNumberToSend)) {
+            toast.error(MESSAGES.INVALID_PHONE_FORMAT);
+            return;
         }
-
-        const emailToSend = userInfo.email?.trim() === '' ? null : userInfo.email;
-        const phoneNumberToSend = userInfo.phoneNumber?.trim() === '' ? null : userInfo.phoneNumber;
 
         dispatch(updateProfileAction({
             body: {

@@ -7,6 +7,7 @@ export const productData = {
     discount: "8%",
     sold: "14.5k",
     stock: 38,
+    sku: '#SKU45HFH',
     mainImage: "https://lebaostore.com/wp-content/uploads/2024/09/iphone-16-teal-1-638621658163033418-650x650-1.jpg",
     images: [
         "https://lebaostore.com/wp-content/uploads/2024/09/iphone-16-teal-1-638621658163033418-650x650-1.jpg",

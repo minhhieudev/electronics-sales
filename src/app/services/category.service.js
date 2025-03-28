@@ -6,9 +6,11 @@ const CategoryService = {
             params: { search, page: page - 1, limit }
         }),
         postCategory: (data) => 
-            SysFetch.post(`api/categories`, data)
+            SysFetch.post(`api/categories`, data),
+        putCategory: (id, data) => 
+            SysFetch.put(`api/categories?id=${id}`, data),
+        
 };
-
 
 
 export default CategoryService;

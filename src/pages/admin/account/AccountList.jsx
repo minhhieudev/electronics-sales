@@ -82,7 +82,7 @@ const closeDeleteModal = () => {
   const columns = [
     { header: "Họ tên", accessor: "fullName", render: (account) => <strong className="font-bold">{account.fullName}</strong> },
     { header: "Tài khoản", accessor: "userName" },
-    { header: "Số điện thoại", accessor: "numberPhone" },
+    { header: "Số điện thoại", accessor: "phoneNumber" },
     {
       header: "Giới tính",
       render: (account) => (

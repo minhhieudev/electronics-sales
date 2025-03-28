@@ -25,4 +25,16 @@ export const fetchCategories = createAsyncThunk(
     }
 );
 
+export const updateCategory = createAsyncThunk(
+  "category/updateCategory",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await CategoryService.putCategory(id, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data.message);
+    }
+  }
+)
+
   

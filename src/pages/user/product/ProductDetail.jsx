@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { FaGreaterThan, FaStar } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import academicCap from './academic-cap.png';
 import { productData } from './productData';
 
 const ProductDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [selectedColor, setSelectedColor] = useState('Xanh');
     const [quantity, setQuantity] = useState(1);
     const [product, setProduct] = useState(null);
@@ -30,15 +31,35 @@ const ProductDetail = () => {
         }
     };
 
+    const handleBuyNow = () => {
+        // Create orderItem object for the current product
+        const orderItem = {
+            id: product.id,
+            sku: product.sku,
+            name: product.name,
+            price: product.price, 
+            quantity: quantity,
+            color: selectedColor,
+            mainImage: product.mainImage
+        };
+
+        // Redirect to the checkout page and pass the product data
+        navigate('/checkout', { state: { orderItems: [orderItem] } });
+    };
+
+    const handleBreadcrumbClick = () => {
+        navigate(`/`);
+    };
+
     return (
         <div className="container mx-auto px-6 md:px-8 lg:px-16 py-6">
             {/* Breadcrumb */}
             <div className="text-gray-500 mb-4 text-xs md:text-sm mt-3 flex flex-wrap items-center gap-1 md:gap-2">
-                <span className='text-black font-semibold'>Sản phẩm</span>
+                <span className='text-black font-semibold cursor-pointer' onClick={handleBreadcrumbClick}>Sản phẩm</span>
                 <FaGreaterThan className='text-gray-400 h-3' />
-                <span className='text-black font-semibold'>{product.category}</span>
+                <span className='text-black font-semibold cursor-pointer' onClick={handleBreadcrumbClick}>{product.category}</span>
                 <FaGreaterThan className='text-gray-400 h-3' />
-                <span className='font-semibold text-gray-400'>{product.name}</span>
+                <span className='font-semibold text-gray-400 cursor-pointer'>{product.name}</span>
             </div>
 
             {/* Main Product Section */}
@@ -80,7 +101,7 @@ const ProductDetail = () => {
 
                     <div className="mt-2">
                         <h2 className="text-[32px] font-bold">
-                            <span className="text-[#FF8900]">{formatPrice(product.discountPrice)}</span><span className="text-gray-400 ml-2 text-lg">đ</span>
+                            <span className="text-[#FF8900]">{formatPrice(product.discountPrice)}</span><span className="text-gray-400 ml-2 text-lg">VND</span>
                         </h2>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="text-gray-500 line-through text-[14px]">
@@ -154,7 +175,7 @@ const ProductDetail = () => {
                                             Thêm vào giỏ hàng
                                         </button>
                                     </div>
-                                    <button className="w-full py-2 bg-[#FF8900] text-white rounded-md font-medium">
+                                    <button onClick={handleBuyNow} className="w-full py-2 bg-[#FF8900] text-white rounded-md font-medium">
                                         Mua ngay
                                     </button>
                                 </div>

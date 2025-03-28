@@ -9,6 +9,9 @@ import DataTable from "../../../components/admin/DataTable";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { MdOutlineModeEdit } from "react-icons/md";
 import CategoryAdd from "../../../pages/admin/category/CategoryAdd";
+import Modal from "../../../components/admin/Modal";
+import CategoryDetail from "./CategoryDetail";
+import CategoryUpdate from "./CategoryUpdate";
 
 
 const CategoryList = () => {
@@ -20,10 +23,12 @@ const CategoryList = () => {
     const [error, setError] = useState(null);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false); 
     const [refresh, setRefresh] = useState(false);
-
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     const searchTerm = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page")) || 1;
-
+    
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -61,6 +66,28 @@ const CategoryList = () => {
         setRefresh(!refresh);
     };
 
+
+    const handleOpenDetailModal = (category ) =>{
+        setIsDetailModalOpen(true);
+        setSelectedCategory(category);
+    }
+
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setRefresh(!refresh);
+    };
+    const handleOpenEditModal = (category) => {
+        setSelectedCategory(category);
+        setIsEditCategoryModalOpen(true);
+    };
+    
+    const handleCloseEditModal = () => {
+        setIsEditCategoryModalOpen(false);
+        setSelectedCategory(null);
+        setRefresh(!refresh);
+    };
+    
     const columns = [
         {
             header: "Tên danh mục",
@@ -78,12 +105,16 @@ const CategoryList = () => {
         },
         {
             header: "Hành động",
-            render: () => (
+            render: (category) => (
                 <div className="flex gap-2">
-                    <button className="text-indigo-600 text-lg hover:scale-110 transition mr-3">
+                    <button className="text-indigo-600 text-lg hover:scale-110 transition mr-3"
+                        onClick={() => handleOpenDetailModal(category)}
+                    >
                         <FaEye />
                     </button>
-                    <button className="text-yellow-500 text-lg hover:scale-110 transition mr-3">
+                    <button className="text-yellow-500 text-lg hover:scale-110 transition mr-3"
+                        onClick={() => handleOpenEditModal(category)}
+                    >
                     <MdOutlineModeEdit />
                     </button>
                     <button className="text-red-600 text-lg hover:scale-110 transition">
@@ -118,6 +149,11 @@ const CategoryList = () => {
 
             <Pagination total={pageInfo.total} totalPages={pageInfo.totalPages} page={page} onPageChange={handlePageChange} />
             <CategoryAdd isOpen={isAddCategoryModalOpen} onClose={handleCloseModal}/>
+
+            <Modal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal}>
+                <CategoryDetail category={selectedCategory} />
+            </Modal>
+            <CategoryUpdate isOpen={isEditCategoryModalOpen} onClose={handleCloseEditModal} category={selectedCategory} />
         </div>
     );
 };

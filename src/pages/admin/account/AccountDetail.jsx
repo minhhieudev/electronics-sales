@@ -62,7 +62,7 @@ const AccountDetails = ({ accountId }) => {
             <p className="flex items-center gap-2 mb-5">
                 <MdOutlinePhone className="text-gray-400" />
                 <strong className="text-gray-400 w-32 font-normal">Số điện thoại:</strong>
-                <span>{account.numberPhone}</span>
+                <span>{account.phoneNumber}</span>
             </p>
 
             <p className="flex items-center gap-2 mb-5">
@@ -76,7 +76,7 @@ const AccountDetails = ({ accountId }) => {
             <p className="flex items-center gap-2 mb-5">
                 <PiCakeDuotone className="text-gray-400" />
                 <strong className="text-gray-400 w-32 font-normal">Ngày sinh:</strong>
-                <span>{formatDate(account.birthDay)}</span>
+                <span>{formatDate(account.dateOfBirth)}</span>
             </p>
 
             <p className="flex items-center gap-2 mb-5">

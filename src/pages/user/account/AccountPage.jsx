@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
-import ProfileContent from './ProfileContent';
-import Sidebar from './Sidebar';
+import ProfileContent from './pages/ProfilePage';
+import Sidebar from './components/Sidebar';
+import DetailOrder from './pages/OrderDetailPage';
+import OrdersContent from './pages/OrdersPage';
 
 const AccountPage = () => {
     const [currentPage, setCurrentPage] = useState('profile');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+    const handlePage = (id) => {
+        setSelectedOrderId(id)
+        setCurrentPage('detailOrder')
+    };
+
+    const handleGoBack = () => {
+        setCurrentPage('orders');
+    };
 
     const renderContent = () => {
         switch (currentPage) {
             case 'profile':
                 return <ProfileContent />;
+            case 'orders':
+                return <OrdersContent onOrderSelect={handlePage} />;
+            case 'detailOrder':
+                return <DetailOrder orderId={selectedOrderId} handleGoBack={handleGoBack} />;
             default:
                 return <ProfileContent />;
         }

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlineCalendar, AiOutlineClose, AiOutlineDown, AiOutlineEdit, AiOutlineEnvironment, AiOutlineLoading3Quarters, AiOutlineLock, AiOutlineMail, AiOutlinePhone, AiOutlineSave, AiOutlineUpload, AiOutlineUser } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
-import { updateProfileAction } from '../../../app/redux/slices/user/account.slice';
-import { deleteFileFromCloudinary, uploadFileToCloudinary, validateFile } from '../../../app/utils/uploadUtils';
-import MESSAGES from '../../../common/const';
-import avatarUrls from '../../../Images/avatars.png';
-import ChangePasswordModal from './ChangePasswordModal';
+import { updateProfileAction } from '../../../../app/redux/slices/user/account.slice';
+import { deleteFileFromCloudinary, uploadFileToCloudinary, validateFile } from '../../../../app/utils/uploadUtils';
+import MESSAGES from '../../../../common/const';
+import avatarUrls from '../../../../Images/avatars.png';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
 const ProfileContent = () => {
 
@@ -142,7 +142,7 @@ const ProfileContent = () => {
         // If there is a new uploaded image, delete it
         if (tempUploadedUrl) {
             try {
-                await deleteFileFromCloudinary(tempUploadedUrl);
+                //await deleteFileFromCloudinary(tempUploadedUrl);
             } catch (error) {
                 console.error("Error deleting temporary uploaded avatar:", error);
             }

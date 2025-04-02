@@ -59,7 +59,7 @@ const ProductDetail = () => {
                 <FaGreaterThan className='text-gray-400 h-3' />
                 <span className='text-black font-semibold cursor-pointer' onClick={handleBreadcrumbClick}>{product.category}</span>
                 <FaGreaterThan className='text-gray-400 h-3' />
-                <span className='font-semibold text-gray-400 cursor-pointer'>{product.name}</span>
+                <span className='font-semibold text-gray-400'>{product.name}</span>
             </div>
 
             {/* Main Product Section */}

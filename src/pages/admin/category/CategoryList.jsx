@@ -12,7 +12,7 @@ import CategoryAdd from "../../../pages/admin/category/CategoryAdd";
 import Modal from "../../../components/admin/Modal";
 import CategoryDetail from "./CategoryDetail";
 import CategoryUpdate from "./CategoryUpdate";
-
+import CategoryDelete from "./CategoryDelete";
 
 const CategoryList = () => {
     const dispatch = useDispatch();
@@ -24,8 +24,9 @@ const CategoryList = () => {
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false); 
     const [refresh, setRefresh] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const searchTerm = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page")) || 1;
     
@@ -87,7 +88,16 @@ const CategoryList = () => {
         setSelectedCategory(null);
         setRefresh(!refresh);
     };
-    
+    const handleOpenDeleteModal = (category) => {
+        setSelectedCategory(category);
+        setIsDeleteModalOpen(true);
+      };
+      
+      const handleCloseDeleteModal = () => {
+        setSelectedCategory(null);
+        setIsDeleteModalOpen(false);
+        setRefresh(!refresh);
+      };
     const columns = [
         {
             header: "Tên danh mục",
@@ -117,7 +127,9 @@ const CategoryList = () => {
                     >
                     <MdOutlineModeEdit />
                     </button>
-                    <button className="text-red-600 text-lg hover:scale-110 transition">
+                    <button className="text-red-600 text-lg hover:scale-110 transition"
+                        onClick={() => handleOpenDeleteModal(category)}
+                    >
                         <FaTrash />
                     </button>
                 </div>
@@ -154,6 +166,9 @@ const CategoryList = () => {
                 <CategoryDetail category={selectedCategory} />
             </Modal>
             <CategoryUpdate isOpen={isEditCategoryModalOpen} onClose={handleCloseEditModal} category={selectedCategory} />
+            <CategoryDelete category={selectedCategory} isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal}
+        
+      />
         </div>
     );
 };

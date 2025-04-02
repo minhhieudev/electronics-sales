@@ -6,7 +6,6 @@ import reducer from "./reducer.js";
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['loading'],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducer);

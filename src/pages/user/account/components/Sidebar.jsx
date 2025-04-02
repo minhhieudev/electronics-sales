@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlineEdit, AiOutlineFileProtect, AiOutlineFileText, AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
-import avatars from '../../../Images/avatars.png';
+import avatars from '../../../../Images/avatars.png';
 
 const Sidebar = ({ activePage, onPageChange }) => {
     const profile = useSelector((state) => state.auth.userInfo);
@@ -45,7 +45,7 @@ const Sidebar = ({ activePage, onPageChange }) => {
 
                         <button
                             className={`flex items-center gap-3 w-full p-2 rounded-lg transition-colors
-                                ${activePage === 'orders'
+                                ${activePage === 'orders' || activePage === 'detailOrder'
                                     ? 'bg-orange-50 text-orange-500'
                                     : 'text-gray-700 hover:bg-gray-50'
                                 }`}

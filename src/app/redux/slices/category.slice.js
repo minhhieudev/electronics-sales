@@ -35,6 +35,19 @@ export const updateCategory = createAsyncThunk(
       return rejectWithValue(error.response?.data.message);
     }
   }
-)
+);
+
+export const deleteCategory = createAsyncThunk(
+  "category/deleteCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await CategoryService.deleteCategory(id);
+      return response; 
+    } catch (error) {
+      return rejectWithValue(error.response?.data.message);
+    }
+  }
+);
+
 
   

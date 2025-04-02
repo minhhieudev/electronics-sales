@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { shippingMethods } from './data/checkoutData';
 import OrderSideInfo from './OrderSideInfo';
@@ -14,21 +14,14 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [shippingMethod, setShippingMethod] = useState('STANDARD');
 
-  const calculateSubtotal = useCallback(() => {
-    return orderItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  }, [orderItems]);
-
-  const [summary, setSummary] = useState(() => {
-    const subtotal = calculateSubtotal();
-    return {
-      subtotal,
-      shippingFee: shippingMethods[0].price,
-      total: subtotal + shippingMethods[0].price
-    };
+  const [summary, setSummary] = useState({
+    subtotal: 0,
+    shippingFee: shippingMethods[0].price,
+    total: shippingMethods[0].price
   });
 
   useEffect(() => {
-    const subtotal = calculateSubtotal();
+    const subtotal = orderItems.reduce((total, item) => total + item.price * item.quantity, 0);
     const selectedMethod = shippingMethods.find(method => method.id === shippingMethod);
 
     if (selectedMethod) {
@@ -37,12 +30,14 @@ const CheckoutPage = () => {
         shippingFee: selectedMethod.price,
         total: subtotal + selectedMethod.price
       });
+    } else {
+      setSummary(prevSummary => ({
+        ...prevSummary,
+        shippingFee: 0,
+        total: subtotal
+      }));
     }
-  }, [shippingMethod, calculateSubtotal]);
-
-  const handleShippingMethodChange = useCallback((methodId) => {
-    setShippingMethod(methodId);
-  }, []);
+  }, [shippingMethod, orderItems]);
 
   return (
     <div className="mt-6">
@@ -65,7 +60,7 @@ const CheckoutPage = () => {
               <div className="h-full">
                 <ShippingMethods
                   selectedMethod={shippingMethod}
-                  onSelectMethod={handleShippingMethodChange}
+                  onSelectMethod={setShippingMethod}
                 />
               </div>
             </div>

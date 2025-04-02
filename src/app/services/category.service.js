@@ -9,7 +9,7 @@ const CategoryService = {
             SysFetch.post(`api/categories`, data),
         putCategory: (id, data) => 
             SysFetch.put(`api/categories?id=${id}`, data),
-        
+        deleteCategory: (id) => SysFetch.delete(`api/categories?id=${id}`)
 };
 
 

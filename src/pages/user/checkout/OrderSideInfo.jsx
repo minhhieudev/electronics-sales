@@ -21,14 +21,11 @@ const OrderSideInfo = (orderInfo) => {
             totalPrice: summary.total,
             feeDelivery: summary.shippingFee,
             address: userInfo.address,
-            status: "PENDING",
-            transaction: paymentMethod,
+            fullName: userInfo.fullName,
+            phoneNumber: userInfo.phoneNumber,
+            paymentMethod: paymentMethod,
             delivery: shippingMethod,
-            orderDetail: orderItems.map(item => ({
-                productId: item.id,
-                color: item.color,
-                quantity: item.quantity
-            }))
+            items: orderItems
         };
         navigate('/checkout/success');
     };

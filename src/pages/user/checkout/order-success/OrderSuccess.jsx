@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { FaShoppingBag } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { orderData } from '../data/orderData';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const OrderSuccess = ({ orderId }) => {
-  const [showAllProducts, setShowAllProducts] = useState(false);
+const OrderSuccess = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const orderData = location.state?.data;
+
+  // Initialize state for showing all products
+  const [showAllProducts, setShowAllProducts] = useState(false);
+
+  if (!orderData) {
+    // Handle the case where there is no order data
+    return <div>Không có dữ liệu đơn hàng.</div>;
+  }
 
   const handleContinueShopping = () => {
     navigate('/');
   };
-  
+
   return (
     <div className="max-w-7xl mt-3 mx-auto px-4 sm:px-6 lg:px-8">
       <div className="space-y-2 w-full h-[70%] bg-cover bg-center" style={{ backgroundImage: `url(${process.env.REACT_APP_CDN_URL}auzpiagtf0lw7dn5ze9s.png)` }}>
@@ -48,10 +56,10 @@ const OrderSuccess = ({ orderId }) => {
           <div className="flex items-center gap-5 py-2 px-1">
             <div className="flex items-center gap-2">
               <span className="text-gray-600">Mã đơn hàng</span>
-              <span className="font-medium">{orderId || orderData?.id}</span>
+              <span className="font-medium">{orderData.orderCode}</span>
             </div>
             <div className="flex text-[#FF8900]  items-center gap-3 font-bold">
-              <button className="text-sm" onClick={() => { }}>
+              <button className="text-sm" onClick={() => { navigate(`/account/orders/${orderData.id}`) }}>
                 Xem chi tiết
               </button>
               <AiOutlineArrowRight className="text-xl" />
@@ -60,7 +68,7 @@ const OrderSuccess = ({ orderId }) => {
 
           <div className="m-auto w-full rounded-sm">
             <div className="p-4 space-y-4 bg-white">
-              {(showAllProducts ? orderData?.products : orderData?.products.slice(0, 2)).map((product) => (
+              {(showAllProducts ? orderData.items : orderData.items.slice(0, 2)).map((product) => (
                 <div key={product.id} className="flex gap-2 items-center">
                   <img src={`${process.env.REACT_APP_CDN_URL}uzgvdswqumfuzs8zw7zf.png`} alt={product.name} className="w-16 h-16 object-cover rounded" />
                   <div className="flex-1">
@@ -75,13 +83,13 @@ const OrderSuccess = ({ orderId }) => {
             </div>
           </div>
 
-          {orderData?.products.length > 2 && !showAllProducts && (
+          {orderData.items.length > 2 && !showAllProducts && (
             <button
               className="w-full text-center py-2"
               onClick={() => setShowAllProducts(true)}
             >
               <span className="text-gray-600 font-bold flex items-center justify-center gap-1">
-                Xem thêm {orderData?.products.length - 2} sản phẩm
+                Xem thêm {orderData.items.length - 2} sản phẩm
                 <AiOutlineArrowRight className="w-4 h-4" />
               </span>
             </button>
@@ -105,7 +113,7 @@ const OrderSuccess = ({ orderId }) => {
         <div className="flex gap-5 items-center justify-center">
           <span className="text-gray-600 font-bold text-[16px] sm:text-[18px]">Tổng tiền</span>
           <div className="flex gap-2 text-[24px] sm:text-[32px] font-bold text-[#FF8900]">
-            <span>{orderData?.totalPrice.toLocaleString()}</span>
+            <span>{orderData.totalPrice.toLocaleString()}</span>
             <span className="underline">đ</span>
           </div>
         </div>

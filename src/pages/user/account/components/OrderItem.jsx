@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { AiOutlineCar, AiOutlineCheckCircle, AiOutlineClockCircle, AiOutlineClose, AiOutlineCloseCircle, AiOutlineCopy, AiOutlineDollar, AiOutlineDown, AiOutlineRight, AiOutlineTag, AiOutlineUp } from 'react-icons/ai';
-import { paymentMethods, shippingMethods } from '../data/checkoutData';
+import { paymentMethods, shippingMethods } from '../../checkout/data/checkoutData';
 import CancelConfirmationModal from '../components/CancelConfirmationModal';
 
-const OrderItem = ({ order, isShow = false, onOrderSelect, isDetailView = false }) => {
+const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusChange }) => {
     const [showAll, setShowAll] = useState(false);
     const [copyMessage, setCopyMessage] = useState({ show: false, id: null });
     const [showCancelModal, setShowCancelModal] = useState(false);
+
     const displayedProducts = showAll ? order.items : order.items?.slice(0, 3);
 
     const formatPrice = (price) => {
@@ -26,83 +27,71 @@ const OrderItem = ({ order, isShow = false, onOrderSelect, isDetailView = false 
     const handleCopy = (sku, e) => {
         e.stopPropagation();
         navigator.clipboard.writeText(sku);
-
-        // Hiển thị thông báo cho SKU được copy
         setCopyMessage({ show: true, id: sku });
 
-        // Tự động ẩn thông báo sau 2 giây
         setTimeout(() => {
             setCopyMessage({ show: false, id: null });
         }, 2000);
     };
 
-    // Hàm hiển thị trạng thái đơn hàng
+    // Function to display order status
     const renderOrderStatus = () => {
         const status = order.status || 'PENDING';
 
-        // Cấu hình hiển thị cho từng trạng thái
+        // Configuration to display each status
         const statusConfig = {
             'PENDING': {
                 label: 'CHỜ XỬ LÝ',
                 color: 'text-orange-500 border-orange-500 bg-orange-50',
-                bgHover: 'hover:bg-orange-100',
-                icon: <AiOutlineClockCircle className="h-4 w-4 mr-1" />
+                bgColor: 'bg-orange-500',
+                textColor: 'text-white',
+                bgHover: 'hover:bg-orange-600',
+                icon: <AiOutlineClockCircle className="h-5 w-5 mr-2" />
             },
             'SHIPPING': {
                 label: 'ĐANG GIAO HÀNG',
                 color: 'text-blue-500 border-blue-500 bg-blue-50',
-                bgHover: 'hover:bg-blue-100',
-                icon: <AiOutlineCar className="h-4 w-4 mr-1" />
+                bgColor: 'bg-blue-500',
+                textColor: 'text-white',
+                bgHover: 'hover:bg-blue-600',
+                icon: <AiOutlineCar className="h-5 w-5 mr-2" />
             },
             'COMPLETED': {
                 label: 'ĐÃ GIAO HÀNG',
                 color: 'text-green-500 border-green-500 bg-green-50',
-                bgHover: 'hover:bg-green-100',
-                icon: <AiOutlineCheckCircle className="h-4 w-4 mr-1" />
+                bgColor: 'bg-green-500',
+                textColor: 'text-white',
+                bgHover: 'hover:bg-green-600',
+                icon: <AiOutlineCheckCircle className="h-5 w-5 mr-2" />
             },
             'CANCELED': {
                 label: 'ĐÃ HỦY',
                 color: 'text-red-500 border-red-500 bg-red-50',
-                bgHover: 'hover:bg-red-100',
-                icon: <AiOutlineCloseCircle className="h-4 w-4 mr-1" />
+                bgColor: 'bg-red-500',
+                textColor: 'text-white',
+                bgHover: 'hover:bg-red-600',
+                icon: <AiOutlineCloseCircle className="h-5 w-5 mr-2" />
             }
         };
 
-        // Lấy cấu hình cho trạng thái hiện tại hoặc mặc định
+        // Get configuration for current status or default
         const currentStatus = statusConfig[status] || statusConfig['PENDING'];
 
         return (
-            <div className={`flex items-center sm:text-sm text-[11px] border rounded-full sm:px-4 py-1.5 px-2 font-semibold ${currentStatus.color} ${currentStatus.bgHover} transition-colors shadow-sm`}>
-                {currentStatus.icon}
-                <span>{currentStatus.label}</span>
+            <div className="flex flex-col items-end">
+                <div className={`flex items-center text-xs sm:text-sm font-bold px-2 sm:px-4 py-2 rounded-lg shadow-md ${currentStatus.bgColor} ${currentStatus.textColor} ${currentStatus.bgHover} transition-colors`}>
+                    {currentStatus.icon}
+                    <span>{currentStatus.label}</span>
+                </div>
             </div>
         );
     };
 
-    // Add function to handle order cancellation
-    const handleCancelOrder = () => {
-        // Here you would call your API to cancel the order
-        console.log('Cancelling order', order.orderCode);
-        // Example API call:
-        // orderService.cancelOrder(order.orderCode)
-        //   .then(() => {
-        //     toast.success('Đơn hàng đã được hủy thành công');
-        //     // Optionally refresh order list or update UI
-        //   })
-        //   .catch(error => {
-        //     toast.error('Không thể hủy đơn hàng. Vui lòng thử lại sau.');
-        //     console.error(error);
-        //   });
-
-        // Close the modal after processing
-        setShowCancelModal(false);
-    };
-
     return (
         <div>
-            <div className="p-4 space-y-4 cursor-pointer" onClick={isDetailView ? () => onOrderSelect(order.orderCode) : undefined}>
+            <div className="p-4 space-y-4 cursor-pointer" onClick={!isDetailView ? () => onOrderSelect(order.orderCode) : undefined}>
                 {/* Header */}
-                {isShow ? (
+                {isDetailView ? (
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -116,7 +105,7 @@ const OrderItem = ({ order, isShow = false, onOrderSelect, isDetailView = false 
                     </div>
                 ) : (
                     <div className="flex sm:flex-row items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 sm:gap-3">
                             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                 <AiOutlineTag className="h-4 w-4 text-blue-500" />
                             </div>
@@ -179,20 +168,19 @@ const OrderItem = ({ order, isShow = false, onOrderSelect, isDetailView = false 
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Price */}
-                                <div className="flex flex-col items-end justify-center">
-                                    <div className="flex items-center gap-1">
-                                        <AiOutlineDollar className="text-orange-500" />
-                                        <div className="text-right">
-                                            <span className="font-bold text-gray-800">{formatPrice(product.priceAtTime || product.price)}</span>
-                                            <span className="text-gray-500">đ</span>
-                                        </div>
+                            </div>
+                            {/* Price */}
+                            <div className="flex flex-col items-end justify-center">
+                                <div className="flex items-center gap-1">
+                                    <AiOutlineDollar className="text-orange-500" />
+                                    <div className="text-right">
+                                        <span className="font-bold text-gray-800">{formatPrice(product.priceAtTime || product.price)}</span>
+                                        <span className="text-gray-500">đ</span>
                                     </div>
-                                    {product.discount > 0 && (
-                                        <div className="text-xs text-gray-400 line-through">{formatPrice(product.originalPrice)}đ</div>
-                                    )}
                                 </div>
+                                {product.discount > 0 && (
+                                    <div className="text-xs text-gray-400 line-through">{formatPrice(product.originalPrice)}đ</div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -253,33 +241,29 @@ const OrderItem = ({ order, isShow = false, onOrderSelect, isDetailView = false 
                     </div>
 
                     {/* Cancel Button - Only show for PENDING orders */}
-                    {!isShow && order.status === 'PENDING' && (
+                    {(order.status === 'PENDING' && isDetailView) && (
                         <div className="flex justify-end mt-4">
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowCancelModal(true); // Show modal instead of window.confirm
+                                    setShowCancelModal(true);
                                 }}
-                                className="group relative overflow-hidden rounded-lg bg-white px-4 py-2 text-red-500 shadow-sm transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-lg border border-red-500"
+                                className="flex items-center gap-2 font-semibold rounded-lg px-4 py-2 border border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:shadow-lg"
                             >
-                                <span className="relative z-10 flex items-center gap-2 font-semibold">
-                                    <AiOutlineClose className="h-4 w-4" />
-                                    Hủy đơn hàng
-                                </span>
-                                <span className="absolute bottom-0 left-0 h-0 w-full bg-red-100 transition-all duration-300 group-hover:h-full"></span>
+                                <AiOutlineClose className="h-4 w-4" />
+                                Hủy đơn hàng
                             </button>
                         </div>
                     )}
                 </div>
-
-
             </div>
             {/* Cancel Confirmation Modal */}
             {showCancelModal && (
                 <CancelConfirmationModal
                     orderCode={order.orderCode}
-                    onCancel={handleCancelOrder}
+                    orderId={order.id}
                     onClose={() => setShowCancelModal(false)}
+                    onOrderStatusChange={onOrderStatusChange}
                 />
             )}
         </div>

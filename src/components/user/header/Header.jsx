@@ -130,7 +130,7 @@ const Header = () => {
                                             <div className="relative bg-white rounded-lg z-10">
                                                 <div className="py-2 font-semibold">
                                                     <Link
-                                                        to="/account"
+                                                        to="/account/profile"
                                                         data-account-button
                                                         className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
                                                         onClick={() => setShowDropdown(false)}

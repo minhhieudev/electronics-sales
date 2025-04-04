@@ -152,7 +152,6 @@ const ProductDetail = () => {
                                         <input
                                             type="text"
                                             value={quantity}
-                                            readOnly
                                             className="w-12 h-8 border text-center rounded-md"
                                         />
                                         <button

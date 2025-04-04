@@ -1,40 +1,21 @@
 import React, { useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
-import ProfileContent from './pages/ProfilePage';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
-import DetailOrder from './pages/OrderDetailPage';
-import OrdersContent from './pages/OrdersPage';
 
 const AccountPage = () => {
-    const [currentPage, setCurrentPage] = useState('profile');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [selectedOrderId, setSelectedOrderId] = useState(null);
-
-    const handlePage = (id) => {
-        setSelectedOrderId(id)
-        setCurrentPage('detailOrder')
-    };
-
-    const handleGoBack = () => {
-        setCurrentPage('orders');
-    };
-
-    const renderContent = () => {
-        switch (currentPage) {
-            case 'profile':
-                return <ProfileContent />;
-            case 'orders':
-                return <OrdersContent onOrderSelect={handlePage} />;
-            case 'detailOrder':
-                return <DetailOrder orderId={selectedOrderId} handleGoBack={handleGoBack} />;
-            default:
-                return <ProfileContent />;
-        }
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-        setIsSidebarOpen(false);
+    const location = useLocation();
+    
+    // Xác định trang hiện tại từ URL
+    const getActivePage = () => {
+        const path = location.pathname;
+        if (path.includes('/orders/')) return 'orders';
+        if (path.includes('/profile')) return 'profile';
+        if (path.includes('/orders')) return 'orders';
+        if (path.includes('/help')) return 'help';
+        if (path.includes('/terms')) return 'terms';
+        return 'profile'; 
     };
 
     return (
@@ -80,14 +61,14 @@ const AccountPage = () => {
                             ${isSidebarOpen ? 'p-4 pt-20' : ''}
                         `}>
                             <Sidebar
-                                activePage={currentPage}
-                                onPageChange={handlePageChange}
+                                activePage={getActivePage()}
+                                setIsSidebarOpen={setIsSidebarOpen}
                             />
                         </div>
                     </div>
 
                     <div className="lg:col-span-10">
-                        {renderContent()}
+                        <Outlet />
                     </div>
                 </div>
             </div>

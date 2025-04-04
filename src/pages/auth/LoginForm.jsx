@@ -7,25 +7,19 @@ import { loginAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
 const LoginForm = ({ prefilledUsername = '' }) => {
-    const DEFAULT_USERNAME = "hieu5";  // tài khoản mặc định
-    const DEFAULT_PASSWORD = "123"; // mật khẩu mặc định
-
     const [formData, setFormData] = useState({
-        userName: prefilledUsername || DEFAULT_USERNAME, // Nếu không có prefilledUsername thì dùng DEFAULT_USERNAME
-        passWord: DEFAULT_PASSWORD
+        userName: prefilledUsername,
+        passWord: ''
     });
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        if (prefilledUsername) {
         setFormData(prev => ({
             ...prev,
-                userName: prefilledUsername,
-                passWord: '' // Reset password khi có prefilledUsername
+            userName: prefilledUsername
         }));
-        }
     }, [prefilledUsername]);
 
     const handleInputChange = (e) => {

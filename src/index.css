@@ -103,3 +103,14 @@
         opacity: 0;
     }
 }
+
+.modal-enter {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.modal-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s, transform 0.3s;
+}

@@ -1,17 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineClose, AiOutlineSearch } from 'react-icons/ai';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { fetchOrders } from '../../../../app/redux/slices/user/order.slice';
 import OrderItem from '../components/OrderItem';
 
-const OrdersContent = ({ onOrderSelect }) => {
+const OrdersContent = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [ordersList, setOrdersList] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [allOrdersStats, setAllOrdersStats] = useState({});
 
-    // Tab mapping for displaying user-friendly labels
     const tabMapping = [
         { value: '', label: 'Tất cả' },
         { value: 'PENDING', label: 'Đang xử lý' },
@@ -21,39 +23,34 @@ const OrdersContent = ({ onOrderSelect }) => {
     ];
 
     // Function to fetch orders with filters
-    const fetchOrdersData = useCallback((query = searchQuery) => {
-        setLoading(true);
+    const fetchOrdersData = (query = searchQuery) => {
         dispatch(fetchOrders({
             params: {
                 status: activeTab,
                 search: query,
             },
             onSuccess: (data) => {
-                console.log('Orders loaded successfully', data);
                 setOrdersList(data || []);
-                setLoading(false);
+
+                // Update statistics when fetching all orders (empty tab)
+                if (activeTab === '' && !query) {
+                    const stats = {
+                        '': data?.length || 0,
+                        'PENDING': data?.filter(order => order.status === 'PENDING').length || 0,
+                        'SHIPPING': data?.filter(order => order.status === 'SHIPPING').length || 0,
+                        'COMPLETED': data?.filter(order => order.status === 'COMPLETED').length || 0,
+                        'CANCELED': data?.filter(order => order.status === 'CANCELED').length || 0,
+                    };
+                    setAllOrdersStats(stats);
+                }
             }
         }));
-    }, [dispatch, activeTab, searchQuery]);
+    };
 
-    // Initial load and tab change handler
+    /* eslint-disable react-hooks/exhaustive-deps */
     useEffect(() => {
         fetchOrdersData(searchQuery);
     }, [activeTab]);
-
-    // Order counts calculation
-    const orderCounts = {
-        '': ordersList.length,
-        'PENDING': ordersList.filter(order => order.status === 'PENDING').length,
-        'SHIPPING': ordersList.filter(order => order.status === 'SHIPPING').length,
-        'COMPLETED': ordersList.filter(order => order.status === 'COMPLETED').length,
-        'CANCELLED': ordersList.filter(order => order.status === 'CANCELLED').length,
-    };
-
-    // Handle tab change
-    const handleTabChange = (tab) => {
-        setActiveTab(tab);
-    };
 
     // Handle search button click
     const handleSearch = () => {
@@ -71,7 +68,12 @@ const OrdersContent = ({ onOrderSelect }) => {
     // Handle clear search input
     const handleClearSearch = () => {
         setSearchQuery('');
-        fetchOrdersData(''); // Search with empty query
+        fetchOrdersData('');
+    };
+
+    // Hàm này thay thế onOrderSelect
+    const handleOrderSelect = (orderId) => {
+        navigate(`/account/orders/${orderId}`);
     };
 
     const renderEmptyState = () => (
@@ -81,12 +83,8 @@ const OrdersContent = ({ onOrderSelect }) => {
         </div>
     );
 
-    if (loading) {
-        return <div className="text-center py-6">Đang tải...</div>;
-    }
-
     return (
-        <div className="">
+        <div>
             <div className="space-y-2">
                 <h1 className="text-xl font-bold">Đơn hàng của tôi</h1>
 
@@ -128,11 +126,11 @@ const OrdersContent = ({ onOrderSelect }) => {
                                 <button
                                     key={tab.value}
                                     className={`px-4 py-3 text-sm font-medium ${activeTab === tab.value ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700'}`}
-                                    onClick={() => handleTabChange(tab.value)}
+                                    onClick={() => setActiveTab(tab.value)}
                                 >
                                     {tab.label}
-                                    {orderCounts[tab.value] > 0 && (
-                                        <span className="ml-1 text-orange-500">({orderCounts[tab.value]})</span>
+                                    {allOrdersStats[tab.value] > 0 && (
+                                        <span className="ml-1 text-orange-500">({allOrdersStats[tab.value]})</span>
                                     )}
                                 </button>
                             ))}
@@ -141,11 +139,11 @@ const OrdersContent = ({ onOrderSelect }) => {
                 </div>
 
                 {/* Orders list with scroll */}
-                <div className="space-y-4 max-h-[450px] overflow-y-auto">
+                <div className="space-y-4  sm:max-h-[450px] overflow-y-auto">
                     {ordersList.length > 0 ? (
                         ordersList.map(order => (
-                            <div key={order.orderCode || order.id} className="bg-white rounded-lg" onClick={() => onOrderSelect(order.id)}>
-                                <OrderItem order={order} onOrderSelect={onOrderSelect} />
+                            <div key={order.orderCode || order.id} className="bg-white rounded-lg" onClick={() => handleOrderSelect(order.id)}>
+                                <OrderItem order={order} onOrderSelect={handleOrderSelect} />
                             </div>
                         ))
                     ) : (

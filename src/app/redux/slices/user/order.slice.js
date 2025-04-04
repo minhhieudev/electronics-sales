@@ -34,7 +34,6 @@ export const fetchOrderDetail = createAsyncThunk(
                 onSuccess && onSuccess(response.data);
             }
         } catch (error) {
-            console.log(error)
             toast.error(error.response?.data?.message || MESSAGES.NETWORK_ERROR);
         }
         finally {
@@ -52,9 +51,57 @@ export const createOrder = createAsyncThunk(
             const response = await OrderService.createOrder(orderData);
             if (response.status === CONST.STATUS.SUCCESS) {
                 onSuccess && onSuccess(response.data);
+                toast.success(MESSAGES.CREATE_ORDER_SUCCESS)
             }
         } catch (error) {
             toast.error(error.response?.data?.message || MESSAGES.NETWORK_ERROR);
+        }
+        finally {
+            dispatch(setLoading(false));
+        }
+    }
+);
+
+// Thunk action to update order address
+export const updateOrderAddress = createAsyncThunk(
+    "orders/updateOrderAddress",
+    async ({ orderData, onSuccess }, { dispatch }) => {
+        try {
+            dispatch(setLoading(true));
+            const updateData = {
+                ...orderData,
+                status: 'PENDING'
+            };
+            const response = await OrderService.updateOrder(updateData);
+            if (response.status === CONST.STATUS.SUCCESS) {
+                toast.success(MESSAGES.UPDATE_ORDER_SUCCESS);
+                onSuccess && onSuccess(response.data);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || MESSAGES.UPDATE_ORDER_ERROR);
+        }
+        finally {
+            dispatch(setLoading(false));
+        }
+    }
+);
+
+// Thunk action to cancel order
+export const cancelOrder = createAsyncThunk(
+    "orders/cancelOrder",
+    async ({ orderId, onSuccess }, { dispatch }) => {
+        try {
+            dispatch(setLoading(true));
+            const response = await OrderService.updateOrder({
+                id: orderId,
+                status: 'CANCELED'
+            });
+            if (response.status === CONST.STATUS.SUCCESS) {
+                toast.success(MESSAGES.DELETE_ORDER_SUCCESS);
+                onSuccess && onSuccess();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || MESSAGES.DELETE_ORDER_ERROR);
         }
         finally {
             dispatch(setLoading(false));

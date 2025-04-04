@@ -40,6 +40,13 @@ const MESSAGES = {
     DELETE_FILE_ERROR: 'Lỗi khi xóa file',
     DELETE_FILE_NOT_FOUND: 'Không tìm thấy file cần xóa',
     DELETE_FILE_CLOUDINARY_ERROR: 'Lỗi khi xóa file từ Cloudinary',
+
+    // Order messages
+    CREATE_ORDER_SUCCESS: 'Đặt hàng thành công',
+    UPDATE_ORDER_SUCCESS: 'Cập nhật đơn hàng thành công',
+    UPDATE_ORDER_ERROR: 'Lỗi khi cập nhật đơn hàng',
+    DELETE_ORDER_SUCCESS: 'Hủy đơn hàng thành công',
+    DELETE_ORDER_ERROR: 'Lỗi khi hủy đơn hàng',
 };
 
 const CONST = {

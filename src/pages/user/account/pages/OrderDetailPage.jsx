@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     AiOutlineArrowLeft,
-    AiOutlineAudit,
     AiOutlineCar,
     AiOutlineCheckCircle,
+    AiOutlineClockCircle,
     AiOutlineClose,
+    AiOutlineCloseCircle,
     AiOutlineEdit,
     AiOutlineEnvironment,
     AiOutlineHeart,
@@ -13,20 +14,32 @@ import {
     AiOutlineShoppingCart
 } from 'react-icons/ai';
 import { useDispatch } from 'react-redux';
-import { fetchOrderDetail } from '../../../../app/redux/slices/user/order.slice';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { fetchOrderDetail, updateOrderAddress } from '../../../../app/redux/slices/user/order.slice';
+import MESSAGES from '../../../../common/const';
 import OrderItem from '../components/OrderItem';
+import OrderStatusTracker from '../components/OrderStatusTracker';
+import ThankYouModal from '../components/ThankYouModal';
 
-const DetailOrder = ({ orderId, handleGoBack }) => {
-
+const DetailOrder = () => {
+    const { orderId } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+    const containerRef = useRef(null);
 
     const [orderData, setOrderData] = useState(null);
-    const [isEditingAddress, setIsEditingAddress] = useState(false);
-    const [editedAddress, setEditedAddress] = useState({
+    const [isAddressEditable, setIsAddressEditable] = useState(false);
+    const [editedInfo, setEditedInfo] = useState({
         fullName: '',
         phoneNumber: '',
         address: ''
     });
+    const [showThankYouModal, setShowThankYouModal] = useState(false);
+
+    const handleGoBack = () => {
+        navigate('/account/orders');
+    };
 
     useEffect(() => {
         if (orderId) {
@@ -34,11 +47,13 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                 orderId,
                 onSuccess: (data) => {
                     setOrderData(data);
-                    setEditedAddress({
-                        fullName: data.fullName,
-                        phoneNumber: data.phoneNumber,
-                        address: data.address
-                    });
+                    if (data.status === 'PENDING') {
+                        setEditedInfo({
+                            fullName: data.fullName,
+                            phoneNumber: data.phoneNumber,
+                            address: data.address
+                        });
+                    }
                 },
             }));
         }
@@ -47,22 +62,54 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
     // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEditedAddress(prev => ({
+        setEditedInfo(prev => ({
             ...prev,
             [name]: value
         }));
     };
 
+    // Validate phone number
+    const validatePhoneNumber = (phoneNumber) => {
+        const phoneRegex = /^\d{10}$/;
+        return phoneRegex.test(phoneNumber);
+    };
+
     // Handle address update
     const handleAddressUpdate = () => {
-        console.log('Updated delivery address:', editedAddress);
-        // Here you would call your API to update the address
-        // For now, just update the local state
-        setOrderData(prev => ({
-            ...prev,
-            ...editedAddress
+        if (!validatePhoneNumber(editedInfo.phoneNumber)) {
+            toast.error(MESSAGES.INVALID_PHONE_FORMAT);
+            return;
+        }
+
+        const updateData = {
+            id: orderId,
+            fullName: editedInfo.fullName,
+            phoneNumber: editedInfo.phoneNumber,
+            address: editedInfo.address
+        };
+
+        dispatch(updateOrderAddress({
+            orderData: updateData,
+            onSuccess: () => {
+                setOrderData(prev => ({
+                    ...prev,
+                    ...updateData
+                }));
+                setIsAddressEditable(false);
+            }
         }));
-        setIsEditingAddress(false);
+    };
+
+    // Function to update order status
+    const handleOrderStatusChange = (newStatus) => {
+        setOrderData(prevData => ({
+            ...prevData,
+            status: newStatus
+        }));
+
+        if (containerRef.current) {
+            containerRef.current.scrollTop = 0;
+        }
     };
 
     if (!orderData) {
@@ -70,7 +117,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
     }
 
     return (
-        <div className="bg-white rounded-md mx-auto p-3 sm:p-6 sm:max-h-[600px] overflow-y-auto">
+        <div ref={containerRef} className="bg-white rounded-md mx-auto p-3 sm:p-6 sm:max-h-[600px] overflow-y-auto">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                 <button
                     onClick={handleGoBack}
@@ -82,118 +129,67 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                 </button>
                 <div className="flex gap-4 items-center justify-between">
                     <div className="flex gap-1">
-                        <p>Mã đơn hàng:</p>
+                        <p>Mã đơn:</p>
                         <p className='font-bold'>{orderData.orderCode}</p>
                     </div>
-                    <button className="text-[#FF8900] text-xs sm:text-sm border border-[#FF8900] rounded-full px-3 py-2 font-semibold">
-                        {orderData.status === 'PENDING' ? 'CHỜ XỬ LÝ' :
-                            orderData.status === 'SHIPPING' ? 'ĐANG GIAO HÀNG' :
-                                orderData.status === 'COMPLETED' ? 'ĐÃ GIAO' : 'ĐÃ HỦY'}
-                    </button>
+                    <div className={`
+                        flex items-center gap-2 text-xs sm:text-sm sm:px-4 px-3 py-2 rounded-lg shadow-md font-bold
+                        ${orderData.status === 'PENDING' ? 'bg-orange-400 text-white' :
+                            orderData.status === 'SHIPPING' ? 'bg-blue-500 text-white' :
+                                orderData.status === 'COMPLETED' ? 'bg-green-500 text-white' :
+                                    'bg-red-500 text-white'}
+                    `}>
+                        {orderData.status === 'PENDING' ?
+                            <AiOutlineClockCircle className="h-5 w-5" /> :
+                            orderData.status === 'SHIPPING' ?
+                                <AiOutlineCar className="h-5 w-5" /> :
+                                orderData.status === 'COMPLETED' ?
+                                    <AiOutlineCheckCircle className="h-5 w-5" /> :
+                                    <AiOutlineCloseCircle className="h-5 w-5" />
+                        }
+                        <span>
+                            {orderData.status === 'PENDING' ? 'CHỜ XỬ LÝ' :
+                                orderData.status === 'SHIPPING' ? 'ĐANG GIAO HÀNG' :
+                                    orderData.status === 'COMPLETED' ? 'ĐÃ GIAO HÀNG' : 'ĐÃ HỦY'}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* Tình trạng đơn hàng */}
-            <div className="mt-4">
-                <div className="grid grid-cols-4 gap-4 text-center">
-                    {(() => {
-                        let currentStep = 0;
-
-                        if (orderData.status === 'PENDING') currentStep = 1;
-                        else if (orderData.status === 'SHIPPING') currentStep = 2;
-                        else if (orderData.status === 'COMPLETED') currentStep = 3;
-
-                        const steps = [
-                            {
-                                icon: AiOutlineShoppingCart,
-                                label: "Đơn hàng đã đặt",
-                                time: "11:24 18/10/2023",
-                                status: 0
-                            },
-                            {
-                                icon: AiOutlineAudit,
-                                label: "Chờ xác nhận",
-                                time: "11:24 18/10/2023",
-                                status: 1
-                            },
-                            {
-                                icon: AiOutlineCar,
-                                label: "Đang giao tới bạn",
-                                time: "11:24 18/10/2023",
-                                status: 2
-                            },
-                            {
-                                icon: AiOutlineCheckCircle,
-                                label: "Giao hàng thành công",
-                                time: "11:24 18/10/2023",
-                                status: 3
-                            },
-                        ];
-
-                        return steps.map((step, index) => {
-                            // Determine step state
-                            const isPassed = step.status < currentStep;
-                            const isCurrent = step.status === currentStep;
-                            const isFuture = step.status > currentStep;
-
-                            return (
-                                <div key={index} className="flex flex-col items-center relative">
-                                    {/* Connecting line to previous step */}
-                                    {index > 0 && (
-                                        <div className="absolute" style={{ top: '13px', right: '50%', width: '100%', height: '6px' }}>
-                                            <div
-                                                className={`w-full h-full rounded-full
-                                                    ${steps[index - 1].status < currentStep - 1 || orderData.status === 'COMPLETED' ? 'bg-green-500' :
-                                                        step.status === currentStep && steps[index - 1].status === currentStep - 1 ? 'bg-gray-200 overflow-hidden' :
-                                                            'bg-gray-300'}`}
-                                            >
-                                                {step.status === currentStep && steps[index - 1].status === currentStep - 1 && orderData.status !== 'COMPLETED' && (
-                                                    <div className="relative w-full h-full">
-                                                        <div className="absolute h-full w-3 bg-green-600 rounded-full animate-[loadingDot1_2.5s_ease-in-out_infinite]"></div>
-                                                        <div className="absolute h-full w-5 bg-green-500 rounded-full animate-[loadingDot2_2.5s_ease-in-out_infinite_0.2s]"></div>
-                                                        <div className="absolute h-full w-3 bg-green-400 rounded-full animate-[loadingDot3_2.5s_ease-in-out_infinite_0.4s]"></div>
-                                                        <div className="absolute h-full w-4 bg-green-500 rounded-full animate-[loadingDot4_2.5s_ease-in-out_infinite_0.6s]"></div>
-                                                        <div className="absolute h-full w-2 bg-green-600 rounded-full animate-[loadingDot5_2.5s_ease-in-out_infinite_0.8s]"></div>
-                                                        <div className="absolute h-full w-3 bg-green-400 rounded-full animate-[loadingDot1_2.5s_ease-in-out_infinite_1s]"></div>
-                                                        <div className="absolute h-full w-2 bg-green-500 rounded-full animate-[loadingDot2_2.5s_ease-in-out_infinite_1.2s]"></div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {/* Step icon */}
-                                    <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center z-10 border-2
-                                            ${isPassed ? 'bg-green-500' :
-                                                isCurrent ? 'bg-white border-green-500 shadow-lg animate-[bounce_2s_ease-in-out_infinite] ring-2 ring-green-500 ring-opacity-50' :
-                                                    'bg-gray-300'}`}
-                                    >
-                                        <step.icon
-                                            className={`text-lg ${isPassed ? 'text-white' :
-                                                isCurrent ? 'text-green-500 animate-[spin_3s_linear_infinite]' :
-                                                    'text-gray-500'}`}
-                                        />
-                                    </div>
-
-                                    {/* Step label */}
-                                    <span className={`text-base font-bold ${isPassed || isCurrent ? '' : 'text-gray-500'}`}>
-                                        {step.label}
-                                    </span>
-
-                                    {/* Step time */}
-                                    <span className="text-gray-500 text-sm">{step.time}</span>
-                                </div>
-                            );
-                        });
-                    })()}
+            {/* Display either status tracker or canceled notification */}
+            {orderData.status === 'CANCELED' ? (
+                <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <AiOutlineCloseCircle className="h-6 w-6 text-red-500" />
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-lg font-medium text-red-800">Đơn hàng đã bị hủy</h3>
+                            <div className="mt-2 text-red-700 sm:text-sm text-xs">
+                                <p>Đơn hàng này đã bị hủy và không thể tiếp tục xử lý.</p>
+                                <p className="mt-1">Nếu bạn vẫn muốn mua các sản phẩm này, vui lòng tạo đơn hàng mới.</p>
+                            </div>
+                            <div className="mt-4">
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                    onClick={() => navigate('/')}
+                                >
+                                    Tiếp tục mua sắm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <OrderStatusTracker status={orderData.status} />
+            )}
 
             <div className='w-full sm:h-[70px] h-10 bg-gray-100 flex justify-end items-center mt-2'>
-                {orderData.status === 'SHIPPING' && (
+                {orderData.status === 'COMPLETED' && (
                     <div className="flex gap-1 rounded-md h-[40%] bg-[#FF8900] p-5 items-center text-white mr-5">
                         <AiOutlineHeart className='h-4 w-4' />
-                        <button className=''>Đã nhận được hàng</button>
+                        <button onClick={() => setShowThankYouModal(true)} >Đã nhận được hàng</button>
                     </div>
                 )}
             </div>
@@ -213,9 +209,9 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                         <AiOutlineEnvironment className='h-5 w-5 text-gray-500' />
                         <h2 className="text-base font-medium">Địa chỉ nhận hàng</h2>
                     </div>
-                    {orderData.status === 'PENDING' && !isEditingAddress && (
+                    {orderData.status === 'PENDING' && !isAddressEditable && (
                         <button
-                            onClick={() => setIsEditingAddress(true)}
+                            onClick={() => setIsAddressEditable(true)}
                             className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 
                                 transition-colors duration-200 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full"
                         >
@@ -225,7 +221,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                     )}
                 </div>
 
-                {!isEditingAddress ? (
+                {!isAddressEditable ? (
                     <div className="space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-8">
                             <div className="flex items-center gap-2">
@@ -266,7 +262,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                                 <input
                                     type="text"
                                     name="fullName"
-                                    value={editedAddress.fullName}
+                                    value={editedInfo.fullName}
                                     onChange={handleInputChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -277,7 +273,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                                 <input
                                     type="text"
                                     name="phoneNumber"
-                                    value={editedAddress.phoneNumber}
+                                    value={editedInfo.phoneNumber}
                                     onChange={handleInputChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
@@ -287,7 +283,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                                 <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
                                 <textarea
                                     name="address"
-                                    value={editedAddress.address}
+                                    value={editedInfo.address}
                                     onChange={handleInputChange}
                                     rows="3"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -297,7 +293,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
 
                         <div className="flex gap-2 justify-end mt-4">
                             <button
-                                onClick={() => setIsEditingAddress(false)}
+                                onClick={() => setIsAddressEditable(false)}
                                 className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-1"
                             >
                                 <AiOutlineClose className="h-4 w-4" />
@@ -315,7 +311,7 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                 )}
             </div>
 
-            {/* Thông tin sản phẩm */}
+            {/* Product Information */}
             <div className='mt-8'>
                 <div className="flex items-center justify-between mb-4 bg-gradient-to-r from-orange-100 to-white p-4 rounded-lg shadow-sm">
                     <div className="flex items-center gap-3">
@@ -336,12 +332,16 @@ const DetailOrder = ({ orderId, handleGoBack }) => {
                     <OrderItem
                         key={orderData.orderCode}
                         order={orderData}
-                        isShow={true}
-                        isDetailView={false}
-                    //onOrderSelect={handleItemClick}
+                        isDetailView={true}
+                        onOrderStatusChange={handleOrderStatusChange}
                     />
                 </div>
             </div>
+
+            {/* Show Thank You Modal */}
+            {showThankYouModal && (
+                <ThankYouModal onClose={() => setShowThankYouModal(false)} />
+            )}
         </div>
     );
 };

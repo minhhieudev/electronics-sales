@@ -12,7 +12,7 @@ const CheckoutPage = () => {
   const orderItems = useMemo(() => location.state?.orderItems || [], [location.state?.orderItems]);
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [shippingMethod, setShippingMethod] = useState('STANDARD');
+  const [shippingMethod, setShippingMethod] = useState('FAST_DELIVERY');
 
   const [summary, setSummary] = useState({
     subtotal: 0,

@@ -8,7 +8,7 @@ const UserLayout = () => {
     // Kiểm tra chính xác path
     const shouldShowGradient = 
         location.pathname === '/' || 
-        location.pathname === '/account';
+        location.pathname.startsWith('/account');
 
     return (
         <div className={`user-layout font-cabin min-h-screen ${

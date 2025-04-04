@@ -1,10 +1,17 @@
 import React from 'react';
 import { AiOutlineEdit, AiOutlineFileProtect, AiOutlineFileText, AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import avatars from '../../../../Images/avatars.png';
 
-const Sidebar = ({ activePage, onPageChange }) => {
+const Sidebar = ({ activePage, setIsSidebarOpen }) => {
     const profile = useSelector((state) => state.auth.userInfo);
+
+    const handleLinkClick = () => {
+        if (setIsSidebarOpen) {
+            setIsSidebarOpen(false);
+        }
+    };
 
     return (
         <div className="space-y-8">
@@ -31,29 +38,31 @@ const Sidebar = ({ activePage, onPageChange }) => {
                         TÀI KHOẢN
                     </div>
                     <div className="space-y-1">
-                        <button
-                            className={`flex items-center gap-3 w-full p-2 rounded-lg transition-colors
-                                ${activePage === 'profile'
+                        <NavLink
+                            to="/account/profile"
+                            className={({ isActive }) => `flex items-center gap-3 w-full p-2 rounded-lg transition-colors
+                                ${isActive || activePage === 'profile'
                                     ? 'bg-orange-50 text-orange-500'
                                     : 'text-gray-700 hover:bg-gray-50'
                                 }`}
-                            onClick={() => onPageChange('profile')}
+                            onClick={handleLinkClick}
                         >
                             <AiOutlineEdit className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm">Chỉnh sửa hồ sơ</span>
-                        </button>
+                        </NavLink>
 
-                        <button
-                            className={`flex items-center gap-3 w-full p-2 rounded-lg transition-colors
-                                ${activePage === 'orders' || activePage === 'detailOrder'
+                        <NavLink
+                            to="/account/orders"
+                            className={({ isActive }) => `flex items-center gap-3 w-full p-2 rounded-lg transition-colors
+                                ${isActive || activePage === 'orders'
                                     ? 'bg-orange-50 text-orange-500'
                                     : 'text-gray-700 hover:bg-gray-50'
                                 }`}
-                            onClick={() => onPageChange('orders')}
+                            onClick={handleLinkClick}
                         >
                             <AiOutlineFileText className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm">Đơn hàng của tôi</span>
-                        </button>
+                        </NavLink>
                     </div>
                 </div>
 
@@ -63,29 +72,31 @@ const Sidebar = ({ activePage, onPageChange }) => {
                         HỖ TRỢ
                     </div>
                     <div className="space-y-1">
-                        <button
-                            className={`flex items-center gap-3 w-full p-2 rounded-lg transition-colors
-                                ${activePage === 'help'
+                        <NavLink
+                            to="/account/help"
+                            className={({ isActive }) => `flex items-center gap-3 w-full p-2 rounded-lg transition-colors
+                                ${isActive || activePage === 'help'
                                     ? 'bg-orange-50 text-orange-500'
                                     : 'text-gray-700 hover:bg-gray-50'
                                 }`}
-                            onClick={() => onPageChange('help')}
+                            onClick={handleLinkClick}
                         >
                             <AiOutlineQuestionCircle className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm">Trợ giúp</span>
-                        </button>
+                        </NavLink>
 
-                        <button
-                            className={`flex items-center gap-3 w-full p-2 rounded-lg transition-colors
-                                ${activePage === 'terms'
+                        <NavLink
+                            to="/account/terms"
+                            className={({ isActive }) => `flex items-center gap-3 w-full p-2 rounded-lg transition-colors
+                                ${isActive || activePage === 'terms'
                                     ? 'bg-orange-50 text-orange-500'
                                     : 'text-gray-700 hover:bg-gray-50'
                                 }`}
-                            onClick={() => onPageChange('terms')}
+                            onClick={handleLinkClick}
                         >
                             <AiOutlineFileProtect className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm">Điều khoản dịch vụ</span>
-                        </button>
+                        </NavLink>
                     </div>
                 </div>
             </div>

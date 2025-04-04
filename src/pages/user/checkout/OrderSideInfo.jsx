@@ -1,12 +1,14 @@
 import { AiOutlineEdit, AiOutlineEnvironment } from 'react-icons/ai';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { createOrder } from '../../../app/redux/slices/user/order.slice';
 
 const OrderSideInfo = (orderInfo) => {
 
     const { orderItems, summary, paymentMethod, shippingMethod } = orderInfo;
     const navigate = useNavigate();
     const userInfo = useSelector((state) => state.auth.userInfo);
+    const dispatch = useDispatch();
 
     // Check if both phoneNumber and address are present in userInfo
     const isAddressComplete = userInfo?.phoneNumber && userInfo?.address;
@@ -15,7 +17,6 @@ const OrderSideInfo = (orderInfo) => {
         navigate('/account');
     };
     const handleCheckout = () => {
-
         // Data to create Order
         const orderData = {
             totalPrice: summary.total,
@@ -25,9 +26,21 @@ const OrderSideInfo = (orderInfo) => {
             phoneNumber: userInfo.phoneNumber,
             paymentMethod: paymentMethod,
             delivery: shippingMethod,
-            items: orderItems
+            items: orderItems.map(item => ({
+                id: item.id,
+                color: item.color,
+                quantity: item.quantity,
+                priceAtTime: item.price,
+                totalPrice: item.price * item.quantity
+            }))
         };
-        navigate('/checkout/success');
+
+        dispatch(createOrder({
+            orderData,
+            onSuccess: (data) => {
+                navigate('/checkout/success', { state: { data } });
+            },
+        }));
     };
 
     return (

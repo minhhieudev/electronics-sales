@@ -226,7 +226,7 @@ const ProfileContent = () => {
     const renderEditableField = (field, label, value, icon) => {
         return (
             <div className="flex items-center gap-3 sm:gap-12">
-                <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-3">
+                <label className="w-[35%] sm:w-32 text-gray-500 text-sm flex items-center gap-3">
                     {icon}
                     {label}:
                 </label>
@@ -254,10 +254,10 @@ const ProfileContent = () => {
 
     const renderDateAndGender = () => {
         return (
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-4">
                 {/* Date Field */}
                 <div className="flex items-center sm:gap-12 gap-3">
-                    <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                    <label className="w-[35%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
                         <AiOutlineCalendar className="w-4 h-4" />
                         Ngày sinh:
                     </label>
@@ -280,13 +280,13 @@ const ProfileContent = () => {
 
                 {/* Gender Field */}
                 <div className="flex items-center sm:gap-12 gap-3">
-                    <label className="w-[30%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
+                    <label className="w-[35%] sm:w-32 text-gray-500 text-sm flex items-center gap-2">
                         <AiOutlineUser className="w-4 h-4" />
                         Giới tính:
                     </label>
                     <div className="flex-1">
                         {isEditMode ? (
-                            <div className="relative w-[60%] sm:w-[50%]">
+                            <div className="relative w-[80%] sm:w-[50%]">
                                 <select
                                     value={userInfo.gender}
                                     onChange={(e) => handleChange('gender', e.target.value === 'true' ? true : e.target.value === 'false' ? false : null)}
@@ -311,21 +311,18 @@ const ProfileContent = () => {
 
     return (
         <div>
-            <div className="p-6 bg-white rounded-lg">
+            <div className="px-6 pt-1 pb-4 bg-white rounded-lg sm:h-[75vh]">
                 {/* Header section */}
-                <div className="mb-6">
-                    <div className="flex justify-between items-start mb-4 w-[95%]">
-                        <h1 className="text-xl sm:text-2xl font-bold">Tài khoản của tôi</h1>
-                        {!isEditMode && (
-                            <button
-                                onClick={() => setIsEditMode(true)}
-                                className="text-orange-500 hover:text-orange-600 p-2 rounded-full hover:bg-orange-50 transition-colors ml-4"
-                            >
-                                <AiOutlineEdit className="w-6 h-6" />
-                            </button>
-                        )}
-                    </div>
-                    <p className="text-sm sm:text-base text-gray-500">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+                <div className="mb-4 sm:w-[95%] flex justify-between">
+                    <p className="text-sm sm:text-base text-gray-500 mt-3">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+                    {!isEditMode && (
+                        <button
+                            onClick={() => setIsEditMode(true)}
+                            className="text-orange-500 hover:text-orange-600 p-2 rounded-full hover:bg-orange-50 transition-colors ml-4"
+                        >
+                            <AiOutlineEdit className="w-8 h-8" />
+                        </button>
+                    )}
                 </div>
 
                 {/* Main content grid */}
@@ -378,7 +375,7 @@ const ProfileContent = () => {
                                     onClick={() => setIsPasswordModalOpen(true)}
                                 >
                                     <AiOutlineLock className="h-5 w-5 text-gray-600" />
-                                    <span className="font-semibold">Đổi mật khẩu</span>
+                                    <span className="font-semibold text-sm">Đổi mật khẩu</span>
                                 </button>
                             </div>
                         </div>
@@ -388,7 +385,7 @@ const ProfileContent = () => {
                     <div className="flex-1 flex justify-center lg:justify-start">
                         <div className="space-y-6 w-full max-w-[600px]">
                             {/* Editable fields với icons */}
-                            <div className="space-y-4">
+                            <div className="space-y-4 sm:space-y-6">
                                 {renderEditableField('fullName', 'Họ và tên', userInfo.fullName,
                                     <AiOutlineUser className="w-4 h-4 text-gray-500" />)}
                                 {renderEditableField('email', 'Email', userInfo.email,

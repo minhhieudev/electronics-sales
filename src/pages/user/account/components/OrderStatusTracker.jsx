@@ -18,25 +18,21 @@ const OrderStatusTracker = ({ status }) => {
         {
             icon: AiOutlineShoppingCart,
             label: "Đơn hàng đã đặt",
-            time: "11:24 18/10/2023",
             status: 0
         },
         {
             icon: AiOutlineAudit,
             label: "Chờ xác nhận",
-            time: "11:24 18/10/2023",
             status: 1
         },
         {
             icon: AiOutlineCar,
             label: "Đang giao tới bạn",
-            time: "11:24 18/10/2023",
             status: 2
         },
         {
             icon: AiOutlineCheckCircle,
             label: "Giao hàng thành công",
-            time: "11:24 18/10/2023",
             status: 3
         },
     ];
@@ -92,9 +88,6 @@ const OrderStatusTracker = ({ status }) => {
                             <span className={`text-base font-bold ${isPassed || isCurrent ? '' : 'text-gray-500'}`}>
                                 {step.label}
                             </span>
-
-                            {/* Step time */}
-                            <span className="text-gray-500 text-sm">{step.time}</span>
                         </div>
                     );
                 })}

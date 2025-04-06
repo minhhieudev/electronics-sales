@@ -89,7 +89,7 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
 
     return (
         <div>
-            <div className="p-4 space-y-4 cursor-pointer" onClick={!isDetailView ? () => onOrderSelect(order.orderCode) : undefined}>
+            <div className="px-4 py-4 pt-4 space-y-4 cursor-pointer shadow-lg" onClick={!isDetailView ? () => onOrderSelect(order.orderCode) : undefined}>
                 {/* Header */}
                 {isDetailView ? (
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
@@ -121,10 +121,10 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
                 {/* Products */}
                 <div className="divide-y divide-gray-100">
                     {displayedProducts?.map((product) => (
-                        <div key={product.id} className="py-4 hover:bg-gray-50 transition-colors cursor-pointer group">
-                            <div className="flex gap-4">
+                        <div key={product.id} className="pt-4 hover:bg-gray-50 transition-colors cursor-pointer group">
+                            <div className="flex sm:gap-4 gap-3 items-center">
                                 {/* Image */}
-                                <div className="w-20 h-20 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 group-hover:border-orange-300 transition-all shadow-sm">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 group-hover:border-orange-300 transition-all shadow-sm">
                                     <img
                                         src={product.mainImageUrl ? `${process.env.REACT_APP_CDN_URL}${product.mainImageUrl}` : `${process.env.REACT_APP_CDN_URL}xgpotizuns7tjuumljcr.png`}
                                         alt={product.name}
@@ -156,7 +156,7 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
                                         <h3 className="text-base font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate">{product.name}</h3>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-1">
+                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                                         {product.color && (
                                             <div className="flex items-center gap-2">
                                                 <span className="text-sm text-gray-600">{product.color}</span>
@@ -203,10 +203,10 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
                 )}
 
                 {/* Footer */}
-                <div className="pt-6 sm:pt-4 border-t border-gray-200">
+                <div className="pt-2 border-t border-gray-200">
                     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                         {/* Payment & Shipping Info */}
-                        <div className="w-full sm:w-auto flex flex-wrap items-center gap-4 border border-dashed border-orange-300 rounded-lg p-3 bg-orange-50">
+                        <div className="w-full sm:w-auto flex flex-wrap items-center gap-4 border border-dashed border-orange-300 rounded-lg py-2 px-4 bg-orange-50">
                             {/* Payment Method */}
                             {paymentMethod && (
                                 <div className="flex items-center gap-2">
@@ -233,8 +233,8 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
                         {/* Total Price */}
                         <div className="flex flex-col items-end self-end sm:self-auto">
                             <span className="text-sm text-gray-500">Thành tiền:</span>
-                            <div className="text-orange-500 flex items-center gap-1">
-                                <span className="text-xl font-bold">{formatPrice(order.totalPrice)}</span>
+                            <div className="text-orange-500 flex items-center gap-1 text-xl font-bold">
+                                <span>{formatPrice(order.totalPrice)}</span>
                                 <span>đ</span>
                             </div>
                         </div>

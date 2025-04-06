@@ -86,8 +86,6 @@ const OrdersContent = () => {
     return (
         <div>
             <div className="space-y-2">
-                <h1 className="text-xl font-bold">Đơn hàng của tôi</h1>
-
                 {/* Search bar */}
                 <div className="bg-white p-2 rounded-lg">
                     <div className="flex text-sm gap-2 rounded-lg border border-gray-200">
@@ -138,8 +136,8 @@ const OrdersContent = () => {
                     </div>
                 </div>
 
-                {/* Orders list with scroll */}
-                <div className="space-y-4  sm:max-h-[450px] overflow-y-auto">
+                {/* Orders list */}
+                <div className="space-y-4">
                     {ordersList.length > 0 ? (
                         ordersList.map(order => (
                             <div key={order.orderCode || order.id} className="bg-white rounded-lg" onClick={() => handleOrderSelect(order.id)}>

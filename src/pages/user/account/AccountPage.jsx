@@ -1,35 +1,68 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 
 const AccountPage = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [pageTitle, setPageTitle] = useState('');
     const location = useLocation();
-    
-    // Xác định trang hiện tại từ URL
+
+    // Determine the current page from the URL
     const getActivePage = () => {
         const path = location.pathname;
-        if (path.includes('/orders/')) return 'orders';
-        if (path.includes('/profile')) return 'profile';
-        if (path.includes('/orders')) return 'orders';
-        if (path.includes('/help')) return 'help';
-        if (path.includes('/terms')) return 'terms';
-        return 'profile'; 
+        if (path.includes('/orders/')) {
+            return 'orders';
+        }
+        if (path.includes('/orders')) {
+            return 'orders';
+        };
+        if (path.includes('/profile')) {
+            return 'profile';
+        }
+        if (path.includes('/help')) {
+            return 'help';
+        }
+        if (path.includes('/terms')) {
+            return 'terms';
+        }
+        return 'profile';
     };
 
+    /* eslint-disable react-hooks/exhaustive-deps */
+    useEffect(() => {
+        const activePage = getActivePage();
+        // Update title based on activePage
+        switch (activePage) {
+            case 'orders':
+                setPageTitle('Đơn hàng của tôi');
+                break;
+            case 'profile':
+                setPageTitle('Thông tin cá nhân');
+                break;
+            case 'help':
+                setPageTitle('Trợ giúp');
+                break;
+            case 'terms':
+                setPageTitle('Điều khoản sử dụng');
+                break;
+            default:
+                setPageTitle('Thông tin cá nhân');
+        }
+    }, [location.pathname]);
+
     return (
-        <div className="mt-4">
-            <div className="mx-auto px-4 py-6 md:px-8 lg:px-16">
+        <div className="sm:mt-3 mt-1">
+            <div className="mx-auto px-4 sm:py-6 py-2 md:px-8 lg:px-16">
                 {/* Mobile Header */}
-                <div className="flex items-center gap-3 lg:hidden mb-4">
+                <div className="flex items-center gap-3 lg:hidden mb-1">
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                     >
                         <AiOutlineMenu className="h-6 w-6" />
                     </button>
-                    <h1 className="text-xl font-bold">Tài khoản</h1>
+                    <h1 className='text-xl sm:text-2xl font-bold'>{pageTitle}</h1>
                 </div>
 
                 {/* Grid Container */}
@@ -68,6 +101,7 @@ const AccountPage = () => {
                     </div>
 
                     <div className="lg:col-span-10">
+                        <h1 className="text-xl sm:text-2xl font-bold mb-2 hidden lg:block">{pageTitle}</h1>
                         <Outlet />
                     </div>
                 </div>

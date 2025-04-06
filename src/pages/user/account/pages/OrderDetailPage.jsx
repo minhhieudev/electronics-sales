@@ -4,13 +4,9 @@ import {
     AiOutlineCar,
     AiOutlineCheckCircle,
     AiOutlineClockCircle,
-    AiOutlineClose,
     AiOutlineCloseCircle,
-    AiOutlineEdit,
-    AiOutlineEnvironment,
+    AiOutlineCopy,
     AiOutlineHeart,
-    AiOutlinePhone,
-    AiOutlineSave,
     AiOutlineShoppingCart
 } from 'react-icons/ai';
 import { useDispatch } from 'react-redux';
@@ -20,6 +16,7 @@ import { fetchOrderDetail, updateOrderAddress } from '../../../../app/redux/slic
 import MESSAGES from '../../../../common/const';
 import OrderItem from '../components/OrderItem';
 import OrderStatusTracker from '../components/OrderStatusTracker';
+import ShippingAddress from '../components/ShippingAddress';
 import ThankYouModal from '../components/ThankYouModal';
 
 const DetailOrder = () => {
@@ -36,6 +33,7 @@ const DetailOrder = () => {
         address: ''
     });
     const [showThankYouModal, setShowThankYouModal] = useState(false);
+    const [copyMessage, setCopyMessage] = useState({ show: false, id: null });
 
     const handleGoBack = () => {
         navigate('/account/orders');
@@ -100,6 +98,25 @@ const DetailOrder = () => {
         }));
     };
 
+    // Function to get order status class and text
+    const getOrderStatus = (status) => {
+        switch (status) {
+            case 'PENDING':
+                return { className: 'bg-orange-400 text-white', text: 'CHỜ XỬ LÝ', icon: <AiOutlineClockCircle className="h-5 w-5" /> };
+            case 'SHIPPING':
+                return { className: 'bg-blue-500 text-white', text: 'ĐANG GIAO HÀNG', icon: <AiOutlineCar className="h-5 w-5" /> };
+            case 'COMPLETED':
+                return { className: 'bg-green-500 text-white', text: 'ĐÃ GIAO HÀNG', icon: <AiOutlineCheckCircle className="h-5 w-5" /> };
+            case 'CANCELED':
+                return { className: 'bg-red-500 text-white', text: 'ĐÃ HỦY', icon: <AiOutlineCloseCircle className="h-5 w-5" /> };
+            default:
+                return { className: '', text: '', icon: null };
+        }
+    };
+
+    // Check if orderData is available before destructuring
+    const { className, text, icon } = orderData ? getOrderStatus(orderData.status) : { className: '', text: '', icon: null };
+
     // Function to update order status
     const handleOrderStatusChange = (newStatus) => {
         setOrderData(prevData => ({
@@ -112,46 +129,61 @@ const DetailOrder = () => {
         }
     };
 
+    const handleCopy = (orderCode, e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(orderCode);
+        setCopyMessage({ show: true, id: orderCode });
+
+        setTimeout(() => {
+            setCopyMessage({ show: false, id: null });
+        }, 2000);
+    };
+
     if (!orderData) {
         return <div className="text-center py-6">Đang tải...</div>;
     }
 
     return (
-        <div ref={containerRef} className="bg-white rounded-md mx-auto p-3 sm:p-6 sm:max-h-[600px] overflow-y-auto">
+        <div ref={containerRef} className="bg-white rounded-md mx-auto p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                <button
-                    onClick={handleGoBack}
-                    className="flex items-center gap-2 text-base py-2 px-3 rounded-md transition-all duration-300 
+                <div className='flex justify-between items-center'>
+                    <button
+                        onClick={handleGoBack}
+                        className="flex items-center gap-2 text-base py-2 px-3 rounded-md transition-all duration-300 
                         bg-green-50 text-green-600 hover:bg-green-100 hover:shadow-md w-fit"
-                >
-                    <AiOutlineArrowLeft className="h-5 w-5" />
-                    <span className="font-medium">Trở lại</span>
-                </button>
-                <div className="flex gap-4 items-center justify-between">
-                    <div className="flex gap-1">
-                        <p>Mã đơn:</p>
-                        <p className='font-bold'>{orderData.orderCode}</p>
+                    >
+                        <AiOutlineArrowLeft className="h-5 w-5" />
+                        <span className="font-medium">Trở lại</span>
+                    </button>
+                    {/* Mobile */}
+                    <div className={`flex sm:hidden items-center gap-2 text-xs sm:text-sm sm:px-4 px-3 py-2 rounded-lg shadow-md font-bold ${className}`}>
+                        {icon}
+                        <span>{text}</span>
                     </div>
-                    <div className={`
-                        flex items-center gap-2 text-xs sm:text-sm sm:px-4 px-3 py-2 rounded-lg shadow-md font-bold
-                        ${orderData.status === 'PENDING' ? 'bg-orange-400 text-white' :
-                            orderData.status === 'SHIPPING' ? 'bg-blue-500 text-white' :
-                                orderData.status === 'COMPLETED' ? 'bg-green-500 text-white' :
-                                    'bg-red-500 text-white'}
-                    `}>
-                        {orderData.status === 'PENDING' ?
-                            <AiOutlineClockCircle className="h-5 w-5" /> :
-                            orderData.status === 'SHIPPING' ?
-                                <AiOutlineCar className="h-5 w-5" /> :
-                                orderData.status === 'COMPLETED' ?
-                                    <AiOutlineCheckCircle className="h-5 w-5" /> :
-                                    <AiOutlineCloseCircle className="h-5 w-5" />
-                        }
-                        <span>
-                            {orderData.status === 'PENDING' ? 'CHỜ XỬ LÝ' :
-                                orderData.status === 'SHIPPING' ? 'ĐANG GIAO HÀNG' :
-                                    orderData.status === 'COMPLETED' ? 'ĐÃ GIAO HÀNG' : 'ĐÃ HỦY'}
-                        </span>
+                </div>
+                <div className="flex gap-4 items-center justify-between mt-2 sm:mt-0">
+                    <div className="flex items-center gap-1">
+                        <div className="flex sm:gap-2 gap-3 items-center">
+                            <p className='text-sm'>Mã đơn hàng:</p>
+                            <p className='font-bold'>{orderData.orderCode}</p>
+                        </div>
+                        <div className="relative">
+                            <AiOutlineCopy
+                                className={`h-4 cursor-pointer transition-colors duration-200 ${copyMessage.show && copyMessage.id === orderData.orderCode ? 'text-green-500' : 'text-gray-400 hover:text-gray-600'}`}
+                                onClick={(e) => handleCopy(orderData.orderCode, e)}
+                                title="Sao chép mã đơn hàng"
+                            />
+                            {copyMessage.show && copyMessage.id === orderData.orderCode && (
+                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-10">
+                                    Đã copy!
+                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className={`hidden sm:flex items-center gap-2 text-xs sm:text-sm sm:px-4 px-3 py-2 rounded-lg shadow-md font-bold ${className}`}>
+                        {icon}
+                        <span>{text}</span>
                     </div>
                 </div>
             </div>
@@ -202,114 +234,14 @@ const DetailOrder = () => {
                 />
             </div>
 
-            {/* Địa chỉ nhận hàng */}
-            <div className="w-full mt-4 p-4 border border-gray-100 rounded-lg shadow-sm">
-                <div className="flex justify-between items-center mb-4">
-                    <div className='flex items-center gap-2'>
-                        <AiOutlineEnvironment className='h-5 w-5 text-gray-500' />
-                        <h2 className="text-base font-medium">Địa chỉ nhận hàng</h2>
-                    </div>
-                    {orderData.status === 'PENDING' && !isAddressEditable && (
-                        <button
-                            onClick={() => setIsAddressEditable(true)}
-                            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 
-                                transition-colors duration-200 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full"
-                        >
-                            <AiOutlineEdit className="h-4 w-4" />
-                            <span>Thay đổi</span>
-                        </button>
-                    )}
-                </div>
-
-                {!isAddressEditable ? (
-                    <div className="space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-8">
-                            <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{orderData.fullName}</span>
-                                {orderData.status === 'PENDING' && (
-                                    <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                                        Có thể thay đổi
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <AiOutlinePhone className="h-4 w-4 text-gray-500" />
-                                <span className="text-gray-700">{orderData.phoneNumber}</span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-2">
-                            <AiOutlineEnvironment className="h-4 w-4 text-gray-500 mt-1" />
-                            <div className="flex-1">
-                                <p className='text-gray-700 text-sm sm:text-base leading-relaxed'>
-                                    {orderData.address}
-                                </p>
-                                {orderData.status === 'PENDING' && (
-                                    <p className="text-xs text-gray-500 mt-2 italic">
-                                        * Bạn có thể thay đổi địa chỉ nhận hàng khi đơn hàng đang ở trạng thái chờ xử lý
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <h3 className="font-medium text-blue-800">Cập nhật địa chỉ nhận hàng</h3>
-
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Họ tên người nhận</label>
-                                <input
-                                    type="text"
-                                    name="fullName"
-                                    value={editedInfo.fullName}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-                                <input
-                                    type="text"
-                                    name="phoneNumber"
-                                    value={editedInfo.phoneNumber}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
-                                <textarea
-                                    name="address"
-                                    value={editedInfo.address}
-                                    onChange={handleInputChange}
-                                    rows="3"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                ></textarea>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-2 justify-end mt-4">
-                            <button
-                                onClick={() => setIsAddressEditable(false)}
-                                className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-1"
-                            >
-                                <AiOutlineClose className="h-4 w-4" />
-                                Hủy
-                            </button>
-                            <button
-                                onClick={handleAddressUpdate}
-                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-1"
-                            >
-                                <AiOutlineSave className="h-4 w-4" />
-                                Cập nhật
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <ShippingAddress
+                orderData={orderData}
+                isAddressEditable={isAddressEditable}
+                setIsAddressEditable={setIsAddressEditable}
+                editedInfo={editedInfo}
+                handleInputChange={handleInputChange}
+                handleAddressUpdate={handleAddressUpdate}
+            />
 
             {/* Product Information */}
             <div className='mt-8'>

@@ -54,11 +54,11 @@ const OrderSuccess = () => {
       <div className="rounded-lg bg-gray-100 text-base">
         <div className='w-[97%] m-auto'>
           <div className="flex items-center gap-5 py-2 px-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:text-base text-sm">
               <span className="text-gray-600">Mã đơn hàng</span>
-              <span className="font-medium">{orderData.orderCode}</span>
+              <span className="font-medium ">{orderData.orderCode}</span>
             </div>
-            <div className="flex text-[#FF8900]  items-center gap-3 font-bold">
+            <div className="flex text-[#FF8900]  items-center gap-2 font-bold">
               <button className="text-sm" onClick={() => { navigate(`/account/orders/${orderData.id}`) }}>
                 Xem chi tiết
               </button>

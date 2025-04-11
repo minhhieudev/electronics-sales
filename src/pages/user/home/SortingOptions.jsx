@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineDown } from 'react-icons/ai';
+import { IoMdClose } from 'react-icons/io';
 
 const SORT_OPTIONS = [
     { value: 'newest', label: 'Mới nhất' },
-    { value: 'best-selling', label: 'Bán chạy' }
+    { value: 'bestseller', label: 'Bán chạy' }
 ];
 
 const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
@@ -25,13 +26,8 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
 
     const handlePriceSelectChange = (e) => {
         const value = e.target.value;
-        if (value) {
-            setSelectedOption(`price-${value}`);
-            onSortChange(`price-${value}`);
-        } else {
-            setSelectedOption('');
-            onSortChange('');
-        }
+        setSelectedOption(value);
+        onSortChange(value);
     };
 
     if (isMobile) {
@@ -41,7 +37,7 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
                     <select
                         value={selectedOption}
                         onChange={(e) => handleButtonClick(e.target.value)}
-                        className={`w-full py-2 px-3 text-sm appearance-none cursor-pointer focus:outline-none rounded-md border ${selectedOption ? 'text-[#FF8900] border-[#FF8900] bg-orange-50 font-medium' : 'text-gray-700 border-gray-200 hover:border-gray-300'
+                        className={`w-full py-2 px-3 appearance-none cursor-pointer focus:outline-none rounded-md border ${selectedOption ? 'text-[#FF8900] border-[#FF8900] bg-orange-50 font-medium' : 'text-gray-700 border-gray-200 hover:border-gray-300'
                             }`}
                     >
                         <option value="">Chọn phương thức sắp xếp</option>
@@ -50,8 +46,8 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
                                 {sortType.label}
                             </option>
                         ))}
-                        <option value="price-asc">Giá tăng dần</option>
-                        <option value="price-desc">Giá giảm dần</option>
+                        <option value="priceAsc">Giá tăng dần</option>
+                        <option value="priceDesc">Giá giảm dần</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
                         <AiOutlineDown className="h-4 w-4 text-gray-400" />
@@ -82,26 +78,46 @@ const SortingOptions = ({ onSortChange, isMobile = false, currentSort }) => {
                                     }`}
                             >
                                 {sortType.label}
+                                {isSelected && (
+                                    <IoMdClose
+                                        className="ml-1 h-4 w-4"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleButtonClick('');
+                                        }}
+                                    />
+                                )}
                             </button>
                         );
                     })}
 
                     <div className="relative min-w-[90px]">
                         <select
-                            value={selectedOption.startsWith('price-') ? selectedOption.replace('price-', '') : ''}
+                            value={selectedOption}
                             onChange={handlePriceSelectChange}
-                            className={`w-full bg-white border rounded-md px-3 py-1.5 pr-8 appearance-none cursor-pointer focus:outline-none text-sm transition-all ${selectedOption.startsWith('price-')
+                            className={`w-full bg-white border rounded-md px-3 py-1.5 pr-8 appearance-none cursor-pointer focus:outline-none text-sm transition-all ${selectedOption === 'priceAsc' || selectedOption === 'priceDesc'
                                 ? 'border-[#FF8900] text-[#FF8900] bg-orange-50 font-medium'
                                 : 'border-gray-300 hover:bg-gray-50'
                                 }`}
                         >
                             <option value="">Giá</option>
-                            <option value="asc">Tăng dần</option>
-                            <option value="desc">Giảm dần</option>
+                            <option value="priceAsc">Tăng dần</option>
+                            <option value="priceDesc">Giảm dần</option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-                            <AiOutlineDown className={`h-4 w-4 ${selectedOption.startsWith('price-') ? 'text-[#FF8900]' : 'text-gray-500'
-                                }`} />
+                            {selectedOption === 'priceAsc' || selectedOption === 'priceDesc' ? (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePriceSelectChange({ target: { value: '' } });
+                                    }}
+                                    className="text-[#FF8900] hover:text-[#FF6900]"
+                                >
+                                    <IoMdClose className="h-4 w-4" />
+                                </button>
+                            ) : (
+                                <AiOutlineDown className="h-4 w-4 text-gray-500" />
+                            )}
                         </div>
                     </div>
                 </div>

@@ -71,6 +71,11 @@ const authSlice = createSlice({
     },
     updateUserInfo: (state, { payload }) => {
       state.userInfo = payload;
+    },
+    updateTotalQuantity: (state, { payload }) => {
+      if (state.userInfo) {
+        state.userInfo.totalQuantity = payload;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -82,5 +87,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, updateUserInfo } = authSlice.actions;
+export const { logout, updateUserInfo, updateTotalQuantity } = authSlice.actions;
 export default authSlice.reducer;

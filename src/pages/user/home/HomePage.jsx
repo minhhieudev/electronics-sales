@@ -1,21 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import { IoMdClose } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { fetchProductsAction } from '../../../app/redux/slices/user/product.slice';
 import { CONST } from '../../../common/const';
 import Pagination from "../../../components/user/pagination/Pagination";
 import Categories from './Categories';
-import data from './data';
 import ProductItem from './ProductItem';
 import SortingOptions from './SortingOptions';
 
 const ITEMS_PER_PAGE = CONST.ITEMS_PER_PAGE;
 
 const HomePage = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortedData, setSortedData] = useState(data);
+    const dispatch = useDispatch();
+    const location = useLocation();
+
+    const [sortType, setSortType] = useState('');
     const [showCategories, setShowCategories] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("Tất cả sản phẩm");
+    const [selectedCategory, setSelectedCategory] = useState({ id: 0, name: "Tất cả sản phẩm" });
+    const [currentPage, setCurrentPage] = useState(0);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+    const [search, setSearch] = useState('');
+    const [products, setProducts] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+
+    // Check if the screen is a narrow desktop
+    const isNarrowDesktop = windowWidth >= 768 && windowWidth < 1024;
 
     useEffect(() => {
         const handleResize = () => {
@@ -26,54 +37,59 @@ const HomePage = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Check if the screen is a narrow desktop
-    const isNarrowDesktop = windowWidth >= 768 && windowWidth < 1024;
+    // Read query parameters from URL
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const searchFromUrl = searchParams.get('search');
 
-    const totalItems = data.length;
-    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+        setSearch(searchFromUrl || '');
+    }, [location.search]);
 
-    const sortByPrice = (data, order) => {
-        return [...data].sort((a, b) =>
-            order === 'asc' ? a.price - b.price : b.price - a.price
-        );
-    };
+    // Fetch data
+    useEffect(() => {
+        const fetchData = () => {
+            const categoryId = selectedCategory.id;
+
+            dispatch(fetchProductsAction({
+                params: {
+                    search,
+                    page: currentPage,
+                    limit: ITEMS_PER_PAGE,
+                    categoryId: categoryId !== 0 ? categoryId : '',
+                    orderBy: sortType
+                },
+                onSuccess: (data) => {
+                    setProducts(data.items || []);
+                    setTotalPages(data.pageInfo?.totalPages || 0);
+                }
+            }));
+        };
+
+        fetchData();
+    }, [dispatch, currentPage, sortType, selectedCategory, search]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
 
     // Handle sorting change from SortingOptions component
-    const handleSortChange = (sortType) => {
-        if (sortType === 'price-asc') {
-            setSortedData(sortByPrice(data, 'asc'));
-        } else if (sortType === 'price-desc') {
-            setSortedData(sortByPrice(data, 'desc'));
-        } else if (sortType === 'newest') {
-            setSortedData([...data].sort((a, b) =>
-                new Date(b.created_at) - new Date(a.created_at)
-            ));
-        } else if (sortType === 'best-selling') {
-            setSortedData([...data].sort((a, b) => b.sold - a.sold));
-        } else {
-            setSortedData(data);
-        }
+    const handleSortChange = (newSortType) => {
+        setSortType(newSortType);
+        setCurrentPage(0);
     };
 
-    const handleCategoryChange = (category) => {
-        setSelectedCategory(category.name);
-        setCurrentPage(1);
+    const handleCategoryChange = (data) => {
+        setSelectedCategory({ id: data.id, name: data.name });
+        setCurrentPage(0);
     };
 
     const toggleCategories = () => {
         setShowCategories(!showCategories);
     };
 
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
     return (
-        <div className="bg-gradient-to-r min-h-screen">
-            <div className='mx-auto space-y-1 mt-10'>
+        <div className="bg-gradient-to-r min-h-screen mt-5">
+            <div className='mx-auto space-y-1'>
                 {/* Mobile Header */}
                 <div className="md:hidden flex justify-between items-center mb-4 px-4 md:px-8 lg:px-16">
                     <button
@@ -82,17 +98,17 @@ const HomePage = () => {
                     >
                         <FiMenu className="h-6 w-6 text-gray-700" />
                     </button>
-                    <h1 className="font-bold text-xl">{selectedCategory}</h1>
+                    <h1 className="font-bold text-xl">{selectedCategory.name}</h1>
                     {/* Dropdown for Filters */}
                     <select
                         onChange={(e) => handleSortChange(e.target.value)}
-                        className="p-2 rounded-md bg-white shadow-sm focus:outline-none"
+                        className="p-2 rounded-md bg-white shadow-sm focus:outline-none "
                     >
                         <option value="">Lọc</option>
                         <option value="newest">Mới nhất</option>
-                        <option value="best-selling">Bán chạy</option>
-                        <option value="price-asc">Giá tăng dần</option>
-                        <option value="price-desc">Giá giảm dần</option>
+                        <option value="bestseller">Bán chạy</option>
+                        <option value="priceAsc">Giá tăng dần</option>
+                        <option value="priceDesc">Giá giảm dần</option>
                     </select>
                 </div>
 
@@ -137,33 +153,42 @@ const HomePage = () => {
                         <div className="hidden md:block py-2">
                             <div className="flex items-center justify-between flex-wrap">
                                 <h1 className={`font-bold text-xl md:text-2xl ${isNarrowDesktop ? 'w-full text-center' : ''}`}>
-                                    {selectedCategory}
+                                    {selectedCategory.name}
                                 </h1>
 
                                 {/* Desktop Sorting Options */}
                                 <div className={`${isNarrowDesktop ? 'w-full' : ''}`}>
-                                    <SortingOptions onSortChange={handleSortChange} />
+                                    <SortingOptions
+                                        onSortChange={handleSortChange}
+                                        currentSort={sortType}
+                                    />
                                 </div>
                             </div>
                         </div>
 
                         {/* Products Grid */}
                         <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-                            {currentItems.map(product => (
+                            {products && products.length > 0 ? products.map(product => (
                                 <div key={product.id} className="w-full">
                                     <ProductItem product={product} />
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="col-span-full text-center py-12">
+                                    <p className="text-gray-500 text-lg">Không có sản phẩm nào được tìm thấy</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Pagination */}
-                        <div className='mt-6 flex justify-center'>
-                            <Pagination
-                                totalPage={totalPages}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                            />
-                        </div>
+                        {products && products.length > 0 && (
+                            <div className='mt-6 flex justify-center'>
+                                <Pagination
+                                    totalPage={totalPages}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

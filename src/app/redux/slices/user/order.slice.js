@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import MESSAGES, { CONST } from "../../../../common/const";
 import OrderService from "../../../services/user/order.service";
 import { setLoading } from "../loading.slice";
+import { updateTotalQuantity } from "../auth.slice";
 
 // Thunk action to fetch order list
 export const fetchOrders = createAsyncThunk(
@@ -51,7 +52,10 @@ export const createOrder = createAsyncThunk(
             const response = await OrderService.createOrder(orderData);
             if (response.status === CONST.STATUS.SUCCESS) {
                 onSuccess && onSuccess(response.data);
-                toast.success(MESSAGES.CREATE_ORDER_SUCCESS)
+                toast.success(MESSAGES.CREATE_ORDER_SUCCESS);
+                
+                // Update totalQuantity of cart
+                dispatch(updateTotalQuantity(response?.data?.totalQuantity));
             }
         } catch (error) {
             toast.error(error.response?.data?.message || MESSAGES.NETWORK_ERROR);

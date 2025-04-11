@@ -4,6 +4,7 @@ import AdminLayout from "../layouts/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
 import AccountList from "../pages/admin/account/AccountList";
 import CategoryList from "../pages/admin/category/CategoryList";
+import BrandList from "../pages/admin/brand/BrandList";
 import ProtectedRoute from "./ProtectedRoute";
 import PageNotFound from "../pages/page-not-found/PageNotFoundPage";
 
@@ -15,6 +16,7 @@ const AdminRoutes = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="accounts" element={<AccountList />} />
           <Route path="category" element={<CategoryList/>}/>
+          <Route path="brand" element={<BrandList/>}/>
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

@@ -9,7 +9,8 @@ import ShippingMethods from './ShippingMethods';
 const CheckoutPage = () => {
   const location = useLocation();
 
-  const orderItems = useMemo(() => location.state?.orderItems || [], [location.state?.orderItems]);
+  // Get order items and other data from location state
+  const orderItems = location.state?.orderItems || [];
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [shippingMethod, setShippingMethod] = useState('FAST_DELIVERY');

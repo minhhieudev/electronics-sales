@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineDown, AiOutlineEnvironment, AiOutlineLogout, AiOutlineSearch, AiOutlineShoppingCart, AiOutlineUser } from 'react-icons/ai';
+import { IoMdClose } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import avatar from '../../../Images/avatar.png';
 import logo from '../../../Images/logo.png';
 import { logout } from '../../../app/redux/slices/auth.slice';
@@ -10,15 +11,28 @@ const Header = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
     const dropdownRef = useRef(null);
     const searchBarRef = useRef(null);
+    const cartRef = useRef(null);
+
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
 
     const userInfo = useSelector((state) => state.auth.userInfo);
     const isLogin = useSelector((state) => state.auth.isLogin);
 
     const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
+
+    // Get searchTerm from URL when the component is mounted
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const searchFromUrl = searchParams.get('search');
+        if (searchFromUrl) {
+            setSearchTerm(searchFromUrl);
+        }
+    }, [location.search]);
 
     // This effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
@@ -59,12 +73,30 @@ const Header = () => {
         setShowSearchBar(!showSearchBar);
     };
 
+    const handleClearSearch = () => {
+        setSearchTerm('');
+        navigate('/', { replace: true });
+        if (showSearchBar) {
+            setShowSearchBar(false);
+        }
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
+        navigate(`/?search=${encodeURIComponent(searchTerm)}`);
+        if (showSearchBar) {
+            setShowSearchBar(false);
+        }
     };
 
     const handleSuggestionClick = (suggestion) => {
         setSearchTerm(suggestion);
+        setTimeout(() => {
+            navigate(`/?search=${encodeURIComponent(suggestion)}`);
+            if (showSearchBar) {
+                setShowSearchBar(false);
+            }
+        }, 100);
     };
 
     return (
@@ -83,13 +115,24 @@ const Header = () => {
                     <div className="flex flex-col w-[60%]">
                         {/* Search */}
                         <form onSubmit={handleSearch} className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900] flex-grow">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm"
-                                className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                            <div className="relative flex-grow">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm sản phẩm"
+                                    className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                {searchTerm && (
+                                    <button
+                                        type="button"
+                                        onClick={handleClearSearch}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        <IoMdClose className="h-5 w-5" />
+                                    </button>
+                                )}
+                            </div>
                             <button
                                 type="submit"
                                 className="bg-[#FF8900] text-white p-2 rounded w-14 flex items-center justify-center shrink-0"
@@ -156,8 +199,8 @@ const Header = () => {
                                     Đăng nhập
                                 </Link>
                             )}
-                            <div className="relative" onClick={handleCartClick}>
-                                <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">99+</span>
+                            <div id="desktop-cart-icon" className="relative cursor-pointer" onClick={handleCartClick} ref={cartRef}>
+                                <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">{userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity : '99+'}</span>
                                 <AiOutlineShoppingCart className="h-8 w-8 cursor-pointer" />
                             </div>
                         </div>
@@ -187,8 +230,8 @@ const Header = () => {
                         <AiOutlineSearch className="h-6 w-6 text-gray-700" />
                     </button>
 
-                    <div className="relative" onClick={handleCartClick}>
-                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[9px] px-1.5 py-0.5 font-bold">99+</span>
+                    <div id="mobile-cart-icon" className="relative cursor-pointer" onClick={handleCartClick} ref={cartRef}>
+                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[9px] px-1.5 py-0.5 font-bold">{userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity : '99+'}</span>
                         <AiOutlineShoppingCart className="h-7 w-7 text-gray-700" />
                     </div>
 
@@ -251,14 +294,25 @@ const Header = () => {
                 <div ref={searchBarRef} className="md:hidden px-4 py-2 bg-white border-t border-gray-200">
                     <form onSubmit={handleSearch}>
                         <div className="flex p-[1px] text-sm h-10 gap-1 rounded-md border-2 border-[#FF8900]">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm"
-                                className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                autoFocus
-                            />
+                            <div className="relative flex-grow">
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm sản phẩm"
+                                    className="p-2 text-[#FF8900] text-[14px] rounded w-full border-none focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                />
+                                {searchTerm && (
+                                    <button
+                                        type="button"
+                                        onClick={handleClearSearch}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        <IoMdClose className="h-5 w-5" />
+                                    </button>
+                                )}
+                            </div>
                             <button
                                 type="submit"
                                 className="bg-[#FF8900] text-white p-2 rounded w-12 flex items-center justify-center shrink-0"
@@ -272,11 +326,7 @@ const Header = () => {
                             <span
                                 key={index}
                                 className="text-sm text-gray-500 cursor-pointer hover:text-[#FF8900]"
-                                onClick={() => {
-                                    handleSuggestionClick(suggestion);
-                                    // Automatically submit form after selecting a suggestion on mobile
-                                    setTimeout(() => handleSearch({ preventDefault: () => { } }), 100);
-                                }}
+                                onClick={() => handleSuggestionClick(suggestion)}
                             >
                                 {suggestion}
                             </span>

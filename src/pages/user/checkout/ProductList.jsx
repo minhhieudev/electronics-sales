@@ -20,7 +20,7 @@ const ProductList = ({ items = [] }) => {
                 <div className="flex gap-4">
                     <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
                         <img
-                            src={item.mainImage}
+                            src={ `${process.env.REACT_APP_CDN_URL}${item.mainImage}`}
                             alt={item.name}
                             className="w-full h-full object-cover"
                         />
@@ -52,7 +52,7 @@ const ProductList = ({ items = [] }) => {
                 <div className="col-span-5 flex gap-3 items-center">
                     <div className="w-16 h-16 rounded-md overflow-hidden">
                         <img
-                            src={item.mainImage}
+                            src={ `${process.env.REACT_APP_CDN_URL}${item.mainImage}`}
                             alt={item.name}
                             className="w-full h-full object-cover"
                         />

@@ -171,6 +171,10 @@ const ProfileContent = () => {
         try {
             setIsUploading(true);
 
+            if (tempUploadedUrl) {
+                await deleteFileFromCloudinary(tempUploadedUrl)
+            }
+
             const newFileName = await uploadFileToCloudinary(file);
 
             if (!tempAvatarUrl) {

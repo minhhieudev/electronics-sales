@@ -21,13 +21,13 @@ function Pagination({
               <AiOutlineRight />
             </div>
           }
-          onPageChange={({ selected }) => onChange(selected + 1)}
+          onPageChange={({ selected }) => onChange(selected)}
           pageRangeDisplayed={4}
           pageCount={totalPage}
           containerClassName="flex items-center list-none"
           pageLinkClassName="flex w-8 h-7 p-1 justify-center items-center rounded cursor-pointer transition duration-500"
           activeLinkClassName="bg-orange-500 text-white rounded"
-          forcePage={page - 1}
+          forcePage={page }
         />
       </div>
     </div>

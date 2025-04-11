@@ -1,5 +1,5 @@
 import { AiOutlineEdit, AiOutlineEnvironment } from 'react-icons/ai';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../../../app/redux/slices/user/order.slice';
 
@@ -13,9 +13,7 @@ const OrderSideInfo = (orderInfo) => {
     // Check if both phoneNumber and address are present in userInfo
     const isAddressComplete = userInfo?.phoneNumber && userInfo?.address;
 
-    const handleUpdateInfo = () => {
-        navigate('/account');
-    };
+    // Handle checkout action
     const handleCheckout = () => {
         // Data to create Order
         const orderData = {
@@ -35,6 +33,7 @@ const OrderSideInfo = (orderInfo) => {
             }))
         };
 
+        // Dispatch action to create order
         dispatch(createOrder({
             orderData,
             onSuccess: (data) => {
@@ -72,7 +71,7 @@ const OrderSideInfo = (orderInfo) => {
                             Vui lòng cập nhật thông tin giao hàng
                         </p>
                         <button
-                            onClick={handleUpdateInfo}
+                            onClick={() => navigate('/account')}
                             className="flex items-center gap-2 mx-auto px-4 py-2 bg-[#FF8900] text-white rounded-lg hover:bg-orange-500 transition-colors"
                         >
                             <AiOutlineEdit className="w-4 h-4" />

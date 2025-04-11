@@ -21,7 +21,7 @@ const Sidebar = () => {
     { name: "Dashboard", icon: <MdDashboard />, link: "/admin/dashboard" },
     { name: "Tài khoản", icon: <FaRegUser />, link: "/admin/accounts" },
     { name: "Loại", icon: <PiTrashSimpleBold />, link: "/admin/category" },
-    { name: "Thương hiệu", icon: <MdBrandingWatermark />, link: "/brands" },
+    { name: "Thương hiệu", icon: <MdBrandingWatermark />, link: "/admin/brand" },
     { name: "Sản phẩm", icon: <BsBox2 />, link: "/products" },
     { name: "Đơn hàng", icon: <RiListOrdered2 />, link: "/orders" },
     { name: "Thống kê", icon: <FiBarChart2 />, link: "/statistics" },

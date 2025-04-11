@@ -11,6 +11,7 @@ import ProfileContent from "../pages/user/account/pages/ProfilePage";
 import OrdersContent from "../pages/user/account/pages/OrdersPage";
 import DetailOrder from "../pages/user/account/pages/OrderDetailPage";
 import ProductDetail from "../pages/user/product/ProductDetail";
+import CartPage from "../pages/user/cart/CartPage";
 
 const UserRoutes = () => {
     return (
@@ -29,6 +30,7 @@ const UserRoutes = () => {
 
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/checkout/success" element={<OrderSuccess />} />
+                <Route path="/cart" element={<CartPage />} />
             </Route>
             <Route path="/auth" element={<AuthForm />} />
             <Route path="*" element={<PageNotFound />} />

@@ -11,7 +11,10 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
     const displayedProducts = showAll ? order.items : order.items?.slice(0, 3);
 
     const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN').format(price) + ' ';
+        if (!price || typeof price !== 'number' || isNaN(price)) {
+            return '0';
+        }
+        return new Intl.NumberFormat('vi-VN').format(price);
     };
 
     // Find the corresponding payment method

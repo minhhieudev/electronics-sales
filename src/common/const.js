@@ -6,15 +6,15 @@ const MESSAGES = {
     LOGIN_ERROR: "Có lỗi xảy ra. Vui lòng thử lại.",
     PASSWORD_MISMATCH: "Mật khẩu không khớp!",
     FIELDS_REQUIRED: "Vui lòng điền đủ thông tin!",
-    
+
     // Session messages
     SESSION_EXPIRED_MESSAGE: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     INVALID_TOKEN: "Token không hợp lệ",
-    
+
     // Network messages
     NETWORK_ERROR: "Lỗi mạng hoặc máy chủ không phản hồi.",
     NO_DATA : "Không có dữ liệu",
-    
+
     // Profile messages
     GET_PROFILE_ERROR: 'Lỗi khi lấy thông tin tài khoản',
     UPDATE_PROFILE_SUCCESS: 'Cập nhật thông tin thành công',
@@ -47,6 +47,19 @@ const MESSAGES = {
     UPDATE_ORDER_ERROR: 'Lỗi khi cập nhật đơn hàng',
     DELETE_ORDER_SUCCESS: 'Hủy đơn hàng thành công',
     DELETE_ORDER_ERROR: 'Lỗi khi hủy đơn hàng',
+    
+    // Product list error message
+    GET_PRODUCT_LIST_ERROR: 'Lỗi khi lấy danh sách sản phẩm',
+    GET_PRODUCT_DETAIL_ERROR: 'Lỗi khi lấy chi tiết sản phẩm',
+    
+    // Cart messages
+    REMOVE_FROM_CART_SUCCESS: "Đã xóa sản phẩm khỏi giỏ hàng",
+    CART_QUANTITY_INVALID: "Số lượng sản phẩm không hợp lệ",
+    PRODUCT_OUT_OF_STOCK: "Sản phẩm đã hết hàng",
+    PRODUCT_INSUFFICIENT_STOCK: "Số lượng sản phẩm trong kho không đủ",
+    
+    // Common error message
+    COMMON_ERROR: 'Có lỗi xảy ra. Vui lòng thử lại sau.'
 };
 
 const CONST = {

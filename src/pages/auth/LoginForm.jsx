@@ -6,10 +6,10 @@ import { toast } from "react-toastify";
 import { loginAction } from "../../app/redux/slices/auth.slice";
 import MESSAGES from "../../common/const";
 
-const LoginForm = ({ prefilledUsername = '' }) => {
+const LoginForm = ({ prefilledUsername = 'hieu5' }) => {
     const [formData, setFormData] = useState({
         userName: prefilledUsername,
-        passWord: ''
+        passWord: '123'
     });
     const dispatch = useDispatch();
     const navigate = useNavigate();

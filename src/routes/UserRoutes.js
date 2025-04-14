@@ -12,6 +12,8 @@ import OrdersContent from "../pages/user/account/pages/OrdersPage";
 import DetailOrder from "../pages/user/account/pages/OrderDetailPage";
 import ProductDetail from "../pages/user/product/ProductDetail";
 import CartPage from "../pages/user/cart/CartPage";
+import HelpPage from "../pages/user/account/pages/HelpPage";
+import TermsPage from "../pages/user/account/pages/TermsPage";
 
 const UserRoutes = () => {
     return (
@@ -26,6 +28,8 @@ const UserRoutes = () => {
                     <Route path="profile" element={<ProfileContent />} />
                     <Route path="orders" element={<OrdersContent />} />
                     <Route path="orders/:orderId" element={<DetailOrder />} />
+                    <Route path="help" element={<HelpPage />} />
+                    <Route path="terms" element={<TermsPage />} />
                 </Route>
 
                 <Route path="/checkout" element={<CheckoutPage />} />

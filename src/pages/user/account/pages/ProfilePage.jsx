@@ -315,7 +315,7 @@ const ProfileContent = () => {
 
     return (
         <div>
-            <div className="px-6 pt-1 pb-4 bg-white rounded-lg sm:h-[75vh]">
+            <div className="px-6 pt-1 pb-4 bg-white rounded-lg ">
                 {/* Header section */}
                 <div className="mb-4 sm:w-[95%] flex justify-between">
                     <p className="text-sm sm:text-base text-gray-500 mt-3">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>

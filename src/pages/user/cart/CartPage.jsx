@@ -26,11 +26,15 @@ const CartPage = () => {
     // State to track if the quantity is updated
     const [isQuantityUpdated, setIsQuantityUpdated] = useState(false);
 
+    // State to store the items fetched from the server
+    const [serverItems, setServerItems] = useState([]);
+
     // Fetch data from API
     useEffect(() => {
         dispatch(fetchUserCart({
             onSuccess: (data) => {
                 setItems(data);
+                setServerItems(data);
             }
         }));
     }, [dispatch]);
@@ -61,69 +65,100 @@ const CartPage = () => {
                 mainImage: item.mainImageUrl
             }));
 
-        // Navigate to checkout
-        navigate('/checkout', { state: { orderItems: listItems } });
+        const itemIds = selectedItems.map(itemId => items.find(item => item.id === itemId).id);
+
+        // Navigate to checkout with additional variable indicating it's from cart
+        navigate('/checkout', { state: { orderItems: listItems, fromCart: true, itemIds } });
     };
 
     // Function to handle quantity change
-    const handleQuantityChange = (id, newQuantity, productId, localOnly = false) => {
-        const item = items.find(item => item.id === id);
+    const handleQuantityChange = (item, newQuantity, localOnly = false) => {
 
-        // Check if it exists and is different
-        if (!item || newQuantity === originalQuantity) {
+        const numericQuantity = parseInt(newQuantity, 10);
+
+        // Check for invalid inputs
+        if (!item || isNaN(numericQuantity) || numericQuantity > item.stock || numericQuantity === originalQuantity) {
+            if (!localOnly) return;
+        }
+
+        // If it's localOnly (entering data), only update the display value without handling logic
+        if (localOnly) {
+            setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: newQuantity } : i));
             return;
         }
 
-        const oldQuantity = item.quantity; // Store the old quantity
+        // Find the server state for this item
+        const serverItem = serverItems.find(i => i.id === item.id);
 
         // Update local state
-        setItems(prev => prev.map(i => i.id === id ? { ...i, quantity: newQuantity } : i));
+        setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: numericQuantity } : i));
 
-        if (localOnly) {
-            return;
-        }
-
-        if (newQuantity === 0) {
-            handleShowDeleteDialog(id);
-        } else {
-            dispatch(updateProductInCart({
-                updateData: {
-                    id: productId,
-                    quantity: newQuantity,
-                    color: item.color
-                },
-                onSuccess: () => { },
-                onError: () => {
-                    // Revert to old quantity if update fails
-                    setItems(prev => prev.map(i => i.id === id ? { ...i, quantity: oldQuantity } : i));
+        dispatch(updateProductInCart({
+            updateData: {
+                id: item.productId,
+                quantity: numericQuantity,
+                color: item.color
+            },
+            onSuccess: () => {
+                // Update server state on success
+                setServerItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: numericQuantity } : i));
+            },
+            onError: () => {
+                // Revert to server state on error
+                if (serverItem) {
+                    setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: serverItem.quantity } : i));
                 }
-            }));
-        }
+            }
+        }));
     };
 
     // Function to handle color change
-    const handleColorChange = (id, newColor, productId) => {
-        const item = items.find(item => item.id === id);
+    const handleColorChange = (item, newColor) => {
 
-        const oldColor = item.color;
+        // Save the old color from serverItems
+        const serverItem = serverItems.find(i => i.id === item.id);
+        const oldColor = serverItem.color;
 
-        // Update the local state immediately
-        setItems(prev => prev.map(item =>
-            item.id === id ? { ...item, color: newColor } : item
+        // Update local state immediately
+        setItems(prev => prev.map(i =>
+            i.id === item.id ? { ...i, color: newColor } : i
         ));
 
         dispatch(updateProductInCart({
             updateData: {
-                id: productId,
+                id: item.productId,
                 quantity: item.quantity,
                 color: newColor
             },
-            onSuccess: () => { },
+            onSuccess: () => {
+                // Update serverItems to sync with items
+                setServerItems(prev => prev.map(i => i.id === item.id ? { ...i, color: newColor } : i));
+            },
             onError: () => {
-                // Revert to old color if update fails
-                setItems(prev => prev.map(i => i.id === id ? { ...i, color: oldColor } : i));
+                // Revert to the old color from serverItems if update fails
+                setItems(prev => prev.map(i => i.id === item.id ? { ...i, color: oldColor } : i));
             }
         }));
+    };
+
+    // Function to handle delete dialog close without confirming
+    const handleDeleteCancel = () => {
+        // If not deleting multiple products and there is a product being prepared for deletion
+        if (!isMultiDelete && itemToRemove) {
+            // Find the corresponding product and serverItem
+            const item = items.find(i => i.id === itemToRemove);
+            const serverItem = serverItems.find(i => i.id === itemToRemove);
+
+            if (item && serverItem) {
+                // Revert to the quantity value from the server
+                setItems(prev => prev.map(i =>
+                    i.id === itemToRemove ? { ...i, quantity: serverItem.quantity } : i
+                ));
+            }
+        }
+
+        // Close the dialog
+        setShowDeleteDialog(false);
     };
 
     // Function to handle delete dialog
@@ -283,7 +318,7 @@ const CartPage = () => {
             {/* Unified Delete Dialog */}
             <DeleteDialog
                 isOpen={showDeleteDialog}
-                onClose={() => setShowDeleteDialog(false)}
+                onClose={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
                 itemCount={isMultiDelete ? selectedItems.length : 1}
             />

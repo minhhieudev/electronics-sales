@@ -21,14 +21,37 @@ const CartItem = ({
 
     // Handle blur event 
     const handleQuantityBlur = (e) => {
-        const newQuantity = parseInt(e.target.value, 10);
+        let newQuantity = parseInt(e.target.value, 10);
 
-        if (!isNaN(newQuantity) && newQuantity !== originalQuantity) {
-            onQuantityChange(item.id, newQuantity, item.productId);
+        // If the value is not a valid number, restore to the original value
+        if (isNaN(newQuantity)) {
+            onQuantityChange(item, originalQuantity, true);
+            return;
+        }
+
+        // If the quantity is 0, display a confirmation dialog for deletion
+        if (newQuantity === 0) {
+            onDelete(item.id);
+            return;
+        }
+
+        // Ensure the quantity does not exceed the stock
+        if (newQuantity > item.stock) {
+            newQuantity = item.stock;
+        }
+
+        // Ensure the quantity is not less than 1
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        }
+
+        // If the new value is different from the original value, update and record the change
+        if (newQuantity !== originalQuantity) {
+            onQuantityChange(item, newQuantity);
             setIsQuantityUpdated(true);
         } else if (!isQuantityUpdated && item.quantity !== originalQuantity) {
-            // If the value is invalid, restore to the original value
-            onQuantityChange(item.id, originalQuantity, item.productId, true);
+            // If the value does not change but is different from the current value, restore
+            onQuantityChange(item, originalQuantity, true);
         }
     };
 
@@ -103,7 +126,7 @@ const CartItem = ({
                                 <select
                                     className="text-sm border rounded max-w-full h-[27px]"
                                     value={item.color}
-                                    onChange={(e) => onColorChange(item.id, e.target.value, item.productId)}
+                                    onChange={(e) => onColorChange(item, e.target.value)}
                                     disabled={item.isDeleted}
                                 >
                                     {item?.colors?.map((color, idx) => (
@@ -133,16 +156,21 @@ const CartItem = ({
                                 quantity={item.quantity}
                                 onIncrease={(e) => {
                                     e.stopPropagation();
-                                    onQuantityChange(item.id, item.quantity + 1, item.productId);
+                                    if (item.quantity < item.stock) {
+                                        onQuantityChange(item, item.quantity + 1);
+                                    }
                                 }}
                                 onDecrease={(e) => {
                                     e.stopPropagation();
-                                    onQuantityChange(item.id, item.quantity - 1, item.productId);
+                                    onQuantityChange(item, item.quantity - 1);
                                 }}
                                 onInputChange={(e) => {
                                     e.stopPropagation();
-                                    const newQuantity = Math.max(0, parseInt(e.target.value, 10) || 0);
-                                    onQuantityChange(item.id, newQuantity, item.productId, true);
+                                    if (e.target.value === '') {
+                                        onQuantityChange(item, '', true);
+                                    } else {
+                                        onQuantityChange(item, e.target.value, true);
+                                    }
                                 }}
                                 onFocus={(e) => {
                                     e.stopPropagation();
@@ -221,7 +249,7 @@ const CartItem = ({
                                     value={item.color}
                                     onChange={(e) => {
                                         e.stopPropagation();
-                                        onColorChange(item.id, e.target.value, item.productId);
+                                        onColorChange(item, e.target.value);
                                     }}
                                     disabled={item.isDeleted}
                                 >
@@ -242,16 +270,21 @@ const CartItem = ({
                             quantity={item.quantity}
                             onIncrease={(e) => {
                                 e.stopPropagation();
-                                onQuantityChange(item.id, item.quantity + 1, item.productId);
+                                if (item.quantity < item.stock) {
+                                    onQuantityChange(item, item.quantity + 1);
+                                }
                             }}
                             onDecrease={(e) => {
                                 e.stopPropagation();
-                                onQuantityChange(item.id, item.quantity - 1, item.productId);
+                                onQuantityChange(item, item.quantity - 1);
                             }}
                             onInputChange={(e) => {
                                 e.stopPropagation();
-                                const newQuantity = Math.max(0, parseInt(e.target.value, 10) || 0);
-                                onQuantityChange(item.id, newQuantity, item.productId, true);
+                                if (e.target.value === '') {
+                                    onQuantityChange(item, '', true);
+                                } else {
+                                    onQuantityChange(item, e.target.value, true);
+                                }
                             }}
                             onFocus={(e) => {
                                 e.stopPropagation();

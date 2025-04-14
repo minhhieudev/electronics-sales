@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import MESSAGES, { CONST } from "../../../../common/const";
 import CartService from "../../../services/user/cart.service";
-import { setLoading } from "../loading.slice";
 import { updateTotalQuantity } from "../auth.slice";
+import { setLoading } from "../loading.slice";
 
 // Thunk action to fetch user cart
 export const fetchUserCart = createAsyncThunk(
@@ -49,8 +49,9 @@ export const updateProductInCart = createAsyncThunk(
         try {
             const response = await CartService.updateProductInCart(updateData);
             if (response.status === CONST.STATUS.SUCCESS) {
-                onSuccess && onSuccess(response.data);
+                onSuccess && onSuccess();
             }
+
         } catch (error) {
             onError && onError();
             toast.error(error.response?.data?.message || MESSAGES.COMMON_ERROR);

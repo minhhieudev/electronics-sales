@@ -41,7 +41,7 @@ const AccountPage = () => {
                 setPageTitle('Thông tin cá nhân');
                 break;
             case 'help':
-                setPageTitle('Trợ giúp');
+                setPageTitle('Trung tâm trợ giúp');
                 break;
             case 'terms':
                 setPageTitle('Điều khoản sử dụng');

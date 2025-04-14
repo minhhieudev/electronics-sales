@@ -142,7 +142,7 @@ const ProductDetail = () => {
         };
 
         // Redirect to the checkout page and pass the product data
-        navigate('/checkout', { state: { orderItems: [orderItem]} });
+        navigate('/checkout', { state: { orderItems: [orderItem], fromCart: false } });
     };
 
     // Format price function

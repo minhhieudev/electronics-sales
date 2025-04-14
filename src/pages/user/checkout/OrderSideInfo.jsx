@@ -1,11 +1,12 @@
 import { AiOutlineEdit, AiOutlineEnvironment } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { removeProductFromCart } from '../../../app/redux/slices/user/cart.slice';
 import { createOrder } from '../../../app/redux/slices/user/order.slice';
 
 const OrderSideInfo = (orderInfo) => {
 
-    const { orderItems, summary, paymentMethod, shippingMethod } = orderInfo;
+    const { orderItems, summary, paymentMethod, shippingMethod, fromCart, itemIds } = orderInfo;
     const navigate = useNavigate();
     const userInfo = useSelector((state) => state.auth.userInfo);
     const dispatch = useDispatch();
@@ -38,6 +39,13 @@ const OrderSideInfo = (orderInfo) => {
             orderData,
             onSuccess: (data) => {
                 navigate('/checkout/success', { state: { data } });
+
+                // Delete product if purchased from cart
+                if (fromCart) {
+                    dispatch(removeProductFromCart({
+                        cartIds: itemIds,
+                    }));
+                }
             },
         }));
     };

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { shippingMethods } from './data/checkoutData';
 import OrderSideInfo from './OrderSideInfo';
@@ -11,6 +11,8 @@ const CheckoutPage = () => {
 
   // Get order items and other data from location state
   const orderItems = location.state?.orderItems || [];
+  const fromCart = location.state?.fromCart;
+  const itemIds = location.state?.itemIds || [];
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [shippingMethod, setShippingMethod] = useState('FAST_DELIVERY');
@@ -85,6 +87,8 @@ const CheckoutPage = () => {
                 summary={summary}
                 paymentMethod={paymentMethod}
                 shippingMethod={shippingMethod}
+                fromCart={fromCart}
+                itemIds={itemIds}
               />
             </div>
           </div>

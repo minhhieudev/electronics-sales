@@ -9,7 +9,7 @@ import MESSAGES from "../../common/const";
 const LoginForm = ({ prefilledUsername = 'hieu5' }) => {
     const [formData, setFormData] = useState({
         userName: prefilledUsername,
-        passWord: '123'
+        passWord: ''
     });
     const dispatch = useDispatch();
     const navigate = useNavigate();

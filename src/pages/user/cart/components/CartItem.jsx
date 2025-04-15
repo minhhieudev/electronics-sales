@@ -8,7 +8,6 @@ const CartItem = ({
     isSelected,
     onSelectItem,
     onQuantityChange,
-    onColorChange,
     onDelete,
     copyMessage,
     onCopy,
@@ -80,6 +79,85 @@ const CartItem = ({
         // Navigate to product detail page
         navigate(`/product/${item.productId}`);
     };
+    
+    // Tạo component chung cho QuantityControl để tránh lặp code
+    const renderQuantityControl = () => (
+        <QuantityControl
+            quantity={item.quantity}
+            onIncrease={(e) => {
+                e.stopPropagation();
+                if (item.quantity < item.stock) {
+                    onQuantityChange(item, item.quantity + 1);
+                }
+            }}
+            onDecrease={(e) => {
+                e.stopPropagation();
+                if (item.quantity === 1) {
+                    onDelete(item.id);
+                } else {
+                    onQuantityChange(item, item.quantity - 1);
+                }
+            }}
+            onInputChange={(e) => {
+                e.stopPropagation();
+                if (e.target.value === '') {
+                    onQuantityChange(item, '', true);
+                } else {
+                    onQuantityChange(item, e.target.value, true);
+                }
+            }}
+            onFocus={(e) => {
+                e.stopPropagation();
+                setOriginalQuantity(item.quantity);
+                setIsQuantityUpdated(false);
+            }}
+            onKeyDown={(e) => {
+                e.stopPropagation();
+                handleKeyDown(e);
+            }}
+            onBlur={(e) => {
+                e.stopPropagation();
+                handleQuantityBlur(e);
+            }}
+        />
+    );
+    
+    // Component chung cho nút Delete
+    const renderDeleteButton = (additionalClass = "") => (
+        <button
+            className={`text-gray-500 hover:text-red-500 ${additionalClass}`}
+            onClick={(e) => {
+                e.stopPropagation();
+                onDelete(item.id);
+            }}
+        >
+            <AiOutlineDelete className="w-5 h-5" />
+        </button>
+    );
+    
+    // Component chung cho Copy icon và tooltip
+    const renderCopyComponent = () => (
+        <div className="relative">
+            <AiOutlineCopy
+                className={`h-4 cursor-pointer transition-colors duration-200 ${copyMessage.show && copyMessage.id === item.sku ? 'text-green-500' : 'text-gray-400 hover:text-gray-600'}`}
+                onClick={(e) => onCopy(item.sku, e)}
+                title="Copy product code"
+            />
+            {copyMessage.show && copyMessage.id === item.sku && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-10">
+                    Copied!
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                </div>
+            )}
+        </div>
+    );
+    
+    // Thay đổi từ component dropdown sang component chỉ đọc
+    const renderColorDisplay = (additionalClass = "") => (
+        <div className={`text-sm text-gray-500 ${additionalClass}`}>
+            <span className="font-medium">{item.color}</span>
+        </div>
+    );
 
     return (
         <div
@@ -108,84 +186,20 @@ const CartItem = ({
                                 <div className="flex-1 font-medium">
                                     <div className="flex items-center text-[12px] gap-1 text-gray-700">
                                         <span className="truncate">#{item.sku}</span>
-                                        <div className="relative">
-                                            <AiOutlineCopy
-                                                className={`h-4 cursor-pointer transition-colors duration-200 ${copyMessage.show && copyMessage.id === item.sku ? 'text-green-500' : 'text-gray-400 hover:text-gray-600'}`}
-                                                onClick={(e) => onCopy(item.sku, e)}
-                                                title="Copy product code"
-                                            />
-                                            {copyMessage.show && copyMessage.id === item.sku && (
-                                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-10">
-                                                    Copied!
-                                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
-                                                </div>
-                                            )}
-                                        </div>
+                                        {renderCopyComponent()}
                                     </div>
                                 </div>
-                                <select
-                                    className="text-sm border rounded max-w-full h-[27px]"
-                                    value={item.color}
-                                    onChange={(e) => onColorChange(item, e.target.value)}
-                                    disabled={item.isDeleted}
-                                >
-                                    {item?.colors?.map((color, idx) => (
-                                        <option key={idx} value={color} className="truncate">
-                                            {color}
-                                        </option>
-                                    ))}
-                                </select>
+                                {renderColorDisplay()}
                             </div>
                         </div>
                     </div>
 
                     <div className='flex flex-col justify-around'>
                         <div className='flex justify-end'>
-                            <button
-                                className="text-sm text-gray-500 hover:text-red-500"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDelete(item.id);
-                                }}
-                            >
-                                <AiOutlineDelete className="w-5 h-5" />
-                            </button>
+                            {renderDeleteButton("text-sm")}
                         </div>
                         <div className="text-center quantity-control">
-                            <QuantityControl
-                                quantity={item.quantity}
-                                onIncrease={(e) => {
-                                    e.stopPropagation();
-                                    if (item.quantity < item.stock) {
-                                        onQuantityChange(item, item.quantity + 1);
-                                    }
-                                }}
-                                onDecrease={(e) => {
-                                    e.stopPropagation();
-                                    onQuantityChange(item, item.quantity - 1);
-                                }}
-                                onInputChange={(e) => {
-                                    e.stopPropagation();
-                                    if (e.target.value === '') {
-                                        onQuantityChange(item, '', true);
-                                    } else {
-                                        onQuantityChange(item, e.target.value, true);
-                                    }
-                                }}
-                                onFocus={(e) => {
-                                    e.stopPropagation();
-                                    setOriginalQuantity(item.quantity);
-                                    setIsQuantityUpdated(false);
-                                }}
-                                onKeyDown={(e) => {
-                                    e.stopPropagation();
-                                    handleKeyDown(e);
-                                }}
-                                onBlur={(e) => {
-                                    e.stopPropagation();
-                                    handleQuantityBlur(e);
-                                }}
-                            />
+                            {renderQuantityControl()}
                             {item.stock < 50 && (
                                 <p className='text-[10px] font-semibold text-red-400'>Chỉ còn {item.stock} sản phẩm</p>
                             )}
@@ -229,36 +243,10 @@ const CartItem = ({
                                 <div className="flex-1 font-medium">
                                     <div className="flex items-center text-[12px] gap-1 text-gray-500">
                                         <span className="truncate">#{item.sku}</span>
-                                        <div className="relative">
-                                            <AiOutlineCopy
-                                                className={`h-4 cursor-pointer transition-colors duration-200 ${copyMessage.show && copyMessage.id === item.sku ? 'text-green-500' : 'text-gray-400 hover:text-gray-600'}`}
-                                                onClick={(e) => onCopy(item.sku, e)}
-                                                title="Copy product code"
-                                            />
-                                            {copyMessage.show && copyMessage.id === item.sku && (
-                                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap z-10">
-                                                    Copied!
-                                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
-                                                </div>
-                                            )}
-                                        </div>
+                                        {renderCopyComponent()}
                                     </div>
                                 </div>
-                                <select
-                                    className="mt-2 text-sm border rounded p-1 max-w-full"
-                                    value={item.color}
-                                    onChange={(e) => {
-                                        e.stopPropagation();
-                                        onColorChange(item, e.target.value);
-                                    }}
-                                    disabled={item.isDeleted}
-                                >
-                                    {item?.colors?.map((color, idx) => (
-                                        <option key={idx} value={color} className="truncate">
-                                            {color}
-                                        </option>
-                                    ))}
-                                </select>
+                                {renderColorDisplay("mt-2")}
                             </div>
                         </div>
                     </div>
@@ -266,40 +254,7 @@ const CartItem = ({
                         {item.price.toLocaleString()} đ
                     </div>
                     <div className="col-span-2 text-center quantity-control">
-                        <QuantityControl
-                            quantity={item.quantity}
-                            onIncrease={(e) => {
-                                e.stopPropagation();
-                                if (item.quantity < item.stock) {
-                                    onQuantityChange(item, item.quantity + 1);
-                                }
-                            }}
-                            onDecrease={(e) => {
-                                e.stopPropagation();
-                                onQuantityChange(item, item.quantity - 1);
-                            }}
-                            onInputChange={(e) => {
-                                e.stopPropagation();
-                                if (e.target.value === '') {
-                                    onQuantityChange(item, '', true);
-                                } else {
-                                    onQuantityChange(item, e.target.value, true);
-                                }
-                            }}
-                            onFocus={(e) => {
-                                e.stopPropagation();
-                                setOriginalQuantity(item.quantity);
-                                setIsQuantityUpdated(false);
-                            }}
-                            onKeyDown={(e) => {
-                                e.stopPropagation();
-                                handleKeyDown(e);
-                            }}
-                            onBlur={(e) => {
-                                e.stopPropagation();
-                                handleQuantityBlur(e);
-                            }}
-                        />
+                        {renderQuantityControl()}
                         {item.stock < 50 && (
                             <p className='text-xs font-semibold text-red-400'>Chỉ còn {item.stock} sản phẩm</p>
                         )}
@@ -309,27 +264,11 @@ const CartItem = ({
                         <span className='underline ml-1'>đ</span>
                     </div>
                     <div className="hidden md:block md:col-span-1 text-center">
-                        <button
-                            className="text-gray-500 hover:text-red-500"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(item.id);
-                            }}
-                        >
-                            <AiOutlineDelete className="w-5 h-5" />
-                        </button>
+                        {renderDeleteButton()}
                     </div>
                 </div>
                 <div className="md:hidden mt-2 text-right">
-                    <button
-                        className="text-sm text-gray-500 hover:text-red-500"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(item.id);
-                        }}
-                    >
-                        <AiOutlineDelete className="w-5 h-5" />
-                    </button>
+                    {renderDeleteButton("text-sm")}
                 </div>
 
                 {/* Message for deleted items */}

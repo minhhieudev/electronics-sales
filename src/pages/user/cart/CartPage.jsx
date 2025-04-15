@@ -73,17 +73,23 @@ const CartPage = () => {
 
     // Function to handle quantity change
     const handleQuantityChange = (item, newQuantity, localOnly = false) => {
+        // Nếu đây là thao tác nhập liệu (localOnly=true), chỉ cập nhật giao diện
+        if (localOnly) {
+            setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: newQuantity } : i));
+            return;
+        }
 
         const numericQuantity = parseInt(newQuantity, 10);
 
         // Check for invalid inputs
         if (!item || isNaN(numericQuantity) || numericQuantity > item.stock || numericQuantity === originalQuantity) {
-            if (!localOnly) return;
+            return;
         }
 
-        // If it's localOnly (entering data), only update the display value without handling logic
-        if (localOnly) {
-            setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: newQuantity } : i));
+        // Xử lý khi số lượng là 0
+        if (numericQuantity === 0) {
+            // Hiển thị hộp thoại xác nhận xóa
+            handleShowDeleteDialog(item.id);
             return;
         }
 
@@ -108,35 +114,6 @@ const CartPage = () => {
                 if (serverItem) {
                     setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: serverItem.quantity } : i));
                 }
-            }
-        }));
-    };
-
-    // Function to handle color change
-    const handleColorChange = (item, newColor) => {
-
-        // Save the old color from serverItems
-        const serverItem = serverItems.find(i => i.id === item.id);
-        const oldColor = serverItem.color;
-
-        // Update local state immediately
-        setItems(prev => prev.map(i =>
-            i.id === item.id ? { ...i, color: newColor } : i
-        ));
-
-        dispatch(updateProductInCart({
-            updateData: {
-                id: item.productId,
-                quantity: item.quantity,
-                color: newColor
-            },
-            onSuccess: () => {
-                // Update serverItems to sync with items
-                setServerItems(prev => prev.map(i => i.id === item.id ? { ...i, color: newColor } : i));
-            },
-            onError: () => {
-                // Revert to the old color from serverItems if update fails
-                setItems(prev => prev.map(i => i.id === item.id ? { ...i, color: oldColor } : i));
             }
         }));
     };
@@ -258,8 +235,8 @@ const CartPage = () => {
                     </div>
                 ) : (
                     <div>
-                        {/* Cart Items List */}
-                        <div className="block sm:hidden bg-white rounded-lg border-t max-h-[65vh] overflow-auto">
+                        {/* Cart Items List - Unified View with Responsive Classes */}
+                        <div className="bg-white rounded-lg border-t max-h-[65vh] overflow-auto">
                             {items.map((item, index) => (
                                 <CartItem
                                     key={index}
@@ -267,28 +244,6 @@ const CartPage = () => {
                                     isSelected={selectedItems.includes(item.id)}
                                     onSelectItem={handleSelectItem}
                                     onQuantityChange={handleQuantityChange}
-                                    onColorChange={handleColorChange}
-                                    onDelete={handleShowDeleteDialog}
-                                    copyMessage={copyMessage}
-                                    onCopy={handleCopy}
-                                    originalQuantity={originalQuantity}
-                                    setOriginalQuantity={setOriginalQuantity}
-                                    isQuantityUpdated={isQuantityUpdated}
-                                    setIsQuantityUpdated={setIsQuantityUpdated}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Desktop View */}
-                        <div className="hidden sm:block bg-white rounded-lg border-t max-h-[65vh] overflow-auto">
-                            {items.map((item, index) => (
-                                <CartItem
-                                    key={index}
-                                    item={item}
-                                    isSelected={selectedItems.includes(item.id)}
-                                    onSelectItem={handleSelectItem}
-                                    onQuantityChange={handleQuantityChange}
-                                    onColorChange={handleColorChange}
                                     onDelete={handleShowDeleteDialog}
                                     copyMessage={copyMessage}
                                     onCopy={handleCopy}

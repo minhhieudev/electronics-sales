@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserCart, removeProductFromCart, updateProductInCart } from '../../../app/redux/slices/user/cart.slice';
@@ -15,31 +15,75 @@ const CartPage = () => {
     const [summary, setSummary] = useState(0);
 
     const [itemToRemove, setItemToRemove] = useState(null);
-    const [copyMessage, setCopyMessage] = useState({ show: false, id: null });
-
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isMultiDelete, setIsMultiDelete] = useState(false);
     const [selectAll, setSelectAll] = useState(false);
 
-    const [originalQuantity, setOriginalQuantity] = useState(null);
+    const [copyMessage, setCopyMessage] = useState({ show: false, id: null });
+    const [originalQuantities, setOriginalQuantities] = useState({});
+    const [pendingChanges, setPendingChanges] = useState([]);
+    const pendingChangesRef = useRef({});
 
-    // State to track if the quantity is updated
-    const [isQuantityUpdated, setIsQuantityUpdated] = useState(false);
+    // Update ref whenever pendingChanges changes
+    useEffect(() => {
+        pendingChangesRef.current = pendingChanges;
+    }, [pendingChanges]);
 
-    // State to store the items fetched from the server
-    const [serverItems, setServerItems] = useState([]);
-
-    // Fetch data from API
+    // Fetch data
     useEffect(() => {
         dispatch(fetchUserCart({
             onSuccess: (data) => {
                 setItems(data);
-                setServerItems(data);
+                // Saving the initial count of the products
+                const initialQuantities = {};
+                data.forEach(item => {
+                    initialQuantities[item.id] = item.quantity;
+                });
+                setOriginalQuantities(initialQuantities);
             }
         }));
     }, [dispatch]);
 
-    // Update summary when items or selectedItems change
+    // Handling when user leave page or close the browser
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            const currentChanges = pendingChangesRef.current;
+            if (currentChanges.length > 0) {
+                // Display default dialog of the browser
+                event.preventDefault();
+                saveChanges();
+
+            }
+        };
+
+        const saveChanges = () => {
+            const currentChanges = pendingChangesRef.current;
+            if (currentChanges.length > 0) {
+                currentChanges.forEach(({ id, quantity, color }) => {
+                    dispatch(updateProductInCart({
+                        updateData: { id, quantity, color },
+                        onSuccess: (data) => {
+                            
+                        }
+                    }));
+                });
+            }
+            // if (currentChanges.length > 0) {
+            //     dispatch(updateProductInCart({
+            //         updateData: currentChanges,
+            //     }));
+            // }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            saveChanges(); // Call API ONLY when component unmounts (leaves the page within the application)
+        };
+    }, [dispatch]);
+
+    // Calculate summary
     useEffect(() => {
         const total = items.reduce((sum, item) => {
             if (selectedItems.includes(item.id)) {
@@ -65,80 +109,93 @@ const CartPage = () => {
                 mainImage: item.mainImageUrl
             }));
 
-        const itemIds = selectedItems.map(itemId => items.find(item => item.id === itemId).id);
+        const itemIds = selectedItems.map(itemId =>
+            items.find(item => item.id === itemId).id
+        );
 
-        // Navigate to checkout with additional variable indicating it's from cart
-        navigate('/checkout', { state: { orderItems: listItems, fromCart: true, itemIds } });
+        navigate('/checkout', {
+            state: {
+                orderItems: listItems,
+                fromCart: true,
+                itemIds
+            }
+        });
     };
 
-    // Function to handle quantity change
-    const handleQuantityChange = (item, newQuantity, localOnly = false) => {
-        // Nếu đây là thao tác nhập liệu (localOnly=true), chỉ cập nhật giao diện
-        if (localOnly) {
-            setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: newQuantity } : i));
-            return;
+    const handleQuantityChange = (item, newQuantity) => {
+
+        // Store the initial value if it doesn't exist
+        if (!originalQuantities[item.id]) {
+            setOriginalQuantities(prev => ({
+                ...prev,
+                [item.id]: item.quantity
+            }));
         }
 
         const numericQuantity = parseInt(newQuantity, 10);
 
-        // Check for invalid inputs
-        if (!item || isNaN(numericQuantity) || numericQuantity > item.stock || numericQuantity === originalQuantity) {
+        // Allow empty value when typing
+        if (newQuantity === '') {
+            setItems(prev => prev.map(i =>
+                i.id === item.id ? { ...i, quantity: '' } : i
+            ));
             return;
         }
 
-        // Xử lý khi số lượng là 0
-        if (numericQuantity === 0) {
-            // Hiển thị hộp thoại xác nhận xóa
-            handleShowDeleteDialog(item.id);
+        // If not a valid number, do nothing
+        if (isNaN(numericQuantity)) {
             return;
         }
 
-        // Find the server state for this item
-        const serverItem = serverItems.find(i => i.id === item.id);
+        // Update UI
+        setItems(prev => prev.map(i =>
+            i.id === item.id ? { ...i, quantity: numericQuantity } : i
+        ));
 
-        // Update local state
-        setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: numericQuantity } : i));
-
-        dispatch(updateProductInCart({
-            updateData: {
-                id: item.productId,
-                quantity: numericQuantity,
-                color: item.color
-            },
-            onSuccess: () => {
-                // Update server state on success
-                setServerItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: numericQuantity } : i));
-            },
-            onError: () => {
-                // Revert to server state on error
-                if (serverItem) {
-                    setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: serverItem.quantity } : i));
+        // Check and update pendingChanges
+        if (numericQuantity !== originalQuantities[item.id]) {
+            // Check if the product already exists in pendingChanges
+            setPendingChanges(prev => {
+                const existingChangeIndex = prev.findIndex(change => change.id === item.productId && change.color === item.color);
+                if (existingChangeIndex !== -1) {
+                    // If it already exists, update the quantity
+                    const updatedChanges = [...prev];
+                    updatedChanges[existingChangeIndex].quantity = numericQuantity;
+                    return updatedChanges;
+                } else {
+                    // If it doesn't exist, add a new one
+                    return [
+                        ...prev,
+                        {
+                            id: item.productId,
+                            quantity: numericQuantity,
+                            color: item.color
+                        }
+                    ];
                 }
-            }
-        }));
+            });
+        } else {
+            // If the new value is the same as the original value, remove from pendingChanges
+            setPendingChanges(prev => prev.filter(change => !(change.id === item.productId && change.color === item.color)));
+        }
     };
 
-    // Function to handle delete dialog close without confirming
     const handleDeleteCancel = () => {
-        // If not deleting multiple products and there is a product being prepared for deletion
         if (!isMultiDelete && itemToRemove) {
-            // Find the corresponding product and serverItem
-            const item = items.find(i => i.id === itemToRemove);
-            const serverItem = serverItems.find(i => i.id === itemToRemove);
-
-            if (item && serverItem) {
-                // Revert to the quantity value from the server
+            // Restore the initial value when canceling deletion
+            const originalQuantity = originalQuantities[itemToRemove];
+            if (originalQuantity) {
                 setItems(prev => prev.map(i =>
-                    i.id === itemToRemove ? { ...i, quantity: serverItem.quantity } : i
+                    i.id === itemToRemove ? { ...i, quantity: originalQuantity } : i
                 ));
+
+                // Remove from pendingChanges if returning to the initial value
+                setPendingChanges(prev => prev.filter(change => change.id !== itemToRemove));
             }
         }
-
-        // Close the dialog
         setShowDeleteDialog(false);
     };
 
-    // Function to handle delete dialog
     const handleShowDeleteDialog = (id, multiDelete = false) => {
         setItemToRemove(id);
         setIsMultiDelete(multiDelete);
@@ -171,7 +228,6 @@ const CartPage = () => {
         const isChecked = e.target.checked;
         setSelectAll(isChecked);
 
-        // Select only items that are not deleted
         const newSelectedItems = isChecked ? items.filter(item => !item.isDeleted).map(item => item.id) : [];
         setSelectedItems(newSelectedItems);
     };
@@ -186,10 +242,10 @@ const CartPage = () => {
         });
     };
 
-    const handleCopy = (sku, e) => {
+    const handleCopy = (sku, itemId, e) => {
         e.stopPropagation();
         navigator.clipboard.writeText(sku);
-        setCopyMessage({ show: true, id: sku });
+        setCopyMessage({ show: true, id: itemId });
 
         setTimeout(() => {
             setCopyMessage({ show: false, id: null });
@@ -235,7 +291,6 @@ const CartPage = () => {
                     </div>
                 ) : (
                     <div>
-                        {/* Cart Items List - Unified View with Responsive Classes */}
                         <div className="bg-white rounded-lg border-t max-h-[65vh] overflow-auto">
                             {items.map((item, index) => (
                                 <CartItem
@@ -247,10 +302,6 @@ const CartPage = () => {
                                     onDelete={handleShowDeleteDialog}
                                     copyMessage={copyMessage}
                                     onCopy={handleCopy}
-                                    originalQuantity={originalQuantity}
-                                    setOriginalQuantity={setOriginalQuantity}
-                                    isQuantityUpdated={isQuantityUpdated}
-                                    setIsQuantityUpdated={setIsQuantityUpdated}
                                 />
                             ))}
                         </div>
@@ -258,7 +309,6 @@ const CartPage = () => {
                 )}
             </div>
 
-            {/* Fixed Footer */}
             {items.length > 0 && (
                 <CartFooter
                     selectedItems={selectedItems}
@@ -270,7 +320,6 @@ const CartPage = () => {
                 />
             )}
 
-            {/* Unified Delete Dialog */}
             <DeleteDialog
                 isOpen={showDeleteDialog}
                 onClose={handleDeleteCancel}

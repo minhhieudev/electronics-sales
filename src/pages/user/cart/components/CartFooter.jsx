@@ -40,17 +40,19 @@ const CartFooter = ({
               <span className="text-xl font-bold text-[#FF8900] ml-2">{summary.toLocaleString()} đ</span>
             </div>
           </div>
-          <button
-            className={`sm:px-6 sm:py-3 p-3 text-base text-white sm:text-lg font-medium rounded-lg transition-colors flex items-center gap-2
-              ${selectedItems.length > 0 ? 'bg-[#FF8900] hover:bg-orange-500' : 'bg-gray-300 cursor-not-allowed'}`}
-            onClick={handleBuyNow}
-            disabled={selectedItems.length === 0}
-          >
-            <span>Mua hàng</span>
-            {selectedItems.length > 0 && (
-              <span className="text-sm">({selectedItems.length})</span>
-            )}
-          </button>
+          <div className="flex gap-2">
+            <button
+              className={`sm:px-6 sm:py-3 p-3 text-base text-white sm:text-lg font-medium rounded-lg transition-colors flex items-center gap-2
+                ${selectedItems.length > 0 ? 'bg-[#FF8900] hover:bg-orange-500' : 'bg-gray-300 cursor-not-allowed'}`}
+              onClick={handleBuyNow}
+              disabled={selectedItems.length === 0}
+            >
+              <span>Mua hàng</span>
+              {selectedItems.length > 0 && (
+                <span className="text-sm">({selectedItems.length})</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -81,17 +83,19 @@ const CartFooter = ({
             <span className="text-gray-500">Tổng cộng:</span>
             <span className="text-xl font-bold text-[#FF8900] ml-2">{summary.toLocaleString()} đ</span>
           </div>
-          <button
-            className={`px-6 py-3 text-white text-lg font-medium rounded-lg transition-colors flex items-center gap-2
-              ${selectedItems.length > 0 ? 'bg-[#FF8900] hover:bg-orange-500' : 'bg-gray-300 cursor-not-allowed'}`}
-            onClick={handleBuyNow}
-            disabled={selectedItems.length === 0}
-          >
-            <span>Mua hàng</span>
-            {selectedItems.length > 0 && (
-              <span className="text-sm">({selectedItems.length})</span>
-            )}
-          </button>
+          <div className="flex gap-2">
+            <button
+              className={`px-6 py-3 text-white text-lg font-medium rounded-lg transition-colors flex items-center gap-2
+                ${selectedItems.length > 0 ? 'bg-[#FF8900] hover:bg-orange-500' : 'bg-gray-300 cursor-not-allowed'}`}
+              onClick={handleBuyNow}
+              disabled={selectedItems.length === 0}
+            >
+              <span>Mua hàng</span>
+              {selectedItems.length > 0 && (
+                <span className="text-sm">({selectedItems.length})</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

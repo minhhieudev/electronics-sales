@@ -24,6 +24,10 @@ const CartPage = () => {
     const [pendingChanges, setPendingChanges] = useState([]);
     const pendingChangesRef = useRef({});
 
+    // Add state for custom unsaved changes dialog
+    const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+    const navigatingRef = useRef(false);
+
     // Update ref whenever pendingChanges changes
     useEffect(() => {
         pendingChangesRef.current = pendingChanges;
@@ -44,44 +48,97 @@ const CartPage = () => {
         }));
     }, [dispatch]);
 
-    // Handling when user leave page or close the browser
+    // Save changes to the server
+    const saveChanges = () => {
+        const currentChanges = pendingChangesRef.current;
+        if (currentChanges.length > 0) {
+            dispatch(updateProductInCart({
+                updateData: currentChanges,
+                onSuccess: () => {
+                    // Clear pending changes after saving
+                    setPendingChanges([]);
+                }
+            }));
+
+            return true;
+        }
+
+        return false;
+    };
+
+    // Revert changes back to original quantities
+    const revertChanges = () => {
+        const updatedItems = items.map(item => ({
+            ...item,
+            quantity: originalQuantities[item.id] || item.quantity
+        }));
+        setItems(updatedItems);
+        setPendingChanges([]);
+    };
+
+    // Handling when user leaves the page or closes the browser
     useEffect(() => {
         const handleBeforeUnload = (event) => {
-            const currentChanges = pendingChangesRef.current;
-            if (currentChanges.length > 0) {
-                // Display default dialog of the browser
+            if (pendingChangesRef.current.length > 0) {
+                // Standard browser behavior - show default dialog
                 event.preventDefault();
-                saveChanges();
+                event.returnValue = '';
 
-            }
-        };
+                // Set a timeout to show our custom dialog if they clicked "Cancel" on browser dialog
+                setTimeout(() => {
+                    setShowUnsavedChangesDialog(true);
+                }, 100);
 
-        const saveChanges = () => {
-            const currentChanges = pendingChangesRef.current;
-            if (currentChanges.length > 0) {
-                currentChanges.forEach(({ id, quantity, color }) => {
-                    dispatch(updateProductInCart({
-                        updateData: { id, quantity, color },
-                        onSuccess: (data) => {
-                            
-                        }
-                    }));
-                });
+                return event.returnValue;
             }
-            // if (currentChanges.length > 0) {
-            //     dispatch(updateProductInCart({
-            //         updateData: currentChanges,
-            //     }));
-            // }
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
 
+        // Cleanup
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
-            saveChanges(); // Call API ONLY when component unmounts (leaves the page within the application)
+            saveChanges();
         };
     }, [dispatch]);
+
+    // Handle in-app navigation
+    useEffect(() => {
+        const handlePopState = () => {
+            if (pendingChangesRef.current.length > 0) {
+                // Prevent the default navigation
+                window.history.pushState(null, null, window.location.pathname);
+                // Show our custom dialog
+                setShowUnsavedChangesDialog(true);
+                navigatingRef.current = true;
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+
+    // Handle save or discard changes from our custom dialog
+    const handleSaveChanges = () => {
+        saveChanges();
+        setShowUnsavedChangesDialog(false);
+        if (navigatingRef.current) {
+            navigatingRef.current = false;
+            window.history.back();
+        }
+    };
+
+    const handleDiscardChanges = () => {
+        revertChanges();
+        setShowUnsavedChangesDialog(false);
+        if (navigatingRef.current) {
+            navigatingRef.current = false;
+            window.history.back();
+        }
+    };
 
     // Calculate summary
     useEffect(() => {
@@ -326,6 +383,32 @@ const CartPage = () => {
                 onConfirm={handleDeleteConfirm}
                 itemCount={isMultiDelete ? selectedItems.length : 1}
             />
+
+            {/* Custom Unsaved Changes Dialog */}
+            {showUnsavedChangesDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                        <h3 className="text-lg font-medium mb-4">Bạn có thay đổi chưa lưu</h3>
+                        <p className="text-gray-600 mb-6">
+                            Bạn có muốn lưu thay đổi trước khi rời đi không?
+                        </p>
+                        <div className="flex justify-end gap-4">
+                            <button
+                                onClick={handleDiscardChanges}
+                                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                            >
+                                Không
+                            </button>
+                            <button
+                                onClick={handleSaveChanges}
+                                className="px-4 py-2 bg-[#FF8900] text-white rounded-md hover:bg-orange-600"
+                            >
+                                Có
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

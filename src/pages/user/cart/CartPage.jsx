@@ -35,18 +35,62 @@ const CartPage = () => {
 
     // Fetch data
     useEffect(() => {
-        dispatch(fetchUserCart({
-            onSuccess: (data) => {
-                setItems(data);
-                // Saving the initial count of the products
-                const initialQuantities = {};
-                data.forEach(item => {
-                    initialQuantities[item.id] = item.quantity;
-                });
-                setOriginalQuantities(initialQuantities);
+        // Fetch data and set initial quantities
+        const fetchData = () => {
+            dispatch(fetchUserCart({
+                onSuccess: (data) => {
+                    setItems(data);
+                    const initialQuantities = {};
+                    data.forEach(item => {
+                        initialQuantities[item.id] = item.quantity;
+                    });
+                    setOriginalQuantities(initialQuantities);
+                }
+            }));
+        };
+
+        fetchData();
+
+        // Handle navigation and unsaved changes
+        const handleBeforeUnload = (event) => {
+            if (pendingChangesRef.current.length > 0) {
+                event.preventDefault();
+                event.returnValue = '';
+                setTimeout(() => {
+                    setShowUnsavedChangesDialog(true);
+                }, 100);
+                return event.returnValue;
             }
-        }));
+        };
+
+        const handlePopState = () => {
+            if (pendingChangesRef.current.length > 0) {
+                window.history.pushState(null, null, window.location.pathname);
+                setShowUnsavedChangesDialog(true);
+                navigatingRef.current = true;
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('popstate', handlePopState);
+            saveChanges();
+        };
     }, [dispatch]);
+
+    // Calculate summary
+    useEffect(() => {
+        const total = items.reduce((sum, item) => {
+            if (selectedItems.includes(item.id)) {
+                return sum + (item.price * item.quantity);
+            }
+            return sum;
+        }, 0);
+        setSummary(total);
+    }, [selectedItems, items]);
 
     // Save changes to the server
     const saveChanges = () => {
@@ -55,8 +99,18 @@ const CartPage = () => {
             dispatch(updateProductInCart({
                 updateData: currentChanges,
                 onSuccess: () => {
-                    // Clear pending changes after saving
                     setPendingChanges([]);
+                },
+                onError: () => {
+                    // Restore old quantity if update fails
+                    const updatedItems = items.map(item => {
+                        const change = currentChanges.find(c => c.cartId === item.id);
+                        if (change) {
+                            return { ...item, quantity: originalQuantities[item.id] || item.quantity }; 
+                        }
+                        return item;
+                    });
+                    setItems(updatedItems);
                 }
             }));
 
@@ -75,51 +129,6 @@ const CartPage = () => {
         setItems(updatedItems);
         setPendingChanges([]);
     };
-
-    // Handling when user leaves the page or closes the browser
-    useEffect(() => {
-        const handleBeforeUnload = (event) => {
-            if (pendingChangesRef.current.length > 0) {
-                // Standard browser behavior - show default dialog
-                event.preventDefault();
-                event.returnValue = '';
-
-                // Set a timeout to show our custom dialog if they clicked "Cancel" on browser dialog
-                setTimeout(() => {
-                    setShowUnsavedChangesDialog(true);
-                }, 100);
-
-                return event.returnValue;
-            }
-        };
-
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        // Cleanup
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            saveChanges();
-        };
-    }, [dispatch]);
-
-    // Handle in-app navigation
-    useEffect(() => {
-        const handlePopState = () => {
-            if (pendingChangesRef.current.length > 0) {
-                // Prevent the default navigation
-                window.history.pushState(null, null, window.location.pathname);
-                // Show our custom dialog
-                setShowUnsavedChangesDialog(true);
-                navigatingRef.current = true;
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
-    }, []);
 
     // Handle save or discard changes from our custom dialog
     const handleSaveChanges = () => {
@@ -140,17 +149,6 @@ const CartPage = () => {
         }
     };
 
-    // Calculate summary
-    useEffect(() => {
-        const total = items.reduce((sum, item) => {
-            if (selectedItems.includes(item.id)) {
-                return sum + (item.price * item.quantity);
-            }
-            return sum;
-        }, 0);
-        setSummary(total);
-    }, [selectedItems, items]);
-
     // Function to handle the "Buy Now"
     const handleBuyNow = () => {
         // Format the selected items for checkout
@@ -166,20 +164,19 @@ const CartPage = () => {
                 mainImage: item.mainImageUrl
             }));
 
-        const itemIds = selectedItems.map(itemId =>
-            items.find(item => item.id === itemId).id
-        );
-
         navigate('/checkout', {
             state: {
                 orderItems: listItems,
-                fromCart: true,
-                itemIds
+                isFromCart: true,
             }
         });
     };
 
     const handleQuantityChange = (item, newQuantity) => {
+
+        if (newQuantity > item.stock) {
+            newQuantity = item.stock;
+        }
 
         // Store the initial value if it doesn't exist
         if (!originalQuantities[item.id]) {
@@ -210,7 +207,7 @@ const CartPage = () => {
         ));
 
         // Check and update pendingChanges
-        if (numericQuantity !== originalQuantities[item.id]) {
+        if (numericQuantity !== originalQuantities[item.id] && numericQuantity !== 0) {
             // Check if the product already exists in pendingChanges
             setPendingChanges(prev => {
                 const existingChangeIndex = prev.findIndex(change => change.id === item.productId && change.color === item.color);
@@ -226,7 +223,8 @@ const CartPage = () => {
                         {
                             id: item.productId,
                             quantity: numericQuantity,
-                            color: item.color
+                            color: item.color,
+                            cartId: item.id
                         }
                     ];
                 }
@@ -266,6 +264,8 @@ const CartPage = () => {
                 onSuccess: () => {
                     setItems(prev => prev.filter(item => !selectedItems.includes(item.id)));
                     setSelectedItems([]);
+                    // Remove deleted items from pendingChanges
+                    setPendingChanges(prev => prev.filter(change => !selectedItems.includes(change.cartId)));
                     setShowDeleteDialog(false);
                 }
             }));
@@ -275,6 +275,8 @@ const CartPage = () => {
                 onSuccess: () => {
                     setItems(prev => prev.filter(item => item.id !== itemToRemove));
                     setSelectedItems(prev => prev.filter(itemId => itemId !== itemToRemove));
+                    // Remove deleted item from pendingChanges
+                    setPendingChanges(prev => prev.filter(change => change.cartId !== itemToRemove));
                     setShowDeleteDialog(false);
                 }
             }));

@@ -45,7 +45,7 @@ export const addProductToCart = createAsyncThunk(
 // Thunk action to update product in cart
 export const updateProductInCart = createAsyncThunk(
     "cart/updateProductInCart",
-    async ({ updateData, onSuccess }) => {
+    async ({ updateData, onSuccess, onError }) => {
         try {
             const response = await CartService.updateProductInCart(updateData);
             if (response.status === CONST.STATUS.SUCCESS) {
@@ -53,6 +53,7 @@ export const updateProductInCart = createAsyncThunk(
             }
 
         } catch (error) {
+            onError && onError()
             toast.error(error.response?.data?.message || MESSAGES.COMMON_ERROR);
         }
     }

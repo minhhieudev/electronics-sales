@@ -11,8 +11,7 @@ const CheckoutPage = () => {
 
   // Get order items and other data from location state
   const orderItems = location.state?.orderItems || [];
-  const fromCart = location.state?.fromCart;
-  const itemIds = location.state?.itemIds || [];
+  const isFromCart = location.state?.isFromCart;
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [shippingMethod, setShippingMethod] = useState('FAST_DELIVERY');
@@ -87,8 +86,7 @@ const CheckoutPage = () => {
                 summary={summary}
                 paymentMethod={paymentMethod}
                 shippingMethod={shippingMethod}
-                fromCart={fromCart}
-                itemIds={itemIds}
+                isFromCart={isFromCart}
               />
             </div>
           </div>

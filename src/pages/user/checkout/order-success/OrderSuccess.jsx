@@ -70,7 +70,7 @@ const OrderSuccess = () => {
             <div className="p-4 space-y-4 bg-white">
               {(showAllProducts ? orderData.items : orderData.items.slice(0, 2)).map((product) => (
                 <div key={product.id} className="flex gap-2 items-center">
-                  <img src={`${process.env.REACT_APP_CDN_URL}uzgvdswqumfuzs8zw7zf.png`} alt={product.name} className="w-16 h-16 object-cover rounded" />
+                  <img src={`${process.env.REACT_APP_CDN_URL}${product.mainImageUrl}`} alt={product.name} className="w-16 h-16 object-cover rounded" />
                   <div className="flex-1">
                     <p className="text-gray-900 font-semibold">{product.name}</p>
                     <div className="flex items-center mt-1 gap-4">

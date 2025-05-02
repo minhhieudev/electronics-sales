@@ -3,12 +3,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { updateCategory } from "../../../app/redux/slices/category.slice";
+import { updateCategory } from "../../../app/redux/slices/admin/category.slice";
 import { useEffect } from "react";
 import ModalUpdate from "../../../components/admin/ModalUpdate";
+import MESSAGES from "../../../common/const";
 
 const schema = yup.object().shape({
-    name: yup.string().trim().required("Tên danh mục không được để trống!"),
+    name: yup.string().trim().required(MESSAGES.CATEGORY_NAME_EMPTY),
     description: yup.string().trim(),
 });
 

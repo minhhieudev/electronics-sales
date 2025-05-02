@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchUserCart, removeProductFromCart, updateProductInCart } from '../../../app/redux/slices/user/cart.slice';
@@ -33,13 +33,14 @@ const CartPage = () => {
         pendingChangesRef.current = pendingChanges;
     }, [pendingChanges]);
 
-    // Fetch data
+     /* eslint-disable react-hooks/exhaustive-deps */
     useEffect(() => {
         // Fetch data and set initial quantities
         const fetchData = () => {
             dispatch(fetchUserCart({
                 onSuccess: (data) => {
                     setItems(data);
+                    // Saving the initial count of the products
                     const initialQuantities = {};
                     data.forEach(item => {
                         initialQuantities[item.id] = item.quantity;
@@ -92,8 +93,8 @@ const CartPage = () => {
         setSummary(total);
     }, [selectedItems, items]);
 
-    // Save changes to the server
-    const saveChanges = () => {
+    // Handle save changes to the server
+    const saveChanges = useCallback(() => {
         const currentChanges = pendingChangesRef.current;
         if (currentChanges.length > 0) {
             dispatch(updateProductInCart({
@@ -106,7 +107,7 @@ const CartPage = () => {
                     const updatedItems = items.map(item => {
                         const change = currentChanges.find(c => c.cartId === item.id);
                         if (change) {
-                            return { ...item, quantity: originalQuantities[item.id] || item.quantity }; 
+                            return { ...item, quantity: originalQuantities[item.id] || item.quantity };
                         }
                         return item;
                     });
@@ -118,7 +119,7 @@ const CartPage = () => {
         }
 
         return false;
-    };
+    }, [dispatch, items, originalQuantities]);
 
     // Revert changes back to original quantities
     const revertChanges = () => {
@@ -174,6 +175,7 @@ const CartPage = () => {
 
     const handleQuantityChange = (item, newQuantity) => {
 
+        // Check if the new quantity is a number
         if (newQuantity > item.stock) {
             newQuantity = item.stock;
         }

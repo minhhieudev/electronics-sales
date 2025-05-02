@@ -47,7 +47,7 @@ const MESSAGES = {
     UPDATE_ORDER_ERROR: 'Lỗi khi cập nhật đơn hàng',
     DELETE_ORDER_SUCCESS: 'Hủy đơn hàng thành công',
     DELETE_ORDER_ERROR: 'Lỗi khi hủy đơn hàng',
-    
+
     // Product list error message
     GET_PRODUCT_LIST_ERROR: 'Lỗi khi lấy danh sách sản phẩm',
     GET_PRODUCT_DETAIL_ERROR: 'Lỗi khi lấy chi tiết sản phẩm',
@@ -59,7 +59,58 @@ const MESSAGES = {
     PRODUCT_INSUFFICIENT_STOCK: "Số lượng sản phẩm trong kho không đủ",
     
     // Common error message
-    COMMON_ERROR: 'Có lỗi xảy ra. Vui lòng thử lại sau.'
+    COMMON_ERROR: 'Có lỗi xảy ra. Vui lòng thử lại sau.',
+
+
+    // Brand error message
+    BRAND_NAME_EMPTY: "Tên thương hiệu không được để trống!",
+    GET_BRAND_LIST_ERROR: "Lỗi khi lấy danh sách thương hiệu",
+
+    // Brand error message
+    CATEGORY_NAME_EMPTY: "Tên danh mục không được để trống!",
+    GET_CATEGORY_LIST_ERROR: "Lỗi khi lấy danh sách danh mục",
+
+    // Account error message
+    GET_ACCOUNT_LIST_ERROR: "Lỗi khi lấy danh sách tài khoản",
+    // Order error message
+    GET_ORDER_LIST_ERROR : "Lỗi khi lấy danh sách đơn hàng",
+    
+    // Statistics error message
+    START_DATE_AFTER_END_DATE_ERROR :"Ngày bắt đầu không được lớn hơn ngày kết thúc!",
+    // VALLIDATION MESSAGE
+    VALIDATION: {
+        productCode: "Vui lòng nhập mã sản phẩm",
+        productName: "Vui lòng nhập tên sản phẩm",
+
+        quantity: {
+            required: "Vui lòng nhập số lượng",
+            type: "Số lượng phải là số",
+            min: "Số lượng không được âm",
+        },
+        categoryId: "Vui lòng chọn loại sản phẩm",
+        brandId: "Vui lòng chọn thương hiệu",
+        color: "Vui lòng nhập màu sắc",
+        warranty: "Vui lòng nhập thời gian bảo hành",
+        price: {
+            required: "Vui lòng nhập giá",
+            type: "Giá phải là số",
+            min: "Giá không được âm",
+        },
+        discount: {
+            type: "Giảm giá phải là số",
+            min: "Giảm giá không được âm",
+            max: "Giảm giá không được vượt quá 100%",
+        },
+        description: "Vui lòng nhập mô tả",
+        mainImageFile: {
+            required: "Vui lòng chọn ảnh đại diện",
+            size: "Ảnh đại diện phải nhỏ hơn 1MB",
+        },
+        images: {
+            min: "Cần ít nhất 1 ảnh phụ",
+            size: "Mỗi ảnh phụ phải nhỏ hơn 1MB",
+        },
+    }
 };
 
 const CONST = {

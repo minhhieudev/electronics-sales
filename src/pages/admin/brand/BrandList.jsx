@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { fetchBrands } from "../../../app/redux/slices/brand.slice";
+import { fetchBrands } from "../../../app/redux/slices/admin/brand.slice";
 import { FaEye, FaTrash } from "react-icons/fa";
 import SearchBar from "../../../components/admin/Searchbar";
 import Pagination from "../../../components/admin/Pagination";
@@ -11,6 +11,10 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import BrandAdd from "./BrandAdd";
 import Modal from "../../../components/admin/Modal";
 import BrandDetail from "./BrandDetail";
+import BrandUpdate from "./BrandUpdate";
+import BrandDelete from "./BrandDelete";
+import { toast } from "react-toastify";
+
 
 const BrandList = () => {
     const dispatch = useDispatch();
@@ -18,27 +22,27 @@ const BrandList = () => {
     const [brands, setBrands] = useState([]);
     const [pageInfo, setPageInfo] = useState({ total: 0, totalPages: 0 });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [isAddBrandModalOpen, setIsAddBrandModalOpen] = useState(false); 
     const [refresh, setRefresh] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedBrand, setSelectedBrand] = useState(null);
+    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const searchTerm = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page")) || 1;
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            setError(null);
             try {
-                const response = await dispatch(fetchBrands({ search: searchTerm, page })).unwrap();
+                const response = await dispatch(fetchBrands({ search: searchTerm, page, limit :6 })).unwrap();
                 setBrands(response.items || []);
                 setPageInfo({
                     total: response.pageInfo?.totalElements || 0,
                     totalPages: response.pageInfo?.totalPages || 0,
                 });
-            } catch (err) {
-                setError(err.message || "Lỗi khi tải dữ liệu");
+            } catch (error) {
+                toast.error(error);
             } finally {
                 setLoading(false);
             }
@@ -55,12 +59,14 @@ const BrandList = () => {
         setSearchParams((prev) => ({ ...Object.fromEntries(prev), page: newPage }));
     };
 
+
     const handleOpenAddModal = () => {
         setIsAddBrandModalOpen(true);
     };
 
     const handleCloseAddModal = () => {
         setIsAddBrandModalOpen(false);
+        setRefresh(!refresh);
     }
     
     const handleOpenDetailModal = (brand ) =>{
@@ -73,6 +79,28 @@ const BrandList = () => {
         setIsDetailModalOpen(false);
         setRefresh(!refresh);
     };
+
+    const handleOpenUpdateModal = (brand) => {
+        setSelectedBrand(brand);
+        setIsOpenUpdateModal(true);
+    };
+    
+    const handleCloseUpdateModal = () => {
+        setIsOpenUpdateModal(false);
+        setSelectedBrand(null);
+        setRefresh(!refresh);
+    };
+
+    const handleOpenDeleteModal = (brand) =>{
+        setIsOpenDeleteModal(true);
+        setSelectedBrand(brand);
+    }
+
+    const handleCloseDeleteModal = () => {
+        setIsOpenDeleteModal(false);
+        setRefresh(!refresh);
+    };
+
     const columns = [
         {
             header: "Tên thương hiệu",
@@ -97,10 +125,12 @@ const BrandList = () => {
                     >
                         <FaEye />
                     </button>
-                    <button className="text-yellow-500 text-lg hover:scale-110 transition mr-3">
+                    <button className="text-yellow-500 text-lg hover:scale-110 transition mr-3"
+                        onClick={() => handleOpenUpdateModal(brand)}>
                         <MdOutlineModeEdit />
                     </button>
-                    <button className="text-red-600 text-lg hover:scale-110 transition">
+                    <button className="text-red-600 text-lg hover:scale-110 transition"
+                    onClick={() => handleOpenDeleteModal(brand)}>
                         <FaTrash />
                     </button>
                 </div>
@@ -125,7 +155,6 @@ const BrandList = () => {
             </div>
 
             {loading && <p className="text-center text-gray-600 mt-1">Đang tải dữ liệu...</p>}
-            {error && <p className="text-center text-red-600 mt-1">{error}</p>}
 
             <DataTable columns={columns} data={brands} />
 
@@ -135,6 +164,9 @@ const BrandList = () => {
             <Modal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal}>
                 <BrandDetail brand={selectedBrand} />
             </Modal>
+
+            <BrandUpdate isOpen={isOpenUpdateModal} onClose={handleCloseUpdateModal} brand={selectedBrand} />
+            <BrandDelete isOpen={isOpenDeleteModal} onClose={handleCloseDeleteModal} brand={selectedBrand} />
         </div>
     );
 };

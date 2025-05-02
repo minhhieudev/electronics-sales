@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchAccountById } from "../../../app/redux/slices/account.slice";
+import { fetchAccountById } from "../../../app/redux/slices/admin/account.slice";
 import { FaRegUserCircle, FaMapMarkerAlt } from "react-icons/fa";
 import { MdOutlinePhone } from "react-icons/md";
 import { PiAddressBookLight, PiCakeDuotone } from "react-icons/pi";
 import { AiOutlineCalendar } from "react-icons/ai";
 import MESSAGES from "../../../common/const";
+import { toast } from "react-toastify";
 
 const AccountDetails = ({ accountId }) => {
     const dispatch = useDispatch();
     const [account, setAccount] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         const getAccount = async () => {
             if (!accountId) return;
 
             setLoading(true);
-            setError(null);
             try {
-                const data = await dispatch(fetchAccountById(accountId));
-                setAccount(data.payload);
-            } catch (err) {
-                setError(err);
+                const data = await dispatch(fetchAccountById(accountId)).unwrap();
+                setAccount(data);
+            } catch (error) {
+                toast.error(error);
             } finally {
                 setLoading(false);
             }
@@ -43,7 +42,6 @@ const AccountDetails = ({ accountId }) => {
     };
 
     if (loading) return <p className="text-center text-gray-600">Đang tải dữ liệu...</p>;
-    if (error) return <p className="text-center text-red-500">{error}</p>;
     if (!account) return <p className="text-center text-gray-400">Không có dữ liệu</p>;
 
     const genderText = account.gender ? "Nam" : "Nữ";

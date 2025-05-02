@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FaBook, FaUserCircle, FaShoppingCart, FaExchangeAlt, FaCopyright, FaLock, FaBalanceScale, FaEdit, FaGavel, FaEnvelope, FaChevronRight, FaCheck, FaArrowUp } from 'react-icons/fa';
+import React, { useEffect, useRef, useState } from 'react';
+import { FaArrowUp, FaBalanceScale, FaBook, FaCheck, FaChevronRight, FaCopyright, FaEdit, FaEnvelope, FaExchangeAlt, FaGavel, FaLock, FaShoppingCart, FaUserCircle } from 'react-icons/fa';
 
 const TermsPage = () => {
     const [activeSection, setActiveSection] = useState(0);
@@ -95,17 +95,14 @@ const TermsPage = () => {
         }
     ];
 
-    // Scroll to active section when it changes - với offset
+    // Scroll to active section when it changes 
     useEffect(() => {
         if (sectionRefs.current[activeSection]) {
-            const yOffset = -20; // Điều chỉnh offset này để phù hợp
             const element = sectionRefs.current[activeSection];
-            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            
-            // Nếu sử dụng container có overflow-y: auto
+
             if (mainContentRef.current) {
                 mainContentRef.current.scrollTo({
-                    top: element.offsetTop - 20, // Điều chỉnh offset này
+                    top: element.offsetTop - 20, 
                     behavior: 'smooth'
                 });
             }
@@ -153,11 +150,10 @@ const TermsPage = () => {
                 {sections.map((section, index) => (
                     <li key={index}>
                         <button
-                            className={`text-left w-full py-2 px-3 rounded-lg transition-all duration-200 flex items-center ${
-                                activeSection === index 
-                                    ? 'bg-blue-600 text-white font-medium shadow-md' 
+                            className={`text-left w-full py-2 px-3 rounded-lg transition-all duration-200 flex items-center ${activeSection === index
+                                    ? 'bg-blue-600 text-white font-medium shadow-md'
                                     : 'hover:bg-blue-100 text-gray-700'
-                            }`}
+                                }`}
                             onClick={() => setActiveSection(index)}
                         >
                             <span className="mr-2">{section.icon}</span>
@@ -170,7 +166,7 @@ const TermsPage = () => {
         </div>
     );
 
-    // Terms Section Component - thêm scrollMarginTop
+    // Terms Section Component - add scrollMarginTop
     const TermsSection = ({ title, icon, content }) => (
         <div className="mb-8 bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg" style={{ scrollMarginTop: '20px' }}>
             <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-blue-200 flex items-center text-blue-800">
@@ -207,33 +203,32 @@ const TermsPage = () => {
                     </div>
                 </div>
             </div>
-            
+
             <div className="p-8">
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar with table of contents */}
                     <div className="md:w-1/4">
                         <TableOfContents />
                     </div>
-                    {/* Main content - thêm style max-height và overflow-y */}
-                    <div 
-                        className="md:w-3/4 relative pr-4 custom-scrollbar" 
+                    <div
+                        className="md:w-3/4 relative pr-4 custom-scrollbar"
                         ref={mainContentRef}
-                        style={{ 
-                            maxHeight: '70vh', 
+                        style={{
+                            maxHeight: '70vh',
                             overflowY: 'auto'
                         }}
                     >
                         {sections.map((section, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 ref={el => sectionRefs.current[index] = el}
                                 id={`section-${index}`}
-                                style={{ scrollMarginTop: '20px' }} // Thêm thuộc tính này
+                                style={{ scrollMarginTop: '20px' }} 
                             >
                                 <TermsSection title={section.title} icon={section.icon} content={section.content} />
                             </div>
                         ))}
-                        
+
                         {/* Agreement section */}
                         <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-md border border-blue-100">
                             <h3 className="text-xl font-semibold mb-4 text-blue-800 flex items-center">
@@ -243,10 +238,10 @@ const TermsPage = () => {
                                 Bằng cách sử dụng dịch vụ của chúng tôi, bạn xác nhận rằng bạn đã đọc, hiểu và đồng ý với tất cả các điều khoản và điều kiện được nêu trong tài liệu này.
                             </p>
                             <div className="flex items-center bg-white p-4 rounded-lg shadow-sm">
-                                <input 
-                                    type="checkbox" 
-                                    id="agree" 
-                                    className="mr-3 h-5 w-5 accent-blue-600 cursor-pointer" 
+                                <input
+                                    type="checkbox"
+                                    id="agree"
+                                    className="mr-3 h-5 w-5 accent-blue-600 cursor-pointer"
                                     checked={isChecked}
                                     onChange={() => setIsChecked(!isChecked)}
                                 />
@@ -254,14 +249,14 @@ const TermsPage = () => {
                                     Tôi đã đọc và đồng ý với Điều khoản dịch vụ
                                 </label>
                             </div>
-                            <button 
+                            <button
                                 className={`mt-6 px-8 py-3 rounded-lg font-medium text-white transition-all duration-300 flex items-center justify-center ${isChecked ? 'bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg' : 'bg-gray-400 cursor-not-allowed'}`}
                                 disabled={!isChecked}
                             >
                                 <FaCheck className="mr-2" /> Xác nhận
                             </button>
                         </div>
-                        
+
                         {/* Last updated */}
                         <div className="mt-8 text-center text-gray-500 text-sm p-4 bg-white rounded-lg shadow-sm">
                             <p>Điều khoản dịch vụ này có hiệu lực từ ngày: 15/08/2023</p>
@@ -270,7 +265,7 @@ const TermsPage = () => {
 
                         {/* Scroll to top button */}
                         {showScrollToTop && (
-                            <button 
+                            <button
                                 onClick={scrollToTop}
                                 className="fixed bottom-6 right-6 bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all duration-300 z-50"
                                 aria-label="Cuộn lên đầu trang"

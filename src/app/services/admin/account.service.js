@@ -1,4 +1,4 @@
-import SysFetch from "./fetch";
+import SysFetch from "../fetch";
 
 const AccountService = {
     getAccount: ({ search = "", page = 1, limit = 6 }) => 

@@ -12,10 +12,10 @@ function App() {
       <Loading />
       <ToastContainer />
       <Routes>
-        {/* Route dành cho Admin */}
+        {/* Route for Admin */}
         <Route path="/admin/*" element={<AdminRoutes />} />
         
-        {/* Route dành cho User */}
+        {/* Route for User */}
         <Route path="/*" element={<UserRoutes />} />
       </Routes>
     </Router>

@@ -4,20 +4,137 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
 
+/* Text animations and effects */
+@keyframes textShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-text-shine {
+  background-size: 200% auto;
+  animation: textShine 2s linear infinite;
+}
+
+@keyframes glowing {
+  0% {
+    text-shadow: 0 0 5px #FF4500, 0 0 15px #FF4500;
+  }
+  33% {
+    text-shadow: 0 0 15px #FF8C00, 0 0 25px #FF8C00;
+  }
+  66% {
+    text-shadow: 0 0 25px #FFD700, 0 0 35px #FFD700;
+  }
+  100% {
+    text-shadow: 0 0 5px #FF4500, 0 0 15px #FF4500;
+  }
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes colorCycle {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes neon {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px #fff,
+      0 0 10px #fff,
+      0 0 15px #fff,
+      0 0 20px #FF1177,
+      0 0 35px #FF1177,
+      0 0 40px #FF1177,
+      0 0 50px #FF1177,
+      0 0 75px #FF1177;
+  }
+  50% {
+    text-shadow: 
+      0 0 5px #fff,
+      0 0 10px #fff,
+      0 0 15px #fff,
+      0 0 20px #00FFFF,
+      0 0 35px #00FFFF,
+      0 0 40px #00FFFF,
+      0 0 50px #00FFFF,
+      0 0 75px #00FFFF;
+  }
+}
+
+.animate-glow {
+  animation: glowing 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: floating 3s ease-in-out infinite;
+}
+
+.animate-color-cycle {
+  animation: colorCycle 10s linear infinite;
+}
+
+.animate-neon {
+  animation: neon 3s ease-in-out infinite alternate;
+  font-weight: bold;
+}
+
+.text-glow {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.6), 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.logo-container {
+  position: relative;
+}
+
+.logo-container::before, .logo-container::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+  background-size: 400%;
+  border-radius: 50%;
+  z-index: -1;
+  animation: textShine 20s linear infinite;
+}
+
+.logo-container::after {
+  filter: blur(10px);
+}
+
+/* Loading animations */
 @keyframes loadingDot1 {
     0% {
         left: -5%;
         opacity: 0;
     }
-
     20% {
         opacity: 1;
     }
-
     80% {
         opacity: 1;
     }
-
     100% {
         left: 105%;
         opacity: 0;
@@ -29,15 +146,12 @@
         left: -10%;
         opacity: 0;
     }
-
     30% {
         opacity: 1;
     }
-
     70% {
         opacity: 1;
     }
-
     100% {
         left: 110%;
         opacity: 0;
@@ -49,15 +163,12 @@
         left: -15%;
         opacity: 0;
     }
-
     40% {
         opacity: 1;
     }
-
     60% {
         opacity: 1;
     }
-
     100% {
         left: 115%;
         opacity: 0;
@@ -69,15 +180,12 @@
         left: -8%;
         opacity: 0;
     }
-
     25% {
         opacity: 1;
     }
-
     75% {
         opacity: 1;
     }
-
     100% {
         left: 108%;
         opacity: 0;
@@ -89,21 +197,19 @@
         left: -12%;
         opacity: 0;
     }
-
     35% {
         opacity: 1;
     }
-
     65% {
         opacity: 1;
     }
-
     100% {
         left: 112%;
         opacity: 0;
     }
 }
 
+/* Modal animations */
 .modal-enter {
     opacity: 0;
     transform: translateY(-20px);

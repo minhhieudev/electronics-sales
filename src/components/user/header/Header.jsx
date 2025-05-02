@@ -4,7 +4,6 @@ import { IoMdClose } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import avatar from '../../../Images/avatar.png';
-import logo from '../../../Images/logo.png';
 import { logout } from '../../../app/redux/slices/auth.slice';
 
 const Header = () => {
@@ -23,7 +22,7 @@ const Header = () => {
     const userInfo = useSelector((state) => state.auth.userInfo);
     const isLogin = useSelector((state) => state.auth.isLogin);
 
-    const searchSuggestions = ["Điện thoại", "Máy tính", "Đồng hồ"];
+    const searchSuggestions = ["Oppo", "Acer", "Samsung", "Dell", "Asus", "Lenovo", "Apple", "Samsung", "HP"];
 
     // Get searchTerm from URL when the component is mounted
     useEffect(() => {
@@ -31,8 +30,11 @@ const Header = () => {
         const searchFromUrl = searchParams.get('search');
         if (searchFromUrl) {
             setSearchTerm(searchFromUrl);
+        } else {
+            // Clear search when not on search page
+            setSearchTerm('');
         }
-    }, [location.search]);
+    }, [location.search, location.pathname]);
 
     // This effect handles the closing of dropdown and search bar when clicking outside of them.
     useEffect(() => {
@@ -105,8 +107,18 @@ const Header = () => {
             {/* Desktop Header */}
             <div className="hidden md:grid grid-cols-12 items-center px-4 lg:px-16 py-1 h-20">
                 <div className="col-span-3 lg:col-span-2">
-                    <Link to="/" className="block">
-                        <img src={logo} alt="logo" className="h-14 w-[40%] shrink-0" />
+                    <Link to="/" className="flex items-center gap-2 group">
+                        <div className="relative overflow-hidden rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            <img
+                                src={`${process.env.REACT_APP_CDN_URL}wozgukimzz5rg8g3xxr0.png`}
+                                alt="Logo"
+                                className="w-[60px] h-[60px] object-cover transition-transform duration-500 hover:rotate-6"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/30 to-orange-400/30 opacity-0 transition-opacity duration-300"></div>
+                        </div>
+                        <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400 relative">
+                            <span className="animate-glow font-black">PHQ Shop</span>
+                        </span>
                     </Link>
                 </div>
 
@@ -200,7 +212,11 @@ const Header = () => {
                                 </Link>
                             )}
                             <div id="desktop-cart-icon" className="relative cursor-pointer" onClick={handleCartClick} ref={cartRef}>
-                                <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">{userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity : '99+'}</span>
+                                {isLogin && (
+                                    <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[10px] px-1.5 py-0.5 font-bold">
+                                        {userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity || 0 : '99+'}
+                                    </span>
+                                )}
                                 <AiOutlineShoppingCart className="h-8 w-8 cursor-pointer" />
                             </div>
                         </div>
@@ -221,8 +237,18 @@ const Header = () => {
 
             {/* Mobile Header */}
             <div className="md:hidden flex items-center justify-between px-4 py-2 h-16">
-                <Link to="/" className="flex items-center">
-                    <img src={logo} alt="logo" className="h-10 w-[75%]" />
+                <Link to="/" className="flex items-center gap-2 group">
+                    <div className="relative overflow-hidden rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <img
+                            src={`${process.env.REACT_APP_CDN_URL}wozgukimzz5rg8g3xxr0.png`}
+                            alt="Logo"
+                            className="w-[60px] h-[60px] object-cover transition-transform duration-500 hover:rotate-6"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/30 to-orange-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400 relative">
+                        <span className="animate-glow font-black">PHQ Shop</span>
+                    </span>
                 </Link>
 
                 <div className="flex items-center gap-3">
@@ -231,7 +257,11 @@ const Header = () => {
                     </button>
 
                     <div id="mobile-cart-icon" className="relative cursor-pointer" onClick={handleCartClick} ref={cartRef}>
-                        <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[9px] px-1.5 py-0.5 font-bold">{userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity : '99+'}</span>
+                        {isLogin && (
+                            <span className="absolute -top-1 -right-1 bg-[#FF8900] text-white rounded-full text-[9px] px-1.5 py-0.5 font-bold">
+                                {userInfo?.totalQuantity < 100 ? userInfo?.totalQuantity || 0 : '99+'}
+                            </span>
+                        )}
                         <AiOutlineShoppingCart className="h-7 w-7 text-gray-700" />
                     </div>
 

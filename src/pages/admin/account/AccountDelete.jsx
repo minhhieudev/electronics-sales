@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { deleteAccount } from "../../../app/redux/slices/account.slice";
+import { deleteAccount } from "../../../app/redux/slices/admin/account.slice";
 import ModalDelete from "../../../components/admin/ModalDelete";
 import { toast } from "react-toastify";
 

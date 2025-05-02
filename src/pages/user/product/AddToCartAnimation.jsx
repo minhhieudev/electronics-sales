@@ -1,4 +1,3 @@
-// src/components/animation/AddToCartAnimation.jsx
 import { useEffect, useState, useRef } from 'react';
 
 const AddToCartAnimation = ({ startElement, endElement, imageUrl, onAnimationComplete }) => {
@@ -6,7 +5,7 @@ const AddToCartAnimation = ({ startElement, endElement, imageUrl, onAnimationCom
     const [isVisible, setIsVisible] = useState(false);
     const animationFrameRef = useRef(null);
 
-    // Điều chỉnh kích thước animation theo viewport
+    // Adjust animation size based on viewport
     const getAnimationSize = () => {
         const isMobile = window.innerWidth < 768;
         return {
@@ -41,7 +40,6 @@ const AddToCartAnimation = ({ startElement, endElement, imageUrl, onAnimationCom
         // Also handle window resize
         const handleResize = () => {
             const startRect = startElement.getBoundingClientRect();
-            const endRect = endElement.getBoundingClientRect();
 
             setPosition(prev => {
                 if (!prev) return prev;
@@ -67,8 +65,6 @@ const AddToCartAnimation = ({ startElement, endElement, imageUrl, onAnimationCom
         }
 
         const startRect = startElement.getBoundingClientRect();
-        const endRect = endElement.getBoundingClientRect();
-
         const animSize = getAnimationSize();
 
         // Set initial position

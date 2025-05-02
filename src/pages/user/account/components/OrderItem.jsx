@@ -92,7 +92,7 @@ const OrderItem = ({ order, onOrderSelect, isDetailView = false, onOrderStatusCh
 
     return (
         <div>
-            <div className="px-4 py-4 pt-4 space-y-4 cursor-pointer shadow-lg" onClick={!isDetailView ? () => onOrderSelect(order.orderCode) : undefined}>
+            <div className="px-4 py-4 pt-4 space-y-4 cursor-pointer shadow-lg" onClick={!isDetailView ? () => onOrderSelect(order.id) : undefined}>
                 {/* Header */}
                 {isDetailView ? (
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">

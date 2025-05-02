@@ -43,6 +43,7 @@ const HomePage = () => {
         const searchFromUrl = searchParams.get('search');
 
         setSearch(searchFromUrl || '');
+        setCurrentPage(0);
     }, [location.search]);
 
     // Fetch data
@@ -79,8 +80,11 @@ const HomePage = () => {
     };
 
     const handleCategoryChange = (data) => {
-        setSelectedCategory({ id: data.id, name: data.name });
-        setCurrentPage(0);
+        // Only update if the selected category is different
+        if (data.id !== selectedCategory.id) {
+            setSelectedCategory({ id: data.id, name: data.name });
+            setCurrentPage(0); // Reset to the first page
+        }
     };
 
     const toggleCategories = () => {

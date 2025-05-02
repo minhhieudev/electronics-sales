@@ -38,7 +38,7 @@ SysFetch.interceptors.response.use(
   (response) => response.data, 
   (error) => {
     if (!error.response) {
-      toast.error(MESSAGES.NETWORK_ERROR); // Sử dụng biến NETWORK_ERROR
+      toast.error(MESSAGES.NETWORK_ERROR); 
       return Promise.reject(error);
     }
 
@@ -52,7 +52,6 @@ SysFetch.interceptors.response.use(
     ) {
       originalRequest._retry = true; // Prevent infinite retry loop
       if (!hasShownToast) {
-        toast.error(MESSAGES.SESSION_EXPIRED_MESSAGE);
         hasShownToast = true; 
       }
     

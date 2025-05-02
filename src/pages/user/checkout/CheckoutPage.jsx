@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { shippingMethods } from './data/checkoutData';
 import OrderSideInfo from './OrderSideInfo';
@@ -9,8 +9,8 @@ import ShippingMethods from './ShippingMethods';
 const CheckoutPage = () => {
   const location = useLocation();
 
-  // Get order items and other data from location state
-  const orderItems = location.state?.orderItems || [];
+  // Sử dụng useMemo để lưu trữ orderItems
+  const orderItems = useMemo(() => location.state?.orderItems || [], [location.state]);
   const isFromCart = location.state?.isFromCart;
 
   const [paymentMethod, setPaymentMethod] = useState('COD');

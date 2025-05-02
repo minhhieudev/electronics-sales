@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FaSearch, FaHeadset, FaRegQuestionCircle, FaRegLightbulb, FaPhone, FaEnvelope, FaComments, FaMapMarkerAlt, FaShippingFast, FaWallet, FaExchangeAlt, FaClipboardCheck, FaArrowRight, FaShoppingCart, FaBoxOpen } from 'react-icons/fa';
+import { FaArrowRight, FaBoxOpen, FaClipboardCheck, FaComments, FaEnvelope, FaExchangeAlt, FaHeadset, FaMapMarkerAlt, FaPhone, FaRegLightbulb, FaRegQuestionCircle, FaSearch, FaShippingFast, FaShoppingCart, FaWallet } from 'react-icons/fa';
 
 const HelpPage = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    
-    // State cho các FAQ items
+
+    // State for FAQ items
     const [openFaqId, setOpenFaqId] = useState(null);
 
     const toggleFaq = (id) => {
@@ -223,7 +223,7 @@ const HelpPage = () => {
                             <div className="space-y-2">
                                 {faqs.map((faq) => (
                                     <div key={faq.id} className="border-b border-gray-200 py-4">
-                                        <button 
+                                        <button
                                             className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors"
                                             onClick={() => toggleFaq(faq.id)}
                                         >
@@ -232,11 +232,11 @@ const HelpPage = () => {
                                                 className={`bg-blue-100 text-blue-600 w-8 h-8 flex items-center justify-center rounded-full transform transition-transform duration-300 ${openFaqId === faq.id ? 'rotate-180' : ''}`}
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                                    <path d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                                                    <path d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
                                                 </svg>
                                             </div>
                                         </button>
-                                        
+
                                         <div className={`mt-3 text-gray-600 bg-gray-50 p-4 rounded-lg transition-all duration-300 overflow-hidden ${openFaqId === faq.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                                             {faq.answer.split('\n').map((text, i) => (
                                                 <p key={i} className="mb-2">{text}</p>
@@ -259,8 +259,8 @@ const HelpPage = () => {
                         <div className="bg-white rounded-xl p-6 shadow-md">
                             <div className="grid md:grid-cols-2 gap-6">
                                 {contactMethods.map((method, index) => (
-                                    <div 
-                                        key={index} 
+                                    <div
+                                        key={index}
                                         className={`bg-gradient-to-br ${method.color} p-6 rounded-lg shadow-md transition-all transform hover:-translate-y-1 hover:shadow-lg`}
                                     >
                                         <div className="flex items-center mb-3">
@@ -291,8 +291,8 @@ const HelpPage = () => {
                         <div className="bg-white rounded-xl p-6 shadow-md">
                             <div className="grid md:grid-cols-3 gap-6 h-full">
                                 {guides.map((guide, index) => (
-                                    <div 
-                                        key={index} 
+                                    <div
+                                        key={index}
                                         className={`${guide.bgColor} border-t-4 ${guide.accentColor} p-6 rounded-lg shadow-md transition-all h-full transform hover:-translate-y-2 hover:shadow-lg`}
                                     >
                                         <div className="flex items-center mb-4">

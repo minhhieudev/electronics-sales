@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaGreaterThan, FaStar } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addProductToCart } from '../../../app/redux/slices/user/cart.slice';
 import { fetchProductDetailAction } from '../../../app/redux/slices/user/product.slice';
@@ -31,6 +31,9 @@ const ProductDetail = () => {
     const addToCartBtnRef = useRef(null);
     const cartIconRef = useRef(null);
     const mainImageRef = useRef(null);
+
+    // Check if user is logged in
+    const isLogin = useSelector((state) => state.auth.isLogin);
 
     // Fetch data
     useEffect(() => {
@@ -80,6 +83,12 @@ const ProductDetail = () => {
 
     // Handle add to cart action
     const handleAddToCart = () => {
+        // Check if user is logged in
+        if (!isLogin) {
+            navigate('/auth');
+            return;
+        }
+
         // Check if animation is already running
         if (showAnimation) {
             return;
@@ -348,7 +357,7 @@ const ProductDetail = () => {
                         </div>
                         <div className="flex justify-between items-center py-1">
                             <div className="w-32 lg:w-40 text-gray-400">Bảo hành:</div>
-                            <div className="flex-1 px-3">{product.warranty}</div>
+                            <div className="flex-1 px-3">{product.warranty} tháng</div>
                         </div>
                     </div>
                 </div>

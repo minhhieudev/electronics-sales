@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { fetchCategories } from "../../../app/redux/slices/category.slice";
+import { fetchCategories } from "../../../app/redux/slices/admin/category.slice";
 import { FaEye, FaTrash } from "react-icons/fa";
 import SearchBar from "../../../components/admin/Searchbar";
 import Pagination from "../../../components/admin/Pagination";
@@ -13,6 +13,7 @@ import Modal from "../../../components/admin/Modal";
 import CategoryDetail from "./CategoryDetail";
 import CategoryUpdate from "./CategoryUpdate";
 import CategoryDelete from "./CategoryDelete";
+import { toast } from "react-toastify";
 
 const CategoryList = () => {
     const dispatch = useDispatch();
@@ -20,7 +21,6 @@ const CategoryList = () => {
     const [categories, setCategories] = useState([]);
     const [pageInfo, setPageInfo] = useState({ total: 0, totalPages: 0 });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false); 
     const [refresh, setRefresh] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -33,16 +33,15 @@ const CategoryList = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            setError(null);
             try {
-                const response = await dispatch(fetchCategories({ search: searchTerm, page }));
-                setCategories(response.payload.items || []);
+                const response = await dispatch(fetchCategories({ search: searchTerm, page, limit :6 })).unwrap();
+                setCategories(response.items || []);
                 setPageInfo({
-                    total: response.payload.pageInfo?.totalElements || 0,
-                    totalPages: response.payload.pageInfo?.totalPages || 0,
+                    total: response.pageInfo?.totalElements || 0,
+                    totalPages: response.pageInfo?.totalPages || 0,
                 });
-            } catch (err) {
-                setError(err.message);
+            } catch (error) {
+                toast.error(error);
             } finally {
                 setLoading(false);
             }
@@ -155,7 +154,6 @@ const CategoryList = () => {
             </div>
 
             {loading && <p className="text-center text-gray-600 mt-1">Đang tải dữ liệu...</p>}
-            {error && <p className="text-center text-red-600 mt-1">{error}</p>}
 
             <DataTable columns={columns} data={categories} />
 

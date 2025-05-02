@@ -3,8 +3,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { addBrand} from "../../../app/redux/slices/admin/brand.slice";
-import ModalAdd from "../../../components/admin/ModalAdd";
+import { updateBrand } from "../../../app/redux/slices/admin/brand.slice";
+import { useEffect } from "react";
+import ModalUpdate from "../../../components/admin/ModalUpdate";
 import MESSAGES from "../../../common/const";
 
 const schema = yup.object().shape({
@@ -12,21 +13,31 @@ const schema = yup.object().shape({
     description: yup.string().trim(),
 });
 
-const BrandAdd = ({ isOpen, onClose }) => {
+const BrandUpdate = ({ isOpen, onClose, brand }) => {
     const dispatch = useDispatch();
-
     const {
         register,
         handleSubmit,
         reset,
+        watch,
     } = useForm({
         resolver: yupResolver(schema),
     });
 
+    useEffect(() => {
+        if (brand) {
+            reset({
+                name: brand.name || "",
+                description: brand.description || "",
+            });
+        }
+    }, [brand, reset]);
+
     const onSubmit = async (data) => {
         try {
-            const response = await dispatch(addBrand(data)).unwrap();
+            const response = await dispatch(updateBrand({ id: brand.id, data })).unwrap();
             toast.success(response.message);
+            
             reset();
             onClose();
         } catch (error) {
@@ -38,25 +49,33 @@ const BrandAdd = ({ isOpen, onClose }) => {
         toast.error(errors.name.message);
     };
 
+    const watchedValues = watch(); 
+
+    const isChanged =
+        watchedValues.name?.trim() !== (brand?.name || "").trim() ||
+        watchedValues.description?.trim() !== (brand?.description || "").trim();
+
     return (
-        <ModalAdd isOpen={isOpen} onClose={onClose} title="Thêm mới thương hiệu" onSave={handleSubmit(onSubmit, onError)}>
+        <ModalUpdate isOpen={isOpen} onClose={onClose} title="Cập nhật danh mục" onSave={handleSubmit(onSubmit, onError) } isDisabled={!isChanged}>
             <label className="block text-lg font-semibold text-gray-700">
                 Tên <span className="text-red-500">*</span>
             </label>
             <input
                 type="text"
                 className="w-full p-3 bg-gray-100 rounded-lg mt-2 focus:ring focus:ring-indigo-400 outline-none text-sm"
+                defaultValue={brand ? brand.name : ""}
                 {...register("name")}
             />
-            
+
             <label className="block text-lg font-semibold text-gray-700 mt-3">Mô tả</label>
             <textarea
                 className="w-full p-3 bg-gray-100 rounded-lg mt-2 focus:ring focus:ring-indigo-400 outline-none text-sm"
                 rows="2"
+                defaultValue={brand ? brand.description : ""}
                 {...register("description")}
             ></textarea>
-        </ModalAdd>
+        </ModalUpdate>
     );
 };
 
-export default BrandAdd;
+export default BrandUpdate;

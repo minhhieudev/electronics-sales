@@ -14,31 +14,34 @@ import ProductDetail from "../pages/user/product/ProductDetail";
 import CartPage from "../pages/user/cart/CartPage";
 import HelpPage from "../pages/user/account/pages/HelpPage";
 import TermsPage from "../pages/user/account/pages/TermsPage";
+import PrivateRoute from "./PrivateRoute";
 
 const UserRoutes = () => {
     return (
-        <Routes>
-            <Route element={<UserLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
+        <PrivateRoute>
+            <Routes>
+                <Route element={<UserLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
 
                 {/* Account Routes */}
-                <Route path="/account" element={<AccountPage />}>
-                    <Route index element={<ProfileContent />} />
-                    <Route path="profile" element={<ProfileContent />} />
-                    <Route path="orders" element={<OrdersContent />} />
-                    <Route path="orders/:orderId" element={<DetailOrder />} />
-                    <Route path="help" element={<HelpPage />} />
-                    <Route path="terms" element={<TermsPage />} />
-                </Route>
+                    <Route path="/account" element={<AccountPage />}>
+                        <Route index element={<ProfileContent />} />
+                        <Route path="profile" element={<ProfileContent />} />
+                        <Route path="orders" element={<OrdersContent />} />
+                        <Route path="orders/:orderId" element={<DetailOrder />} />
+                        <Route path="help" element={<HelpPage />} />
+                        <Route path="terms" element={<TermsPage />} />
+                    </Route>
 
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/checkout/success" element={<OrderSuccess />} />
-                <Route path="/cart" element={<CartPage />} />
-            </Route>
-            <Route path="/auth" element={<AuthForm />} />
-            <Route path="*" element={<PageNotFound />} />
-        </Routes>
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/checkout/success" element={<OrderSuccess />} />
+                    <Route path="/cart" element={<CartPage />} />
+                </Route>
+                <Route path="/auth" element={<AuthForm />} />
+                <Route path="*" element={<PageNotFound />} />
+            </Routes>
+        </PrivateRoute>
     );
 };
 

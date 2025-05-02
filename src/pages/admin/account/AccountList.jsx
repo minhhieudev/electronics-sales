@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { fetchAccounts } from "../../../app/redux/slices/account.slice";
+import { fetchAccounts } from "../../../app/redux/slices/admin/account.slice";
 import SearchBar from "../../../components/admin/Searchbar";
 import Pagination from "../../../components/admin/Pagination";
 import DataTable from "../../../components/admin/DataTable";
@@ -9,6 +9,8 @@ import { FaEye, FaTrash } from "react-icons/fa";
 import Modal from "../../../components/admin/Modal";
 import AccountDetails from "./AccountDetail";
 import AccountDelete from "./AccountDelete";
+import { toast } from "react-toastify";
+
 
 const AccountList = () => {
   const dispatch = useDispatch();
@@ -16,7 +18,6 @@ const AccountList = () => {
   const [accounts, setAccounts] = useState([]);
   const [pageInfo, setPageInfo] = useState({ total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const searchTerm = searchParams.get("search") || "";
   const page = parseInt(searchParams.get("page")) || 1;
@@ -30,16 +31,16 @@ const AccountList = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const response = await dispatch(fetchAccounts({ search: searchTerm, page }));
-        setAccounts(response.payload.items || []);
+        const response = await dispatch(fetchAccounts({ search: searchTerm, page })).unwrap();
+        setAccounts(response.items || []);
         setPageInfo({
-          total: response.payload.pageInfo?.totalElements || 0,
-          totalPages: response.payload.pageInfo?.totalPages || 0,
+          total: response.pageInfo?.totalElements || 0,
+          totalPages: response.pageInfo?.totalPages || 0,
         });
-      } catch (err) {
-        setError(err);
+      } catch (error) {
+        toast.error(error);
+
       } finally {
         setLoading(false);
       }
@@ -137,7 +138,6 @@ const closeDeleteModal = () => {
       </div>
 
       {loading && <p className="text-center text-gray-600 mt-3">Đang tải dữ liệu...</p>}
-      {error && <p className="text-center text-red-600 mt-3">{error}</p>}
 
       <DataTable columns={columns} data={accounts} />
 
